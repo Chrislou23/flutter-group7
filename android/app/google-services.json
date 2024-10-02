@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "556788420487",
+    "project_id": "mobile-games-2783a",
+    "storage_bucket": "mobile-games-2783a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:556788420487:android:d629eff7a7f3ba5c090d22",
+        "android_client_info": {
+          "package_name": "com.example.mobile_games"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXNxxGYxxSFe281zNUZzPwjfxUU2HgFOo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
