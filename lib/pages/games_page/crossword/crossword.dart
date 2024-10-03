@@ -5,8 +5,24 @@ class CrosswordGame extends StatefulWidget {
   const CrosswordGame({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _CrosswordGameState createState() => _CrosswordGameState();
+}
+
+class CrosswordWord {
+  String word;
+  String clue;
+  int row;
+  int col;
+  bool isHorizontal;
+  int number;
+  CrosswordWord({
+    required this.word,
+    required this.clue,
+    required this.row,
+    required this.col,
+    required this.isHorizontal,
+    required this.number,
+  });
 }
 
 class _CrosswordGameState extends State<CrosswordGame> {
@@ -15,14 +31,47 @@ class _CrosswordGameState extends State<CrosswordGame> {
   late List<List<TextEditingController?>> controllers;
   late List<List<int?>> numbers;
 
-  final List<Map<String, String>> crosswordData = [
-    {'word': 'HELLO', 'clue': '1. A greeting'},
-    {'word': 'TREE', 'clue': '2. A tall plant'},
-    {'word': 'HOUSE', 'clue': '3. A place where people live'},
-    {'word': 'DOG', 'clue': '4. A loyal pet'}
+  TextEditingController wordInputController = TextEditingController();
+
+  final List<CrosswordWord> crosswordData = [
+    CrosswordWord(
+        word: 'HELLO',
+        clue: '1. A greeting',
+        row: 1,
+        col: 2,
+        isHorizontal: true,
+        number: 1),
+    CrosswordWord(
+        word: 'HOUSE',
+        clue: '2. A place where people live',
+        row: 1,
+        col: 2,
+        isHorizontal: false,
+        number: 2),
+    CrosswordWord(
+        word: 'TREE',
+        clue: '3. A tall plant',
+        row: 5,
+        col: 0,
+        isHorizontal: true,
+        number: 3),
+    CrosswordWord(
+        word: 'DOG',
+        clue: '4. A loyal pet',
+        row: 0,
+        col: 6,
+        isHorizontal: false,
+        number: 4),
+    CrosswordWord(
+        word: 'PLANT',
+        clue: '5. A living thing that grows on earth',
+        row: 1,
+        col: 0,
+        isHorizontal: false,
+        number: 5),
   ];
 
-  int? selectedClueIndex; // Store the index of the selected word
+  int? selectedClueIndex;
 
   @override
   void initState() {
@@ -34,26 +83,30 @@ class _CrosswordGameState extends State<CrosswordGame> {
   }
 
   void _generateCrossword() {
-    _placeWord('HELLO', 0, 0, true, 1);
-    _placeWord('TREE', 2, 2, false, 2);
-    _placeWord('HOUSE', 2, 2, true, 3);
-    _placeWord('DOG', 4, 2, true, 4);
+    for (var wordData in crosswordData) {
+      _placeWord(wordData.word, wordData.row, wordData.col,
+          wordData.isHorizontal, wordData.number);
+    }
   }
 
-  void _placeWord(
-      String word, int row, int col, bool isHorizontal, int number) {
+  void _placeWord(String word, int row, int col, bool isHorizontal, int number) {
     for (int i = 0; i < word.length; i++) {
       int currentRow = row + (isHorizontal ? 0 : i);
       int currentCol = col + (isHorizontal ? i : 0);
 
-      // If there's already a letter, check if it matches the one we're placing
+      // Vérifier les limites de la grille
+      if (currentRow >= gridSize || currentCol >= gridSize) {
+        return;
+      }
+
+      // Si une lettre existe déjà et est différente, ne pas placer le mot
       if (grid[currentRow][currentCol] != null &&
           grid[currentRow][currentCol] != word[i]) {
-        return; // Conflict found, don't place this word
+        return;
       }
 
       grid[currentRow][currentCol] = word[i];
-      controllers[currentRow][currentCol] = TextEditingController();
+      controllers[currentRow][currentCol] ??= TextEditingController();
       if (i == 0) {
         numbers[currentRow][currentCol] = number;
       }
@@ -72,56 +125,37 @@ class _CrosswordGameState extends State<CrosswordGame> {
     return true;
   }
 
-  // Handle clue selection
   void _selectClue(int index) {
     setState(() {
       selectedClueIndex = index;
+      wordInputController.clear();
     });
   }
 
-  // Function to update the grid based on user input in the selected word field
   void _updateSelectedWord(String input) {
     if (selectedClueIndex == null) return;
 
-    String word = crosswordData[selectedClueIndex!]['word']!;
-    int row, col;
-    bool isHorizontal;
-
-    // Positions based on where the words are placed
-    if (selectedClueIndex == 0) {
-      row = 0;
-      col = 0;
-      isHorizontal = true;
-    } else if (selectedClueIndex == 1) {
-      row = 2;
-      col = 2;
-      isHorizontal = false;
-    } else if (selectedClueIndex == 2) {
-      row = 2;
-      col = 2;
-      isHorizontal = true;
-    } else if (selectedClueIndex == 3) {
-      row = 4;
-      col = 2;
-      isHorizontal = true;
-    } else {
-      return;
-    }
+    var selectedWordData = crosswordData[selectedClueIndex!];
+    String word = selectedWordData.word;
+    int row = selectedWordData.row;
+    int col = selectedWordData.col;
+    bool isHorizontal = selectedWordData.isHorizontal;
 
     for (int i = 0; i < word.length && i < input.length; i++) {
-      if (isHorizontal) {
-        controllers[row][col + i]?.text = input[i].toUpperCase();
-      } else {
-        controllers[row + i][col]?.text = input[i].toUpperCase();
+      int currentRow = row + (isHorizontal ? 0 : i);
+      int currentCol = col + (isHorizontal ? i : 0);
+
+      if (currentRow >= gridSize || currentCol >= gridSize) {
+        continue;
       }
+
+      controllers[currentRow][currentCol]?.text = input[i].toUpperCase();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    double cellSize = min(screenWidth, screenHeight) / gridSize;
+    double cellSize = MediaQuery.of(context).size.width / gridSize;
 
     return Scaffold(
       appBar: AppBar(
@@ -147,34 +181,20 @@ class _CrosswordGameState extends State<CrosswordGame> {
                   String? letter = grid[row][col];
                   int? number = numbers[row][col];
 
+                  // Ne pas afficher les cases qui ne contiennent pas de lettres
+                  if (letter == null) {
+                    return Container(); // Retourner un conteneur vide pour les cases vides
+                  }
+
                   bool isHighlighted = false;
                   if (selectedClueIndex != null) {
-                    String word = crosswordData[selectedClueIndex!]['word']!;
-                    int startRow, startCol;
-                    bool horizontal;
+                    var selectedWord = crosswordData[selectedClueIndex!];
+                    int startRow = selectedWord.row;
+                    int startCol = selectedWord.col;
+                    String word = selectedWord.word;
+                    bool isHorizontal = selectedWord.isHorizontal;
 
-                    // Highlighting based on the selected word's position
-                    if (selectedClueIndex == 0) {
-                      startRow = 0;
-                      startCol = 0;
-                      horizontal = true;
-                    } else if (selectedClueIndex == 1) {
-                      startRow = 2;
-                      startCol = 2;
-                      horizontal = false;
-                    } else if (selectedClueIndex == 2) {
-                      startRow = 2;
-                      startCol = 2;
-                      horizontal = true;
-                    } else if (selectedClueIndex == 3) {
-                      startRow = 4;
-                      startCol = 2;
-                      horizontal = true;
-                    } else {
-                      return Container();
-                    }
-
-                    if (horizontal) {
+                    if (isHorizontal) {
                       isHighlighted = row == startRow &&
                           col >= startCol &&
                           col < startCol + word.length;
@@ -193,27 +213,16 @@ class _CrosswordGameState extends State<CrosswordGame> {
                         height: cellSize,
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.black),
-                          color: isHighlighted
-                              ? Colors.yellow
-                              : letter != null
-                                  ? Colors.white
-                                  : Colors.grey[300],
+                          color: isHighlighted ? Colors.yellow : Colors.white,
                         ),
-                        child: letter != null
-                            ? TextField(
-                                controller: controllers[row][col],
-                                textAlign: TextAlign.center,
-                                decoration: const InputDecoration(
-                                    border: InputBorder.none),
-                                style: const TextStyle(fontSize: 20),
-                                maxLength: 1,
-                                buildCounter: (_,
-                                        {int? currentLength,
-                                        bool? isFocused,
-                                        int? maxLength}) =>
-                                    null,
-                              )
-                            : null,
+                        child: TextField(
+                          controller: controllers[row][col],
+                          textAlign: TextAlign.center,
+                          decoration: const InputDecoration(border: InputBorder.none),
+                          style: const TextStyle(fontSize: 20),
+                          maxLength: 1,
+                          buildCounter: (_, {int? currentLength, bool? isFocused, int? maxLength}) => null,
+                        ),
                       ),
                       if (number != null)
                         Positioned(
@@ -236,7 +245,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
               itemCount: crosswordData.length,
               itemBuilder: (BuildContext context, int index) {
                 return ListTile(
-                  title: Text(crosswordData[index]['clue']!),
+                  title: Text(crosswordData[index].clue),
                   onTap: () => _selectClue(index),
                   selected: selectedClueIndex == index,
                 );
@@ -247,6 +256,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
+                controller: wordInputController,
                 decoration: const InputDecoration(
                   labelText: 'Enter the word for the selected clue',
                   border: OutlineInputBorder(),
@@ -264,8 +274,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: const Text('Congratulations!'),
-                        content:
-                            const Text('You have completed the crossword!'),
+                        content: const Text('You have completed the crossword!'),
                         actions: <Widget>[
                           TextButton(
                             child: const Text('OK'),
