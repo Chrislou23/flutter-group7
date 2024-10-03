@@ -21,12 +21,36 @@ class _LinkGamePageState extends State<LinkGamePage> {
 
   void initGame() {
     items = [
-      ItemModel(name: 'Apple', value: 'apple', imageUrl: 'https://icons.iconarchive.com/icons/fi3ur/fruitsalad/128/watermelon-icon.png'),
-      ItemModel(name: 'Banana', value: 'banana', imageUrl: 'https://icons.iconarchive.com/icons/iconicon/veggies/256/bananas-icon.png'),
-      ItemModel(name: 'Cherry', value: 'cherry', imageUrl: 'https://icons.iconarchive.com/icons/fi3ur/fruitsalad/128/apple-icon.png'),
-      ItemModel(name: 'Pear', value: 'pear', imageUrl: 'https://icons.iconarchive.com/icons/fi3ur/fruitsalad/128/apple-icon.png'),
-      ItemModel(name: 'Grape', value: 'grape', imageUrl: 'https://icons.iconarchive.com/icons/fi3ur/fruitsalad/128/apple-icon.png'),
-      ItemModel(name: 'Strawberry', value: 'strawberry', imageUrl: 'https://icons.iconarchive.com/icons/fi3ur/fruitsalad/128/apple-icon.png'),
+      ItemModel(
+          name: 'Apple',
+          value: 'apple',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/fi3ur/fruitsalad/128/apple-icon.png'),
+      ItemModel(
+          name: 'Banana',
+          value: 'banana',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/iconicon/veggies/256/bananas-icon.png'),
+      ItemModel(
+          name: 'Cherry',
+          value: 'cherry',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/iconarchive/realistic-fruits/128/Cherry-icon.png'),
+      ItemModel(
+          name: 'Pear',
+          value: 'pear',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/google/noto-emoji-food-drink/128/32351-pear-icon.png'),
+      ItemModel(
+          name: 'Grape',
+          value: 'grape',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/google/noto-emoji-food-drink/128/32341-grapes-icon.png'),
+      ItemModel(
+          name: 'Strawberry',
+          value: 'strawberry',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/fi3ur/fruitsalad/128/strawberry-icon.png'),
     ];
 
     // copy of the items list for the drag targets
@@ -38,10 +62,38 @@ class _LinkGamePageState extends State<LinkGamePage> {
     isGameOver = false;
   }
 
-  @override
-  Widget build(BuildContext context) {
+  void checkGameOver() {
+    // Check if all items are matched
     if (items.isEmpty) {
       isGameOver = true;
+      showCongratulationsDialog();
+    }
+  }
+
+  void showCongratulationsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Congratulations!'),
+          content: const Text('You have matched all the items correctly!'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (items.isEmpty && !isGameOver) {
+      checkGameOver();
     }
 
     return Scaffold(
@@ -73,18 +125,21 @@ class _LinkGamePageState extends State<LinkGamePage> {
                               opacity: 0.5,
                               child: Text(
                                 item.name,
-                                style: const TextStyle(fontSize: 24, color: Colors.grey),
+                                style: const TextStyle(
+                                    fontSize: 24, color: Colors.grey),
                               ),
                             ),
                             feedback: Material(
                               child: Text(
                                 item.name,
-                                style: const TextStyle(fontSize: 24, color: Colors.teal),
+                                style: const TextStyle(
+                                    fontSize: 24, color: Colors.teal),
                               ),
                             ),
                             child: Text(
                               item.name,
-                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                  fontSize: 24, fontWeight: FontWeight.bold),
                             ),
                           ),
                         );
@@ -106,6 +161,7 @@ class _LinkGamePageState extends State<LinkGamePage> {
                                 itemsToMatch.remove(item);
                                 score += 10;
                               });
+                              checkGameOver();
                             } else {
                               setState(() {
                                 score -= 5;
@@ -113,7 +169,8 @@ class _LinkGamePageState extends State<LinkGamePage> {
                             }
                           },
                           onWillAccept: (receivedItem) => true,
-                          builder: (context, acceptedItems, rejectedItems) => Container(
+                          builder: (context, acceptedItems, rejectedItems) =>
+                              Container(
                             margin: const EdgeInsets.all(8.0),
                             color: Colors.teal.withOpacity(0.5),
                             height: 80,
@@ -137,7 +194,10 @@ class _LinkGamePageState extends State<LinkGamePage> {
                   children: [
                     const Text(
                       'Game Over!',
-                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.red),
+                      style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red),
                     ),
                     ElevatedButton(
                       onPressed: () {
