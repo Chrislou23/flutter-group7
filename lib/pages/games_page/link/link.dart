@@ -11,6 +11,7 @@ class _LinkGamePageState extends State<LinkGame> {
   List<ItemModel> items = [];
   List<ItemModel> itemsToMatch = [];
   int score = 0;
+  int level = 1;
   bool isGameOver = false;
 
   @override
@@ -20,7 +21,8 @@ class _LinkGamePageState extends State<LinkGame> {
   }
 
   void initGame() {
-    items = [
+    // Define items for the game
+    List<ItemModel> allItems = [
       ItemModel(
         name: 'Happy',
         finnishName: 'Iloinen',
@@ -65,8 +67,12 @@ class _LinkGamePageState extends State<LinkGame> {
       ),
     ];
 
-    // copy of the items list for the drag targets
+    // Set difficulty based on the level
+    int itemsPerLevel = 2 + (level - 1); // Increase items with each level
+
+    items = allItems.sublist(0, itemsPerLevel);
     itemsToMatch = List<ItemModel>.from(items);
+
     items.shuffle();
     itemsToMatch.shuffle();
 
@@ -77,22 +83,30 @@ class _LinkGamePageState extends State<LinkGame> {
   void checkGameOver() {
     // Check if all items are matched
     if (items.isEmpty) {
-      isGameOver = true;
-      showCongratulationsDialog();
+      if (level < 5) {
+        level++;
+        initGame(); // Move to the next level
+      } else {
+        isGameOver = true;
+        showFinalScoreDialog(); // Game completed, show final score
+      }
+      setState(() {});
     }
   }
 
-  void showCongratulationsDialog() {
+  void showFinalScoreDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Congratulations!'),
-          content: const Text('You have matched all the items correctly!'),
+          content:
+              Text('You have completed all levels!\nYour final score: $score'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
+                resetGame(); // Reset the game for a new round
               },
               child: const Text('Close'),
             ),
@@ -100,6 +114,13 @@ class _LinkGamePageState extends State<LinkGame> {
         );
       },
     );
+  }
+
+  void resetGame() {
+    level = 1;
+    score = 0;
+    initGame();
+    setState(() {});
   }
 
   @override
@@ -119,6 +140,10 @@ class _LinkGamePageState extends State<LinkGame> {
             Text(
               'Score: $score',
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              'Level: $level',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 20),
             if (!isGameOver)
@@ -252,8 +277,7 @@ class _LinkGamePageState extends State<LinkGame> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        initGame();
-                        setState(() {});
+                        resetGame();
                       },
                       child: const Text('New Game'),
                     ),
