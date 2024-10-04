@@ -22,35 +22,47 @@ class _LinkGamePageState extends State<LinkGame> {
   void initGame() {
     items = [
       ItemModel(
-          name: 'Apple',
-          value: 'apple',
-          imageUrl:
-              'https://icons.iconarchive.com/icons/fi3ur/fruitsalad/128/apple-icon.png'),
+        name: 'Happy',
+        finnishName: 'Iloinen',
+        value: 'happy',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/seanau/flat-smiley/128/Smiley-1-icon.png',
+      ),
       ItemModel(
-          name: 'Banana',
-          value: 'banana',
-          imageUrl:
-              'https://icons.iconarchive.com/icons/iconicon/veggies/256/bananas-icon.png'),
+        name: 'Sad',
+        finnishName: 'Surullinen',
+        value: 'sad',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/icons-land/flat-emoticons/128/Cry-icon.png',
+      ),
       ItemModel(
-          name: 'Cherry',
-          value: 'cherry',
-          imageUrl:
-              'https://icons.iconarchive.com/icons/iconarchive/realistic-fruits/128/Cherry-icon.png'),
+        name: 'Angry',
+        finnishName: 'Vihainen',
+        value: 'angry',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Angry-Face-Flat-icon.png',
+      ),
       ItemModel(
-          name: 'Pear',
-          value: 'pear',
-          imageUrl:
-              'https://icons.iconarchive.com/icons/google/noto-emoji-food-drink/128/32351-pear-icon.png'),
+        name: 'Fearful',
+        finnishName: 'Pelokas',
+        value: 'fearful',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Fearful-Face-Flat-icon.png',
+      ),
       ItemModel(
-          name: 'Grape',
-          value: 'grape',
-          imageUrl:
-              'https://icons.iconarchive.com/icons/google/noto-emoji-food-drink/128/32341-grapes-icon.png'),
+        name: 'Surprised',
+        finnishName: 'Yllättynyt',
+        value: 'surprised',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Astonished-Face-Flat-icon.png',
+      ),
       ItemModel(
-          name: 'Strawberry',
-          value: 'strawberry',
-          imageUrl:
-              'https://icons.iconarchive.com/icons/fi3ur/fruitsalad/128/strawberry-icon.png'),
+        name: 'Loving',
+        finnishName: 'Rakkaudellinen',
+        value: 'loving',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/icons-land/flat-emoticons/128/Adore-icon.png',
+      ),
     ];
 
     // copy of the items list for the drag targets
@@ -138,7 +150,7 @@ class _LinkGamePageState extends State<LinkGame> {
                             childWhenDragging: Opacity(
                               opacity: 0.5,
                               child: Text(
-                                item.name,
+                                '${item.name} / ${item.finnishName}',
                                 style: const TextStyle(
                                     fontSize: 24,
                                     color: Colors.grey,
@@ -154,7 +166,7 @@ class _LinkGamePageState extends State<LinkGame> {
                             feedback: Material(
                               color: Colors.transparent,
                               child: Text(
-                                item.name,
+                                '${item.name} / ${item.finnishName}',
                                 style: const TextStyle(
                                     fontSize: 26,
                                     color: Colors.teal,
@@ -168,7 +180,7 @@ class _LinkGamePageState extends State<LinkGame> {
                               ),
                             ),
                             child: Text(
-                              item.name,
+                              '${item.name} / ${item.finnishName}',
                               style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
@@ -257,11 +269,13 @@ class _LinkGamePageState extends State<LinkGame> {
 
 class ItemModel {
   final String name;
+  final String finnishName;
   final String value;
   final String imageUrl;
 
   ItemModel({
     required this.name,
+    required this.finnishName,
     required this.value,
     required this.imageUrl,
   });
