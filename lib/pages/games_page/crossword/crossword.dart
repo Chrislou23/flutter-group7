@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 
 class CrosswordGame extends StatefulWidget {
   const CrosswordGame({super.key});
@@ -89,7 +88,8 @@ class _CrosswordGameState extends State<CrosswordGame> {
     }
   }
 
-  void _placeWord(String word, int row, int col, bool isHorizontal, int number) {
+  void _placeWord(
+      String word, int row, int col, bool isHorizontal, int number) {
     for (int i = 0; i < word.length; i++) {
       int currentRow = row + (isHorizontal ? 0 : i);
       int currentCol = col + (isHorizontal ? i : 0);
@@ -218,10 +218,15 @@ class _CrosswordGameState extends State<CrosswordGame> {
                         child: TextField(
                           controller: controllers[row][col],
                           textAlign: TextAlign.center,
-                          decoration: const InputDecoration(border: InputBorder.none),
+                          decoration:
+                              const InputDecoration(border: InputBorder.none),
                           style: const TextStyle(fontSize: 20),
                           maxLength: 1,
-                          buildCounter: (_, {int? currentLength, bool? isFocused, int? maxLength}) => null,
+                          buildCounter: (_,
+                                  {int? currentLength,
+                                  bool? isFocused,
+                                  int? maxLength}) =>
+                              null,
                         ),
                       ),
                       if (number != null)
@@ -274,7 +279,8 @@ class _CrosswordGameState extends State<CrosswordGame> {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: const Text('Congratulations!'),
-                        content: const Text('You have completed the crossword!'),
+                        content:
+                            const Text('You have completed the crossword!'),
                         actions: <Widget>[
                           TextButton(
                             child: const Text('OK'),

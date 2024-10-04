@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_games/pages/games_page/crossword_game_page.dart';
+import 'package:mobile_games/pages/games_page/crossword/crossword_game_page.dart';
+import 'package:mobile_games/pages/games_page/link/link_game_page.dart';
+
+//link
 
 class GamePage extends StatelessWidget {
   const GamePage({Key? key}) : super(key: key);
@@ -38,7 +41,7 @@ class GamePage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const GameSelectionPage(),
+                        builder: (context) => const CrosswordGamePage(),
                       ),
                     );
                   },
@@ -52,14 +55,29 @@ class GamePage extends StatelessWidget {
                   ),
                 ),
               ),
+              // Add Link Game
               Expanded(
-                child: Container(
-                  margin: const EdgeInsets.all(8.0),
-                  color: Colors.grey[300],
-                  height: 150,
-                  child: const Center(
-                    child: Text(
-                        'Game 2: Coming Soon'), // Placeholder for second game, non-clickable
+                child: GestureDetector(
+                  onTap: () {
+                    // Navigate to Link Game
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const LinkGamePage(), // Navigate to LinkGamePage which is link.dart
+                      ),
+                    );
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.all(8.0),
+                    color: Colors.grey[300],
+                    height: 150,
+                    child: const Center(
+                      child: Text(
+                        'Game 2: Link Game', // Updated text for Link Game
+                      ),
+                    ),
                   ),
                 ),
               ),

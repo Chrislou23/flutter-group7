@@ -22,6 +22,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/game': (context) => const GamePage(),
         '/friends': (context) => const FriendPage(),
+      
       },
     );
   }
