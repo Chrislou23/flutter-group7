@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class LinkGamePage extends StatefulWidget {
-  const LinkGamePage({Key? key}) : super(key: key);
+class LinkGame extends StatefulWidget {
+  const LinkGame({Key? key}) : super(key: key);
 
   @override
   _LinkGamePageState createState() => _LinkGamePageState();
 }
 
-class _LinkGamePageState extends State<LinkGamePage> {
+class _LinkGamePageState extends State<LinkGame> {
   List<ItemModel> items = [];
   List<ItemModel> itemsToMatch = [];
   int score = 0;

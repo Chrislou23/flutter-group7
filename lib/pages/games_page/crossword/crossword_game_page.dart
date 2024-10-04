@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_games/pages/games_page/crossword/crossword.dart';
 
-class GameSelectionPage extends StatelessWidget {
-  const GameSelectionPage({super.key});
+class CrosswordGamePage extends StatelessWidget {
+  const CrosswordGamePage({super.key});
 
   @override
   Widget build(BuildContext context) {
