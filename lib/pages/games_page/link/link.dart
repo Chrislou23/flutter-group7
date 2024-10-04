@@ -119,6 +119,20 @@ class _LinkGamePageState extends State<LinkGame> {
                       children: items.map((item) {
                         return Container(
                           margin: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            color: Colors.tealAccent.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.teal, width: 2),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black26,
+                                offset: Offset(2, 2),
+                                blurRadius: 5,
+                                spreadRadius: 1,
+                              )
+                            ],
+                          ),
                           child: Draggable<ItemModel>(
                             data: item,
                             childWhenDragging: Opacity(
@@ -126,20 +140,45 @@ class _LinkGamePageState extends State<LinkGame> {
                               child: Text(
                                 item.name,
                                 style: const TextStyle(
-                                    fontSize: 24, color: Colors.grey),
+                                    fontSize: 24,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.bold,
+                                    shadows: [
+                                      Shadow(
+                                          color: Colors.black26,
+                                          offset: Offset(1, 2),
+                                          blurRadius: 2)
+                                    ]),
                               ),
                             ),
                             feedback: Material(
+                              color: Colors.transparent,
                               child: Text(
                                 item.name,
                                 style: const TextStyle(
-                                    fontSize: 24, color: Colors.teal),
+                                    fontSize: 26,
+                                    color: Colors.teal,
+                                    fontWeight: FontWeight.bold,
+                                    shadows: [
+                                      Shadow(
+                                          color: Colors.black26,
+                                          offset: Offset(1, 2),
+                                          blurRadius: 3)
+                                    ]),
                               ),
                             ),
                             child: Text(
                               item.name,
                               style: const TextStyle(
-                                  fontSize: 24, fontWeight: FontWeight.bold),
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                  shadows: [
+                                    Shadow(
+                                        color: Colors.black26,
+                                        offset: Offset(1, 2),
+                                        blurRadius: 3)
+                                  ]),
                             ),
                           ),
                         );
