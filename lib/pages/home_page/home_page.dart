@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
         leading: IconButton(
           icon: const Icon(Icons.account_circle, color: Colors.black),
           onPressed: () {
-            // Action for account icon
+            Navigator.pushNamed(context, '/account');
           },
         ),
         title: const Text('Title', style: TextStyle(color: Colors.black)),
