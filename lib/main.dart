@@ -24,6 +24,7 @@ class MyApp extends StatelessWidget {
         '/game': (context) => const GamePage(),
         '/friends': (context) => const FriendPage(),
         '/account': (context) => const LoginPage()
+
       },
     );
   }
