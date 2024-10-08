@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_games/pages/games_page/link/link.dart';
+import 'package:mobile_games/pages/games_page/link/link_instructions.dart';
 
 class LinkGamePage extends StatelessWidget {
   const LinkGamePage({super.key});
@@ -15,7 +17,7 @@ class LinkGamePage extends StatelessWidget {
             Navigator.pop(context); // Navigate back to previous page
           },
         ),
-        title: const Text('Game Title', style: TextStyle(color: Colors.black)),
+        title: const Text('Link Game', style: TextStyle(color: Colors.black)),
         centerTitle: true,
         actions: [
           IconButton(
@@ -50,20 +52,24 @@ class LinkGamePage extends StatelessWidget {
             text: 'Create a private game',
             onPressed: () {
               // Action for creating a private game
-              print('Create a private game pressed');
+              if (kDebugMode) {
+                print('Create a private game pressed');
+              }
             },
           ),
           const SizedBox(height: 10),
           CustomButton(
             text: 'Fast game',
             onPressed: () {
-              // open the link game
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const LinkGame(),
                 ),
               );
+              if (kDebugMode) {
+                print('Fast game pressed');
+              }
             },
           ),
         ],
@@ -74,7 +80,7 @@ class LinkGamePage extends StatelessWidget {
 
 // Widget for Tab Buttons (Game, Rank, How to play)
 class TabButtons extends StatelessWidget {
-  const TabButtons({Key? key}) : super(key: key);
+  const TabButtons({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +90,9 @@ class TabButtons extends StatelessWidget {
         GestureDetector(
           onTap: () {
             // Handle Game tab tap
-            print('Game tab pressed');
+            if (kDebugMode) {
+              print('Game tab pressed');
+            }
           },
           child: const Text('Game', style: TextStyle(fontSize: 18)),
         ),
@@ -92,7 +100,9 @@ class TabButtons extends StatelessWidget {
         GestureDetector(
           onTap: () {
             // Handle Rank tab tap
-            print('Rank tab pressed');
+            if (kDebugMode) {
+              print('Rank tab pressed');
+            }
           },
           child: const Text('Rank', style: TextStyle(fontSize: 18)),
         ),
@@ -100,7 +110,12 @@ class TabButtons extends StatelessWidget {
         GestureDetector(
           onTap: () {
             // Handle How to play tab tap
-            print('How to play tab pressed');
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const LinkInstructions(),
+              ),
+            );
           },
           child: const Text('How to play', style: TextStyle(fontSize: 18)),
         ),
