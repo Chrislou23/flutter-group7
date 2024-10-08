@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'pages/home_page/home_page.dart';
 import 'pages/games_page/game_page.dart';
 import 'pages/friends_page/friend_page.dart';
 import 'pages/account_page/account_page.dart';
+import 'timer_provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => TimerProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -14,6 +23,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey, // Utilisez le navigatorKey global ici
       debugShowCheckedModeBanner: false,
       title: 'Game App',
       theme: ThemeData(
@@ -23,8 +33,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/game': (context) => const GamePage(),
         '/friends': (context) => const FriendPage(),
-        '/account': (context) => const LoginPage()
-
+        '/account': (context) => const LoginPage(),
       },
     );
   }
