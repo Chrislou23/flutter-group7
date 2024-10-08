@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_games/pages/games_page/crossword/crossword.dart';
+import 'package:mobile_games/pages/games_page/crossword/crossword_instructions.dart';
 
 class CrosswordGamePage extends StatelessWidget {
   const CrosswordGamePage({super.key});
@@ -15,7 +17,8 @@ class CrosswordGamePage extends StatelessWidget {
             Navigator.pop(context); // Navigate back to previous page
           },
         ),
-        title: const Text('Game Title', style: TextStyle(color: Colors.black)),
+        title:
+            const Text('Crossword Game', style: TextStyle(color: Colors.black)),
         centerTitle: true,
         actions: [
           IconButton(
@@ -50,7 +53,9 @@ class CrosswordGamePage extends StatelessWidget {
             text: 'Create a private game',
             onPressed: () {
               // Action for creating a private game
-              print('Create a private game pressed');
+              if (kDebugMode) {
+                print('Create a private game pressed');
+              }
             },
           ),
           const SizedBox(height: 10),
@@ -74,7 +79,7 @@ class CrosswordGamePage extends StatelessWidget {
 
 // Widget for Tab Buttons (Game, Rank, How to play)
 class TabButtons extends StatelessWidget {
-  const TabButtons({Key? key}) : super(key: key);
+  const TabButtons({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +89,9 @@ class TabButtons extends StatelessWidget {
         GestureDetector(
           onTap: () {
             // Handle Game tab tap
-            print('Game tab pressed');
+            if (kDebugMode) {
+              print('Game tab pressed');
+            }
           },
           child: const Text('Game', style: TextStyle(fontSize: 18)),
         ),
@@ -92,7 +99,9 @@ class TabButtons extends StatelessWidget {
         GestureDetector(
           onTap: () {
             // Handle Rank tab tap
-            print('Rank tab pressed');
+            if (kDebugMode) {
+              print('Rank tab pressed');
+            }
           },
           child: const Text('Rank', style: TextStyle(fontSize: 18)),
         ),
@@ -100,7 +109,12 @@ class TabButtons extends StatelessWidget {
         GestureDetector(
           onTap: () {
             // Handle How to play tab tap
-            print('How to play tab pressed');
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CrosswordInstructions(),
+              ),
+            );
           },
           child: const Text('How to play', style: TextStyle(fontSize: 18)),
         ),
