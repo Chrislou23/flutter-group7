@@ -19,13 +19,33 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(), // Start with the HomePage
+      home: const ResponsiveHomePage(), // Use a responsive home page
       routes: {
         '/game': (context) => const GamePage(),
         '/friends': (context) => const FriendPage(),
         '/account': (context) => const LoginPage()
-
       },
     );
+  }
+}
+
+class ResponsiveHomePage extends StatelessWidget {
+  const ResponsiveHomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+
+    if (screenSize.width < 600) {
+      // Mobile layout
+      return const HomePage();
+    } else {
+      // Tablet/Desktop layout
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Game App - Tablet/Desktop Layout'),
+        ),
+      );
+    }
   }
 }
