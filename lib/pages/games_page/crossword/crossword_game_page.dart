@@ -1,10 +1,25 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_games/pages/games_page/crossword/crossword.dart';
-import 'package:mobile_games/pages/games_page/crossword/crossword_instructions.dart';
+import 'package:mobile_games/pages/games_page/crossword/crossword_instructions_en.dart';
+import 'package:mobile_games/pages/games_page/crossword/crossword_instructions_fi.dart';
 
-class CrosswordGamePage extends StatelessWidget {
+class CrosswordGamePage extends StatefulWidget {
   const CrosswordGamePage({super.key});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _CrosswordGamePageState createState() => _CrosswordGamePageState();
+}
+
+class _CrosswordGamePageState extends State<CrosswordGamePage> {
+  bool isEnglish = true;
+
+  void toggleLanguage() {
+    setState(() {
+      isEnglish = !isEnglish;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +61,7 @@ class CrosswordGamePage extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           // Tab buttons for Game, Rank, and How to play
-          const TabButtons(),
+          TabButtons(isEnglish: isEnglish),
           const SizedBox(height: 20),
           // Create a private game and Fast game buttons
           CustomButton(
@@ -71,6 +86,12 @@ class CrosswordGamePage extends StatelessWidget {
               );
             },
           ),
+          const SizedBox(height: 20),
+          // Language switch button
+          CustomButton(
+            text: isEnglish ? 'Switch to Finnish' : 'Switch to English',
+            onPressed: toggleLanguage,
+          ),
         ],
       ),
     );
@@ -79,7 +100,9 @@ class CrosswordGamePage extends StatelessWidget {
 
 // Widget for Tab Buttons (Game, Rank, How to play)
 class TabButtons extends StatelessWidget {
-  const TabButtons({super.key});
+  final bool isEnglish;
+
+  const TabButtons({super.key, required this.isEnglish});
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +135,9 @@ class TabButtons extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const CrosswordInstructions(),
+                builder: (context) => isEnglish
+                    ? const CrosswordInstructionsEn()
+                    : const CrosswordInstructionsFi(),
               ),
             );
           },

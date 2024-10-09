@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class CrosswordInstructions extends StatelessWidget {
-  const CrosswordInstructions({super.key});
+class CrosswordInstructionsEn extends StatelessWidget {
+  const CrosswordInstructionsEn({super.key});
 
   @override
   Widget build(BuildContext context) {
