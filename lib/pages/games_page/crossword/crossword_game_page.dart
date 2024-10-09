@@ -1,8 +1,25 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_games/pages/games_page/crossword/crossword.dart';
+import 'package:mobile_games/pages/games_page/link/link_instructions_en.dart';
+import 'package:mobile_games/pages/games_page/link/link_instructions_fi.dart';
 
-class CrosswordGamePage extends StatelessWidget {
+class CrosswordGamePage extends StatefulWidget {
   const CrosswordGamePage({super.key});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _CrosswordGamePageState createState() => _CrosswordGamePageState();
+}
+
+class _CrosswordGamePageState extends State<CrosswordGamePage> {
+  bool isEnglish = true;
+
+  void toggleLanguage() {
+    setState(() {
+      isEnglish = !isEnglish;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +32,8 @@ class CrosswordGamePage extends StatelessWidget {
             Navigator.pop(context); // Navigate back to previous page
           },
         ),
-        title: const Text('Game Title', style: TextStyle(color: Colors.black)),
+        title:
+            const Text('Crossword Game', style: TextStyle(color: Colors.black)),
         centerTitle: true,
         actions: [
           IconButton(
@@ -43,14 +61,16 @@ class CrosswordGamePage extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           // Tab buttons for Game, Rank, and How to play
-          const TabButtons(),
+          TabButtons(isEnglish: isEnglish),
           const SizedBox(height: 20),
           // Create a private game and Fast game buttons
           CustomButton(
             text: 'Create a private game',
             onPressed: () {
               // Action for creating a private game
-              print('Create a private game pressed');
+              if (kDebugMode) {
+                print('Create a private game pressed');
+              }
             },
           ),
           const SizedBox(height: 10),
@@ -66,6 +86,12 @@ class CrosswordGamePage extends StatelessWidget {
               );
             },
           ),
+          const SizedBox(height: 20),
+          // Language switch button
+          CustomButton(
+            text: isEnglish ? 'Switch to Finnish' : 'Switch to English',
+            onPressed: toggleLanguage,
+          ),
         ],
       ),
     );
@@ -74,7 +100,9 @@ class CrosswordGamePage extends StatelessWidget {
 
 // Widget for Tab Buttons (Game, Rank, How to play)
 class TabButtons extends StatelessWidget {
-  const TabButtons({Key? key}) : super(key: key);
+  final bool isEnglish;
+
+  const TabButtons({super.key, required this.isEnglish});
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +112,9 @@ class TabButtons extends StatelessWidget {
         GestureDetector(
           onTap: () {
             // Handle Game tab tap
-            print('Game tab pressed');
+            if (kDebugMode) {
+              print('Game tab pressed');
+            }
           },
           child: const Text('Game', style: TextStyle(fontSize: 18)),
         ),
@@ -92,7 +122,9 @@ class TabButtons extends StatelessWidget {
         GestureDetector(
           onTap: () {
             // Handle Rank tab tap
-            print('Rank tab pressed');
+            if (kDebugMode) {
+              print('Rank tab pressed');
+            }
           },
           child: const Text('Rank', style: TextStyle(fontSize: 18)),
         ),
@@ -100,7 +132,14 @@ class TabButtons extends StatelessWidget {
         GestureDetector(
           onTap: () {
             // Handle How to play tab tap
-            print('How to play tab pressed');
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => isEnglish
+                    ? const LinkInstructionsEn()
+                    : const LinkInstructionsFi(),
+              ),
+            );
           },
           child: const Text('How to play', style: TextStyle(fontSize: 18)),
         ),

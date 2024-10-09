@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class LinkInstructions extends StatelessWidget {
-  const LinkInstructions({super.key});
+class LinkInstructionsEn extends StatelessWidget {
+  const LinkInstructionsEn({super.key});
 
   @override
   Widget build(BuildContext context) {

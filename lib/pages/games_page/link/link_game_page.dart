@@ -1,10 +1,24 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_games/pages/games_page/link/link.dart';
-import 'package:mobile_games/pages/games_page/link/link_instructions.dart';
+import 'package:mobile_games/pages/games_page/link/link_instructions_en.dart';
+import 'package:mobile_games/pages/games_page/link/link_instructions_fi.dart';
 
-class LinkGamePage extends StatelessWidget {
+class LinkGamePage extends StatefulWidget {
   const LinkGamePage({super.key});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _LinkGamePageState createState() => _LinkGamePageState();
+}
+
+class _LinkGamePageState extends State<LinkGamePage> {
+  bool isEnglish = true;
+
+  void toggleLanguage() {
+    setState(() {
+      isEnglish = !isEnglish;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +59,7 @@ class LinkGamePage extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           // Tab buttons for Game, Rank, and How to play
-          const TabButtons(),
+          TabButtons(isEnglish: isEnglish),
           const SizedBox(height: 20),
           // Create a private game and Fast game buttons
           CustomButton(
@@ -61,16 +75,17 @@ class LinkGamePage extends StatelessWidget {
           CustomButton(
             text: 'Fast game',
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const LinkGame(),
-                ),
-              );
+              // Action for fast game
               if (kDebugMode) {
                 print('Fast game pressed');
               }
             },
+          ),
+          const SizedBox(height: 20),
+          // Language switch button
+          CustomButton(
+            text: isEnglish ? 'Switch to Finnish' : 'Switch to English',
+            onPressed: toggleLanguage,
           ),
         ],
       ),
@@ -80,7 +95,9 @@ class LinkGamePage extends StatelessWidget {
 
 // Widget for Tab Buttons (Game, Rank, How to play)
 class TabButtons extends StatelessWidget {
-  const TabButtons({super.key});
+  final bool isEnglish;
+
+  const TabButtons({super.key, required this.isEnglish});
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +130,9 @@ class TabButtons extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const LinkInstructions(),
+                builder: (context) => isEnglish
+                    ? const LinkInstructionsEn()
+                    : const LinkInstructionsFi(),
               ),
             );
           },
