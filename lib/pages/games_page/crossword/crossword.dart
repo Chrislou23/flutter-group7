@@ -38,6 +38,50 @@ class _CrosswordGameState extends State<CrosswordGame> {
   final Map<int, List<CrosswordWord>> levels = {
     1: [
       CrosswordWord(
+          word: 'APPLE',
+          clue: '1. A red or green fruit',
+          row: 1,
+          col: 0,
+          isHorizontal: true,
+          number: 1),
+      CrosswordWord(
+          word: 'WATER',
+          clue: '2. Something you drink',
+          row: 0,
+          col: 0,
+          isHorizontal: false,
+          number: 2),
+      CrosswordWord(
+          word: 'LEAF',
+          clue: '3. Part of a tree that turns green in spring',
+          row: 4,
+          col: 3,
+          isHorizontal: true,
+          number: 3),
+      CrosswordWord(
+          word: 'BOOK',
+          clue: '4. Something you read',
+          row: 3,
+          col: 5,
+          isHorizontal: false,
+          number: 4),
+      CrosswordWord(
+          word: 'FISH',
+          clue: '5. Lives in water',
+          row: 1,
+          col: 4,
+          isHorizontal: true,
+          number: 5),
+      CrosswordWord(
+          word: 'FIRE',
+          clue: '6. Hot and burns',
+          row: 5,
+          col: 2,
+          isHorizontal: true,
+          number: 6),
+    ],
+    2: [
+      CrosswordWord(
           word: 'HELLO',
           clue: '1. A greeting',
           row: 1,
@@ -72,50 +116,6 @@ class _CrosswordGameState extends State<CrosswordGame> {
           col: 0,
           isHorizontal: false,
           number: 5),
-    ],
-    2: [
-      CrosswordWord(
-          word: 'APPLE',
-          clue: '1. A red or green fruit',
-          row: 0,
-          col: 0,
-          isHorizontal: true,
-          number: 1),
-      CrosswordWord(
-          word: 'WATER',
-          clue: '2. Something you drink',
-          row: 2,
-          col: 1,
-          isHorizontal: false,
-          number: 2),
-      CrosswordWord(
-          word: 'LEAF',
-          clue: '3. Part of a tree that turns green in spring',
-          row: 4,
-          col: 3,
-          isHorizontal: true,
-          number: 3),
-      CrosswordWord(
-          word: 'BOOK',
-          clue: '4. Something you read',
-          row: 3,
-          col: 5,
-          isHorizontal: false,
-          number: 4),
-      CrosswordWord(
-          word: 'FISH',
-          clue: '5. Lives in water',
-          row: 1,
-          col: 4,
-          isHorizontal: true,
-          number: 5),
-      CrosswordWord(
-          word: 'FIRE',
-          clue: '6. Hot and burns',
-          row: 5,
-          col: 2,
-          isHorizontal: true,
-          number: 6),
     ],
     3: [
       CrosswordWord(
