@@ -25,67 +25,171 @@ class CrosswordWord {
 }
 
 class _CrosswordGameState extends State<CrosswordGame> {
-  final int gridSize = 7;
+  int gridSize = 7;
   late List<List<String?>> grid;
   late List<List<TextEditingController?>> controllers;
   late List<List<int?>> numbers;
 
+  int currentLevel = 1;
+  int maxLevel = 5;
+
   TextEditingController wordInputController = TextEditingController();
 
-  final List<CrosswordWord> crosswordData = [
-    CrosswordWord(
-        word: 'HELLO',
-        clue: '1. A greeting',
-        row: 1,
-        col: 2,
-        isHorizontal: true,
-        number: 1),
-    CrosswordWord(
-        word: 'HOUSE',
-        clue: '2. A place where people live',
-        row: 1,
-        col: 2,
-        isHorizontal: false,
-        number: 2),
-    CrosswordWord(
-        word: 'TREE',
-        clue: '3. A tall plant',
-        row: 5,
-        col: 0,
-        isHorizontal: true,
-        number: 3),
-    CrosswordWord(
-        word: 'DOG',
-        clue: '4. A loyal pet',
-        row: 0,
-        col: 6,
-        isHorizontal: false,
-        number: 4),
-    CrosswordWord(
-        word: 'PLANT',
-        clue: '5. A living thing that grows on earth',
-        row: 1,
-        col: 0,
-        isHorizontal: false,
-        number: 5),
-  ];
+  final Map<int, List<CrosswordWord>> levels = {
+    1: [
+      CrosswordWord(
+          word: 'HELLO',
+          clue: '1. A greeting',
+          row: 1,
+          col: 2,
+          isHorizontal: true,
+          number: 1),
+      CrosswordWord(
+          word: 'HOUSE',
+          clue: '2. A place where people live',
+          row: 1,
+          col: 2,
+          isHorizontal: false,
+          number: 2),
+      CrosswordWord(
+          word: 'TREE',
+          clue: '3. A tall plant',
+          row: 5,
+          col: 0,
+          isHorizontal: true,
+          number: 3),
+      CrosswordWord(
+          word: 'DOG',
+          clue: '4. A loyal pet',
+          row: 0,
+          col: 6,
+          isHorizontal: false,
+          number: 4),
+      CrosswordWord(
+          word: 'PLANT',
+          clue: '5. A living thing that grows on earth',
+          row: 1,
+          col: 0,
+          isHorizontal: false,
+          number: 5),
+    ],
+    2: [
+      CrosswordWord(
+          word: 'APPLE',
+          clue: '1. A red or green fruit',
+          row: 0,
+          col: 0,
+          isHorizontal: true,
+          number: 1),
+      CrosswordWord(
+          word: 'WATER',
+          clue: '2. Something you drink',
+          row: 2,
+          col: 1,
+          isHorizontal: false,
+          number: 2),
+      CrosswordWord(
+          word: 'LEAF',
+          clue: '3. Part of a tree that turns green in spring',
+          row: 4,
+          col: 3,
+          isHorizontal: true,
+          number: 3),
+    ],
+    3: [
+      CrosswordWord(
+          word: 'ELEPHANT',
+          clue: '1. A large animal with a trunk',
+          row: 0,
+          col: 0,
+          isHorizontal: true,
+          number: 1),
+      CrosswordWord(
+          word: 'ORANGE',
+          clue: '2. A citrus fruit',
+          row: 1,
+          col: 2,
+          isHorizontal: false,
+          number: 2),
+      CrosswordWord(
+          word: 'GRASS',
+          clue: '3. Green plant covering the ground',
+          row: 6,
+          col: 4,
+          isHorizontal: true,
+          number: 3),
+    ],
+    4: [
+      CrosswordWord(
+          word: 'DINOSAUR',
+          clue: '1. A large extinct reptile',
+          row: 1,
+          col: 0,
+          isHorizontal: true,
+          number: 1),
+      CrosswordWord(
+          word: 'PYTHON',
+          clue: '2. A large snake or programming language',
+          row: 3,
+          col: 1,
+          isHorizontal: false,
+          number: 2),
+      CrosswordWord(
+          word: 'OCEAN',
+          clue: '3. A large body of water',
+          row: 5,
+          col: 3,
+          isHorizontal: true,
+          number: 3),
+    ],
+    5: [
+      CrosswordWord(
+          word: 'CHAMELEON',
+          clue: '1. A lizard known for changing colors',
+          row: 0,
+          col: 0,
+          isHorizontal: true,
+          number: 1),
+      CrosswordWord(
+          word: 'HIPPOPOTAMUS',
+          clue: '2. A large river-dwelling mammal',
+          row: 2,
+          col: 3,
+          isHorizontal: false,
+          number: 2),
+      CrosswordWord(
+          word: 'MOUNTAIN',
+          clue: '3. A large natural elevation of the earth’s surface',
+          row: 5,
+          col: 5,
+          isHorizontal: true,
+          number: 3),
+    ],
+  };
 
   int? selectedClueIndex;
 
   @override
   void initState() {
     super.initState();
-    grid = List.generate(gridSize, (_) => List.filled(gridSize, null));
-    controllers = List.generate(gridSize, (_) => List.filled(gridSize, null));
-    numbers = List.generate(gridSize, (_) => List.filled(gridSize, null));
+    initializeGrid();
     _generateCrossword();
   }
 
+  void initializeGrid() {
+    grid = List.generate(gridSize, (_) => List.filled(gridSize, null));
+    controllers = List.generate(gridSize, (_) => List.filled(gridSize, null));
+    numbers = List.generate(gridSize, (_) => List.filled(gridSize, null));
+  }
+
   void _generateCrossword() {
+    initializeGrid();
+    List<CrosswordWord> crosswordData = levels[currentLevel] ?? [];
     for (var wordData in crosswordData) {
       _placeWord(wordData.word, wordData.row, wordData.col,
           wordData.isHorizontal, wordData.number);
     }
+    setState(() {});
   }
 
   void _placeWord(
@@ -94,12 +198,12 @@ class _CrosswordGameState extends State<CrosswordGame> {
       int currentRow = row + (isHorizontal ? 0 : i);
       int currentCol = col + (isHorizontal ? i : 0);
 
-      // Vérifier les limites de la grille
+      // Check grid limits
       if (currentRow >= gridSize || currentCol >= gridSize) {
         return;
       }
 
-      // Si une lettre existe déjà et est différente, ne pas placer le mot
+      // If a letter exists but is different, don’t place the word
       if (grid[currentRow][currentCol] != null &&
           grid[currentRow][currentCol] != word[i]) {
         return;
@@ -135,7 +239,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
   void _updateSelectedWord(String input) {
     if (selectedClueIndex == null) return;
 
-    var selectedWordData = crosswordData[selectedClueIndex!];
+    var selectedWordData = levels[currentLevel]![selectedClueIndex!];
     String word = selectedWordData.word;
     int row = selectedWordData.row;
     int col = selectedWordData.col;
@@ -153,13 +257,22 @@ class _CrosswordGameState extends State<CrosswordGame> {
     }
   }
 
+  void _moveToNextLevel() {
+    if (currentLevel < maxLevel) {
+      setState(() {
+        currentLevel++;
+        _generateCrossword();
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double cellSize = MediaQuery.of(context).size.width / gridSize;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Custom Crossword"),
+        title: Text("Crossword Game - Level $currentLevel"),
         backgroundColor: Colors.blue,
       ),
       body: Column(
@@ -181,14 +294,14 @@ class _CrosswordGameState extends State<CrosswordGame> {
                   String? letter = grid[row][col];
                   int? number = numbers[row][col];
 
-                  // Ne pas afficher les cases qui ne contiennent pas de lettres
                   if (letter == null) {
-                    return Container(); // Retourner un conteneur vide pour les cases vides
+                    return Container();
                   }
 
                   bool isHighlighted = false;
                   if (selectedClueIndex != null) {
-                    var selectedWord = crosswordData[selectedClueIndex!];
+                    var selectedWord =
+                        levels[currentLevel]![selectedClueIndex!];
                     int startRow = selectedWord.row;
                     int startCol = selectedWord.col;
                     String word = selectedWord.word;
@@ -247,10 +360,10 @@ class _CrosswordGameState extends State<CrosswordGame> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: crosswordData.length,
+              itemCount: levels[currentLevel]!.length,
               itemBuilder: (BuildContext context, int index) {
                 return ListTile(
-                  title: Text(crosswordData[index].clue),
+                  title: Text(levels[currentLevel]![index].clue),
                   onTap: () => _selectClue(index),
                   selected: selectedClueIndex == index,
                 );
@@ -274,24 +387,44 @@ class _CrosswordGameState extends State<CrosswordGame> {
             child: ElevatedButton(
               onPressed: () {
                 if (_isCrosswordCompleted()) {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Congratulations!'),
-                        content:
-                            const Text('You have completed the crossword!'),
-                        actions: <Widget>[
-                          TextButton(
-                            child: const Text('OK'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                  if (currentLevel < maxLevel) {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Level Complete!'),
+                          content: const Text('You have completed this level.'),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text('Next Level'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                _moveToNextLevel();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  } else {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Congratulations!'),
+                          content: const Text('You have completed all levels!'),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text('OK'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
                 } else {
                   showDialog(
                     context: context,
