@@ -23,35 +23,17 @@ class _LinkGamePageState extends State<LinkGame> {
   }
 
   void initGame() {
-    Map<int, List<ItemModel>> levelItems = {
-      1: [
-        ItemModel(
-          name: 'Happy',
-          finnishName: 'Iloinen',
-          value: 'happy',
-          imageUrl:
-              'https://icons.iconarchive.com/icons/seanau/flat-smiley/128/Smiley-1-icon.png',
-        ),
-        ItemModel(
-          name: 'Sad',
-          finnishName: 'Surullinen',
-          value: 'sad',
-          imageUrl:
-              'https://icons.iconarchive.com/icons/icons-land/flat-emoticons/128/Cry-icon.png',
-        ),
-        ItemModel(
-          name: 'Angry',
-          finnishName: 'Vihainen',
-          value: 'angry',
-          imageUrl:
-              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Angry-Face-Flat-icon.png',
-        ),
-      ],
-      // More levels can be added here.
-    };
-
-    items = levelItems[level] ?? [];
-    itemsToMatch = List<ItemModel>.from(items);
+    if (level == 1) {
+      initLevel1();
+    } else if (level == 2) {
+      initLevel2();
+    } else if (level == 3) {
+      initLevel3();
+    } else if (level == 4) {
+      initLevel4();
+    } else if (level == 5) {
+      initLevel5();
+    }
 
     items.shuffle();
     itemsToMatch.shuffle();
@@ -60,16 +42,232 @@ class _LinkGamePageState extends State<LinkGame> {
     isGameOver = false;
   }
 
+  void initLevel1() {
+    List<ItemModel> levelItems = [
+      ItemModel(
+        name: 'Happy',
+        finnishName: 'Iloinen',
+        value: 'happy',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/seanau/flat-smiley/128/Smiley-1-icon.png',
+      ),
+      ItemModel(
+        name: 'Sad',
+        finnishName: 'Surullinen',
+        value: 'sad',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/icons-land/flat-emoticons/128/Cry-icon.png',
+      ),
+      ItemModel(
+        name: 'Angry',
+        finnishName: 'Vihainen',
+        value: 'angry',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Angry-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Scared',
+        finnishName: 'Peloissaan',
+        value: 'scared',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Fearful-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Surprised',
+        finnishName: 'Yllättynyt',
+        value: 'surprised',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Astonished-Face-Flat-icon.png',
+      ),
+    ];
+
+    items = levelItems;
+    itemsToMatch = List<ItemModel>.from(levelItems);
+  }
+
+  void initLevel2() {
+    List<ItemModel> levelItems = [
+      ItemModel(
+        name: 'Excited',
+        finnishName: 'Innoissaan',
+        value: 'excited',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Grinning-Face-With-Big-Eyes-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Calm',
+        finnishName: 'Rauhallinen',
+        value: 'calm',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Relieved-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Bored',
+        finnishName: 'Tylsistynyt',
+        value: 'bored',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Unamused-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Shy',
+        finnishName: 'Ujo',
+        value: 'shy',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Flushed-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Curious',
+        finnishName: 'Utelias',
+        value: 'curious',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Thinking-Face-Flat-icon.png',
+      ),
+    ];
+
+    items = levelItems;
+    itemsToMatch = List<ItemModel>.from(levelItems);
+  }
+
+  void initLevel3() {
+    List<ItemModel> levelItems = [
+      ItemModel(
+        name: 'Happy',
+        finnishName: 'Iloinen',
+        value: 'happy',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/seanau/flat-smiley/128/Smiley-1-icon.png',
+      ),
+      ItemModel(
+        name: 'Excited',
+        finnishName: 'Innoissaan',
+        value: 'excited',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Grinning-Face-With-Big-Eyes-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Sad',
+        finnishName: 'Surullinen',
+        value: 'sad',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/icons-land/flat-emoticons/128/Cry-icon.png',
+      ),
+      ItemModel(
+        name: 'Calm',
+        finnishName: 'Rauhallinen',
+        value: 'calm',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Relieved-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Angry',
+        finnishName: 'Vihainen',
+        value: 'angry',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Angry-Face-Flat-icon.png',
+      ),
+    ];
+
+    items = levelItems;
+    itemsToMatch = List<ItemModel>.from(levelItems);
+  }
+
+  void initLevel4() {
+    List<ItemModel> levelItems = [
+      ItemModel(
+        name: 'Scared',
+        finnishName: 'Peloissaan',
+        value: 'scared',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Fearful-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Shy',
+        finnishName: 'Ujo',
+        value: 'shy',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Flushed-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Surprised',
+        finnishName: 'Yllättynyt',
+        value: 'surprised',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Astonished-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Curious',
+        finnishName: 'Utelias',
+        value: 'curious',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Thinking-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Bored',
+        finnishName: 'Tylsistynyt',
+        value: 'bored',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Unamused-Face-Flat-icon.png',
+      ),
+    ];
+
+    items = levelItems;
+    itemsToMatch = List<ItemModel>.from(levelItems);
+  }
+
+  void initLevel5() {
+    List<ItemModel> levelItems = [
+      ItemModel(
+        name: 'Angry',
+        finnishName: 'Vihainen',
+        value: 'angry',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Angry-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Sad',
+        finnishName: 'Surullinen',
+        value: 'sad',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/icons-land/flat-emoticons/128/Cry-icon.png',
+      ),
+      ItemModel(
+        name: 'Excited',
+        finnishName: 'Innoissaan',
+        value: 'excited',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Grinning-Face-With-Big-Eyes-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Scared',
+        finnishName: 'Peloissaan',
+        value: 'scared',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Fearful-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Calm',
+        finnishName: 'Rauhallinen',
+        value: 'calm',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Relieved-Face-Flat-icon.png',
+      ),
+    ];
+
+    items = levelItems;
+    itemsToMatch = List<ItemModel>.from(levelItems);
+  }
+
   void checkGameOver() {
-    if (items.isEmpty) {
+    // Check if all items are matched
+    if (items.isEmpty && itemsToMatch.isEmpty) {
       if (level < 5) {
         level++;
-        initGame();
+        initGame(); // Move to the next level
+        setState(() {});
       } else {
         isGameOver = true;
         showFinalScoreDialog();
       }
-      setState(() {});
     }
   }
 
@@ -104,61 +302,64 @@ class _LinkGamePageState extends State<LinkGame> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TimerProvider>(
-      builder: (context, timerProvider, child) {
-        if (timerProvider.isBlocked) {
-          return _buildBlockedScreen();
-        }
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Emotion Linking Game'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text(
+              'Score: $score',
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              'Level: $level',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 20),
+            if (!isGameOver)
+              Row(
+                children: [
+                  // Words Column (on the left)
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: items.map((item) {
+                        return Container(
+                          margin: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            color: Colors.tealAccent.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.teal, width: 2),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black26,
+                                offset: Offset(2, 2),
+                                blurRadius: 5,
+                                spreadRadius: 1,
+                              )
+                            ],
+                          ),
+                          child: Draggable<ItemModel>(
+                            data: item,
+                            childWhenDragging: Opacity(
+                              opacity: 0.5,
+                              child: Text(
+                                '${item.name} / ${item.finnishName}',
+                                style: const TextStyle(
+                                    fontSize: 24,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.bold,
+                                    shadows: [
+                                      Shadow(
+                                          color: Colors.black26,
+                                          offset: Offset(1, 2),
+                                          blurRadius: 2)
+                                    ]),
 
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Emotion Linking Game'),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.settings, color: Colors.black),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/settings');
-                },
-              ),
-            ],
-          ),
-          body: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                Text(
-                  'Score: $score',
-                  style:
-                      const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'Level: $level',
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 20),
-                if (!isGameOver)
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: items.map((item) {
-                            return Container(
-                              margin: const EdgeInsets.all(8.0),
-                              padding: const EdgeInsets.all(8.0),
-                              decoration: BoxDecoration(
-                                color: Colors.tealAccent.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Colors.teal, width: 2),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black26,
-                                    offset: Offset(2, 2),
-                                    blurRadius: 5,
-                                    spreadRadius: 1,
-                                  )
-                                ],
                               ),
                               child: Draggable<ItemModel>(
                                 data: item,
