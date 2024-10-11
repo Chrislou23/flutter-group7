@@ -87,7 +87,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'HOPE',
-        clue: '1. Feeling optimistic',
+        clue: '2. Feeling optimistic',
         row: 1,
         col: 3,
         isHorizontal: true,
@@ -95,7 +95,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'BRAVE',
-        clue: '1. Feeling courageous',
+        clue: '3. Feeling courageous',
         row: 3,
         col: 0,
         isHorizontal: true,
@@ -103,7 +103,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'PROUD',
-        clue: '1. Feeling accomplished',
+        clue: '4. Feeling accomplished',
         row: 2,
         col: 1,
         isHorizontal: false,
@@ -111,7 +111,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'MAD',
-        clue: '1. Feeling angry',
+        clue: '5. Feeling angry',
         row: 2,
         col: 2,
         isHorizontal: false,
@@ -244,7 +244,6 @@ class _CrosswordGameState extends State<CrosswordGame> {
         number: 5,
       ),
     ]
-    // Additional levels are truncated for brevity
   };
 
   int? selectedClueIndex;
@@ -262,7 +261,6 @@ class _CrosswordGameState extends State<CrosswordGame> {
   }
 
   void _generateCrossword() {
-    // Determine the grid size based on the longest word in the current level
     int longestWordLength = levels[currentLevel]!
         .map((word) => word.word.length)
         .reduce((a, b) => a > b ? a : b);
@@ -276,27 +274,20 @@ class _CrosswordGameState extends State<CrosswordGame> {
     setState(() {});
   }
 
-  void _placeWord(
-      String word, int row, int col, bool isHorizontal, int number) {
-    // First check if the word can be placed without conflicts
-
+  void _placeWord(String word, int row, int col, bool isHorizontal, int number) {
     for (int i = 0; i < word.length; i++) {
       int currentRow = row + (isHorizontal ? 0 : i);
       int currentCol = col + (isHorizontal ? i : 0);
 
-      // Check grid limits
       if (currentRow >= gridSize || currentCol >= gridSize) {
-        return; // Word doesn't fit within the grid bounds
+        return;
       }
 
-      // If a letter exists but is different, don’t place the word
-      if (grid[currentRow][currentCol] != null &&
-          grid[currentRow][currentCol] != word[i]) {
-        return; // Word conflicts with another already placed word
+      if (grid[currentRow][currentCol] != null && grid[currentRow][currentCol] != word[i]) {
+        return;
       }
     }
 
-    // Place the word in the grid if all checks pass
     for (int i = 0; i < word.length; i++) {
       int currentRow = row + (isHorizontal ? 0 : i);
       int currentCol = col + (isHorizontal ? i : 0);
@@ -365,8 +356,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
         int currentCol = wordData.col + (wordData.isHorizontal ? i : 0);
 
         if (currentRow < gridSize && currentCol < gridSize) {
-          controllers[currentRow][currentCol]?.text =
-              wordData.word[i].toUpperCase();
+          controllers[currentRow][currentCol]?.text = wordData.word[i].toUpperCase();
         }
       }
     }
@@ -380,109 +370,53 @@ class _CrosswordGameState extends State<CrosswordGame> {
           return _buildBlockedScreen();
         }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Crossword Game - Level $currentLevel"),
-        backgroundColor: Colors.blue,
-      ),
-      body: Column(
-        children: [
-          SizedBox(
-            height: cellSize * gridSize,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: gridSize * gridSize,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: gridSize,
-                  childAspectRatio: 1,
-                ),
-                itemBuilder: (BuildContext context, int index) {
-                  int row = index ~/ gridSize;
-                  int col = index % gridSize;
-                  String? letter = grid[row][col];
-                  int? number = numbers[row][col];
+        return Scaffold(
+          appBar: AppBar(
+            title: Text("Crossword Game - Level \$currentLevel"),
+            backgroundColor: Colors.blue,
+          ),
+          body: Column(
+            children: [
+              SizedBox(
+                height: 400,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: GridView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: gridSize * gridSize,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: gridSize,
+                      childAspectRatio: 1,
+                    ),
+                    itemBuilder: (BuildContext context, int index) {
+                      int row = index ~/ gridSize;
+                      int col = index % gridSize;
+                      String? letter = grid[row][col];
+                      int? number = numbers[row][col];
 
-                  if (letter == null) {
-                    return Container(
-                      margin: const EdgeInsets.all(2),
-                      width: cellSize,
-                      height: cellSize,
-                      decoration: BoxDecoration(
-                        color: Colors.lightBlueAccent,
-                        border: Border.all(color: Colors.white, width: 1),
-                      ),
-                    );
-                  }
-
-                  bool isHighlighted = false;
-                  if (selectedClueIndex != null) {
-                    var selectedWord =
-                        levels[currentLevel]![selectedClueIndex!];
-                    int startRow = selectedWord.row;
-                    int startCol = selectedWord.col;
-                    String word = selectedWord.word;
-                    bool isHorizontal = selectedWord.isHorizontal;
-
-                      bool isHighlighted = false;
-                      if (selectedClueIndex != null) {
-                        var selectedWord = crosswordData[selectedClueIndex!];
-                        int startRow = selectedWord.row;
-                        int startCol = selectedWord.col;
-                        String word = selectedWord.word;
-                        bool isHorizontal = selectedWord.isHorizontal;
-
-                  return Stack(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.all(2),
-                        width: cellSize,
-                        height: cellSize,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white, width: 1),
-                          color: isHighlighted
-                              ? Colors.yellow
-                              : Colors.lightGreenAccent,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: TextField(
-                          controller: controllers[row][col],
-                          textAlign: TextAlign.center,
-                          decoration:
-                              const InputDecoration(border: InputBorder.none),
-                          style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                          maxLength: 1,
-                          buildCounter: (_,
-                                  {int? currentLength,
-                                  bool? isFocused,
-                                  int? maxLength}) =>
-                              null,
-                        ),
-                      ),
-                      if (number != null)
-                        Positioned(
-                          top: 2,
-                          left: 2,
-                          child: Text(
-                            number.toString(),
-                            style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.redAccent),
-                        if (isHorizontal) {
-                          isHighlighted = row == startRow &&
-                              col >= startCol &&
-                              col < startCol + word.length;
-                        } else {
-                          isHighlighted = col == startCol &&
-                              row >= startRow &&
-                              row < startRow + word.length;
-                        }
-                      }
+                      return Stack(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.white, width: 1),
+                              color: letter == null ? Colors.lightBlueAccent : Colors.lightGreenAccent,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: letter != null
+                                ? TextField(
+                                    controller: controllers[row][col],
+                                    textAlign: TextAlign.center,
+                                    decoration: const InputDecoration(border: InputBorder.none),
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                    maxLength: 1,
+                                    buildCounter: (_, {int? currentLength, bool? isFocused, int? maxLength}) => null,
+                                  )
+                                : null,
                           ),
                           if (number != null)
                             Positioned(
@@ -491,7 +425,10 @@ class _CrosswordGameState extends State<CrosswordGame> {
                               child: Text(
                                 number.toString(),
                                 style: const TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.bold),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.redAccent,
+                                ),
                               ),
                             ),
                         ],
@@ -500,97 +437,26 @@ class _CrosswordGameState extends State<CrosswordGame> {
                   ),
                 ),
               ),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: levels[currentLevel]!.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Card(
-                  color: Colors.lightBlue.shade100,
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                  child: ListTile(
-                    title: Text(
-                      levels[currentLevel]![index].clue,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    onTap: () => _selectClue(index),
-                    selected: selectedClueIndex == index,
-                    selectedTileColor: Colors.yellow.shade100,
-                  ),
-                );
-              },
-            ),
-          ),
-          if (selectedClueIndex != null)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: wordInputController,
-                decoration: const InputDecoration(
-                  labelText: 'Enter the word for the selected clue',
-                  border: OutlineInputBorder(),
-
+              Expanded(
+                child: ListView.builder(
+                  itemCount: levels[currentLevel]!.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      color: Colors.lightBlue.shade100,
+                      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                      child: ListTile(
+                        title: Text(
+                          levels[currentLevel]![index].clue,
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        onTap: () => _selectClue(index),
+                        selected: selectedClueIndex == index,
+                        selectedTileColor: Colors.yellow.shade100,
+                      ),
+                    );
+                  },
                 ),
               ),
-            ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
-                    textStyle: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: () {
-                    if (_isCrosswordCompleted()) {
-                      if (currentLevel < maxLevel) {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Level Complete!'),
-                              content:
-                                  const Text('You have completed this level.'),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: const Text('Next Level'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                    _moveToNextLevel();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      } else {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Congratulations!'),
-                              content:
-                                  const Text('You have completed all levels!'),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      }
               if (selectedClueIndex != null)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -603,41 +469,90 @@ class _CrosswordGameState extends State<CrosswordGame> {
                     onChanged: _updateSelectedWord,
                   ),
                 ),
-                    } else {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Try Again'),
-                            content: const Text('Some answers are incorrect.'),
-                            actions: <Widget>[
-                              TextButton(
-                                child: const Text('OK'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      onPressed: () {
+                        if (_isCrosswordCompleted()) {
+                          if (currentLevel < maxLevel) {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Level Complete!'),
+                                  content: const Text('You have completed this level.'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: const Text('Next Level'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        _moveToNextLevel();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Congratulations!'),
+                                  content: const Text('You have completed all levels!'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: const Text('OK'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
+                        } else {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Try Again'),
+                                content: const Text('Some answers are incorrect.'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: const Text('OK'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
                           );
-                        },
-                      );
-                    }
-                  },
-                  child: const Text('Check Answers'),
+                        }
+                      },
+                      child: const Text('Check Answers'),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      onPressed: _showAnswers,
+                      child: const Text('Show Answers'),
+                    ),
+                  ],
                 ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
-                    textStyle: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: _showAnswers,
-                  child: const Text('Show Answers'),
-                ),
-              ],
-            ),
               ),
             ],
           ),
