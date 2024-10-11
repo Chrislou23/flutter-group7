@@ -9,10 +9,8 @@ import 'pages/games_page/link/link_game_page.dart';
 import 'pages/games_page/link/link_instructions_en.dart';
 import 'pages/games_page/crossword/crossword_instructions_en.dart';
 import 'pages/games_page/crossword/crossword_instructions_fi.dart';
-import 'pages/games_page/link/link_game_page.dart';
 import 'pages/account_page/account_page.dart';
 import 'timer_provider.dart';
-
 
 void main() {
   runApp(
@@ -31,7 +29,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      navigatorKey: navigatorKey, // Utilisez le navigatorKey global ici
       debugShowCheckedModeBanner: false,
       title: 'Game App',
       theme: ThemeData(
@@ -41,7 +38,14 @@ class MyApp extends StatelessWidget {
       routes: {
         '/game': (context) => const GamePage(),
         '/friends': (context) => const FriendPage(),
-        '/account': (context) => const LoginPage()
+        '/account': (context) => const LoginPage(),
+        '/crossword': (context) => const CrosswordGamePage(),
+        '/link': (context) => const LinkGamePage(),
+        '/link_instructions_fi': (context) => const LinkInstructionsFi(),
+        '/link_instructions_en': (context) => const LinkInstructionsEn(),
+        '/crossword_instructions': (context) => const CrosswordInstructionsEn(),
+        '/crossword_instructions_fi': (context) =>
+            const CrosswordInstructionsFi(),
       },
     );
   }
@@ -63,20 +67,10 @@ class ResponsiveHomePage extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Game App - Tablet/Desktop Layout'),
         ),
+        body: const Center(
+          child: Text('Welcome to the desktop version of the Game App'),
+        ),
       );
     }
-  }
-}
-        '/crossword': (context) => const CrosswordGamePage(),
-        '/link': (context) => const LinkGamePage(),
-        '/link_instructions_fi': (context) => const LinkInstructionsFi(),
-        '/link_instructions_en': (context) => const LinkInstructionsEn(),
-        '/crossword_instructions': (context) => const CrosswordInstructionsEn(),
-        '/crossword_instructions_fi': (context) =>
-            const CrosswordInstructionsFi(),
-        '/link': (context) => const LinkGamePage(),
-        '/account': (context) => const LoginPage(),
-      },
-    );
   }
 }
