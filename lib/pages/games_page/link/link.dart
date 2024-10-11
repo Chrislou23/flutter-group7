@@ -21,7 +21,26 @@ class _LinkGamePageState extends State<LinkGame> {
   }
 
   void initGame() {
-    // Define items for the game for all levels (same as level 1 for all levels)
+    if (level == 1) {
+      initLevel1();
+    } else if (level == 2) {
+      initLevel2();
+    } else if (level == 3) {
+      initLevel3();
+    } else if (level == 4) {
+      initLevel4();
+    } else if (level == 5) {
+      initLevel5();
+    }
+
+    items.shuffle();
+    itemsToMatch.shuffle();
+
+    score = 0;
+    isGameOver = false;
+  }
+
+  void initLevel1() {
     List<ItemModel> levelItems = [
       ItemModel(
         name: 'Happy',
@@ -60,15 +79,180 @@ class _LinkGamePageState extends State<LinkGame> {
       ),
     ];
 
-    // Assign the same items for every level
     items = levelItems;
     itemsToMatch = List<ItemModel>.from(levelItems);
+  }
 
-    items.shuffle();
-    itemsToMatch.shuffle();
+  void initLevel2() {
+    List<ItemModel> levelItems = [
+      ItemModel(
+        name: 'Excited',
+        finnishName: 'Innoissaan',
+        value: 'excited',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Grinning-Face-With-Big-Eyes-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Calm',
+        finnishName: 'Rauhallinen',
+        value: 'calm',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Relieved-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Bored',
+        finnishName: 'Tylsistynyt',
+        value: 'bored',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Unamused-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Shy',
+        finnishName: 'Ujo',
+        value: 'shy',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Flushed-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Curious',
+        finnishName: 'Utelias',
+        value: 'curious',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Thinking-Face-Flat-icon.png',
+      ),
+    ];
 
-    score = 0;
-    isGameOver = false;
+    items = levelItems;
+    itemsToMatch = List<ItemModel>.from(levelItems);
+  }
+
+  void initLevel3() {
+    List<ItemModel> levelItems = [
+      ItemModel(
+        name: 'Happy',
+        finnishName: 'Iloinen',
+        value: 'happy',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/seanau/flat-smiley/128/Smiley-1-icon.png',
+      ),
+      ItemModel(
+        name: 'Excited',
+        finnishName: 'Innoissaan',
+        value: 'excited',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Grinning-Face-With-Big-Eyes-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Sad',
+        finnishName: 'Surullinen',
+        value: 'sad',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/icons-land/flat-emoticons/128/Cry-icon.png',
+      ),
+      ItemModel(
+        name: 'Calm',
+        finnishName: 'Rauhallinen',
+        value: 'calm',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Relieved-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Angry',
+        finnishName: 'Vihainen',
+        value: 'angry',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Angry-Face-Flat-icon.png',
+      ),
+    ];
+
+    items = levelItems;
+    itemsToMatch = List<ItemModel>.from(levelItems);
+  }
+
+  void initLevel4() {
+    List<ItemModel> levelItems = [
+      ItemModel(
+        name: 'Scared',
+        finnishName: 'Peloissaan',
+        value: 'scared',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Fearful-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Shy',
+        finnishName: 'Ujo',
+        value: 'shy',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Flushed-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Surprised',
+        finnishName: 'Yllättynyt',
+        value: 'surprised',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Astonished-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Curious',
+        finnishName: 'Utelias',
+        value: 'curious',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Thinking-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Bored',
+        finnishName: 'Tylsistynyt',
+        value: 'bored',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Unamused-Face-Flat-icon.png',
+      ),
+    ];
+
+    items = levelItems;
+    itemsToMatch = List<ItemModel>.from(levelItems);
+  }
+
+  void initLevel5() {
+    List<ItemModel> levelItems = [
+      ItemModel(
+        name: 'Angry',
+        finnishName: 'Vihainen',
+        value: 'angry',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Angry-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Sad',
+        finnishName: 'Surullinen',
+        value: 'sad',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/icons-land/flat-emoticons/128/Cry-icon.png',
+      ),
+      ItemModel(
+        name: 'Excited',
+        finnishName: 'Innoissaan',
+        value: 'excited',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Grinning-Face-With-Big-Eyes-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Scared',
+        finnishName: 'Peloissaan',
+        value: 'scared',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Fearful-Face-Flat-icon.png',
+      ),
+      ItemModel(
+        name: 'Calm',
+        finnishName: 'Rauhallinen',
+        value: 'calm',
+        imageUrl:
+            'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Relieved-Face-Flat-icon.png',
+      ),
+    ];
+
+    items = levelItems;
+    itemsToMatch = List<ItemModel>.from(levelItems);
   }
 
   void checkGameOver() {
