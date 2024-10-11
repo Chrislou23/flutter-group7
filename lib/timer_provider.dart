@@ -6,8 +6,8 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
   Timer? _usageTimer;
   Timer? _blockTimer;
   bool _isBlocked = false;
-  static const int _usageDurationMinutes = 20;
-  static const int _blockDurationMinutes = 5;
+  static const int _usageDurationMinutes = 5;
+  static const int _blockDurationMinutes = 2;
   Duration _remainingUsageTime = Duration(minutes: _usageDurationMinutes);
   Duration _remainingBlockTime = Duration(minutes: _blockDurationMinutes);
 

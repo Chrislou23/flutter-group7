@@ -14,15 +14,9 @@ class GamePage extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.white,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
-              onPressed: () {
-                Navigator.pop(context); // Navigate back to previous page
-              },
-            ),
             title: timerProvider.isBlocked
                 ? Text(
-                    "Blocked: ${_formatDuration(timerProvider.remainingBlockTime)}",
+                    "Blocked: \${_formatDuration(timerProvider.remainingBlockTime)}",
                     style: const TextStyle(color: Colors.black),
                   )
                 : const Text('Game', style: TextStyle(color: Colors.black)),
@@ -53,13 +47,25 @@ class GamePage extends StatelessWidget {
                                 ),
                               );
                             },
-                            child: Container(
-                              margin: const EdgeInsets.all(8.0),
-                              color: Colors.grey[300],
-                              height: 150,
-                              child: const Center(
-                                child: Text('Game 1: Crossword'),
-                              ),
+                            child: Column(
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.all(8.0),
+                                  height: 150,
+                                  decoration: BoxDecoration(
+                                    image: const DecorationImage(
+                                      image: AssetImage('assets/game1.png'),
+                                      fit: BoxFit.cover,
+                                    ),
+                                    color: Colors.grey[300],
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                const Text(
+                                  'Game 1: Crossword',
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -73,13 +79,25 @@ class GamePage extends StatelessWidget {
                                 ),
                               );
                             },
-                            child: Container(
-                              margin: const EdgeInsets.all(8.0),
-                              color: Colors.grey[300],
-                              height: 150,
-                              child: const Center(
-                                child: Text('Game 2: Link Game'),
-                              ),
+                            child: Column(
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.all(8.0),
+                                  height: 150,
+                                  decoration: BoxDecoration(
+                                    image: const DecorationImage(
+                                      image: AssetImage('assets/game2.png'),
+                                      fit: BoxFit.cover,
+                                    ),
+                                    color: Colors.grey[300],
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                const Text(
+                                  'Game 2: Link Game',
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -97,7 +115,7 @@ class GamePage extends StatelessWidget {
         duration.inMinutes.remainder(60).toString().padLeft(2, '0');
     String seconds =
         duration.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return "$minutes:$seconds";
+    return "\$minutes:\$seconds";
   }
 
   Widget _buildBlockedScreen() {
