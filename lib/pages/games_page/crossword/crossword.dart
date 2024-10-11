@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:mobile_games/timer_provider.dart';
 
 class CrosswordGame extends StatefulWidget {
   const CrosswordGame({super.key});
@@ -269,8 +271,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
     initializeGrid();
     List<CrosswordWord> crosswordData = levels[currentLevel] ?? [];
     for (var wordData in crosswordData) {
-      _placeWord(wordData.word, wordData.row, wordData.col,
-          wordData.isHorizontal, wordData.number);
+      _placeWord(wordData.word, wordData.row, wordData.col, wordData.isHorizontal, wordData.number);
     }
     setState(() {});
   }
@@ -278,6 +279,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
   void _placeWord(
       String word, int row, int col, bool isHorizontal, int number) {
     // First check if the word can be placed without conflicts
+
     for (int i = 0; i < word.length; i++) {
       int currentRow = row + (isHorizontal ? 0 : i);
       int currentCol = col + (isHorizontal ? i : 0);
@@ -310,8 +312,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
   bool _isCrosswordCompleted() {
     for (int row = 0; row < gridSize; row++) {
       for (int col = 0; col < gridSize; col++) {
-        if (grid[row][col] != null &&
-            controllers[row][col]?.text.toUpperCase() != grid[row][col]) {
+        if (grid[row][col] != null && controllers[row][col]?.text.toUpperCase() != grid[row][col]) {
           return false;
         }
       }
@@ -373,7 +374,11 @@ class _CrosswordGameState extends State<CrosswordGame> {
 
   @override
   Widget build(BuildContext context) {
-    double cellSize = MediaQuery.of(context).size.width / gridSize;
+    return Consumer<TimerProvider>(
+      builder: (context, timerProvider, child) {
+        if (timerProvider.isBlocked) {
+          return _buildBlockedScreen();
+        }
 
     return Scaffold(
       appBar: AppBar(
@@ -420,16 +425,13 @@ class _CrosswordGameState extends State<CrosswordGame> {
                     String word = selectedWord.word;
                     bool isHorizontal = selectedWord.isHorizontal;
 
-                    if (isHorizontal) {
-                      isHighlighted = row == startRow &&
-                          col >= startCol &&
-                          col < startCol + word.length;
-                    } else {
-                      isHighlighted = col == startCol &&
-                          row >= startRow &&
-                          row < startRow + word.length;
-                    }
-                  }
+                      bool isHighlighted = false;
+                      if (selectedClueIndex != null) {
+                        var selectedWord = crosswordData[selectedClueIndex!];
+                        int startRow = selectedWord.row;
+                        int startCol = selectedWord.col;
+                        String word = selectedWord.word;
+                        bool isHorizontal = selectedWord.isHorizontal;
 
                   return Stack(
                     children: [
@@ -471,11 +473,32 @@ class _CrosswordGameState extends State<CrosswordGame> {
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.redAccent),
+                        if (isHorizontal) {
+                          isHighlighted = row == startRow &&
+                              col >= startCol &&
+                              col < startCol + word.length;
+                        } else {
+                          isHighlighted = col == startCol &&
+                              row >= startRow &&
+                              row < startRow + word.length;
+                        }
+                      }
                           ),
-                        ),
-                    ],
-                  );
-                },
+                          if (number != null)
+                            Positioned(
+                              top: 2,
+                              left: 2,
+                              child: Text(
+                                number.toString(),
+                                style: const TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
           ),
@@ -509,8 +532,8 @@ class _CrosswordGameState extends State<CrosswordGame> {
                 decoration: const InputDecoration(
                   labelText: 'Enter the word for the selected clue',
                   border: OutlineInputBorder(),
+
                 ),
-                onChanged: _updateSelectedWord,
               ),
             ),
           Padding(
@@ -568,6 +591,18 @@ class _CrosswordGameState extends State<CrosswordGame> {
                           },
                         );
                       }
+              if (selectedClueIndex != null)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: wordInputController,
+                    decoration: const InputDecoration(
+                      labelText: 'Enter the word for the selected clue',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: _updateSelectedWord,
+                  ),
+                ),
                     } else {
                       showDialog(
                         context: context,
@@ -603,6 +638,25 @@ class _CrosswordGameState extends State<CrosswordGame> {
                 ),
               ],
             ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBlockedScreen() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.lock, size: 100, color: Colors.grey),
+          SizedBox(height: 20),
+          Text(
+            'REST YOUR EYES',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 18),
           ),
         ],
       ),
