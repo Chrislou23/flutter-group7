@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:mobile_games/timer_provider.dart';
 import 'package:mobile_games/pages/friends_page/friend_page.dart';
 import 'package:mobile_games/pages/games_page/game_page.dart';
+import 'package:mobile_games/pages/games_page/crossword/crossword_game_page.dart';
+import 'package:mobile_games/pages/games_page/link/link_game_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -60,7 +62,57 @@ class _HomePageState extends State<HomePage> {
           ),
           body: timerProvider.isBlocked
               ? _buildBlockedScreen()
-              : _pages[_selectedIndex],
+              : (_selectedIndex == 0
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const CrosswordGamePage()),
+                            );
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.all(16.0),
+                            height: MediaQuery.of(context).size.height * 0.35,
+                            decoration: BoxDecoration(
+                              image: const DecorationImage(
+                                image: AssetImage('assets/game1.png'),
+                                fit: BoxFit.cover,
+                              ),
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Center(
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const LinkGamePage()),
+                            );
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.all(16.0),
+                            height: MediaQuery.of(context).size.height * 0.35,
+                            decoration: BoxDecoration(
+                              image: const DecorationImage(
+                                image: AssetImage('assets/game2.png'),
+                                fit: BoxFit.cover,
+                              ),
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Center(
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : _pages[_selectedIndex]),
           bottomNavigationBar: BottomNavigationBar(
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
