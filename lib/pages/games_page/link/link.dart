@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:mobile_games/timer_provider.dart';
 
 class LinkGame extends StatefulWidget {
   const LinkGame({Key? key}) : super(key: key);
@@ -264,7 +266,7 @@ class _LinkGamePageState extends State<LinkGame> {
         setState(() {});
       } else {
         isGameOver = true;
-        showFinalScoreDialog(); // Game completed, show final score
+        showFinalScoreDialog();
       }
     }
   }
@@ -280,8 +282,8 @@ class _LinkGamePageState extends State<LinkGame> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                resetGame(); // Reset the game for a new round
+                Navigator.of(context).pop();
+                resetGame();
               },
               child: const Text('New Game'),
             ),
@@ -357,106 +359,142 @@ class _LinkGamePageState extends State<LinkGame> {
                                           offset: Offset(1, 2),
                                           blurRadius: 2)
                                     ]),
+
                               ),
-                            ),
-                            feedback: Material(
-                              color: Colors.transparent,
-                              child: Text(
-                                '${item.name} / ${item.finnishName}',
-                                style: const TextStyle(
-                                    fontSize: 26,
-                                    color: Colors.teal,
-                                    fontWeight: FontWeight.bold,
-                                    shadows: [
-                                      Shadow(
-                                          color: Colors.black26,
-                                          offset: Offset(1, 2),
-                                          blurRadius: 3)
-                                    ]),
+                              child: Draggable<ItemModel>(
+                                data: item,
+                                childWhenDragging: Opacity(
+                                  opacity: 0.5,
+                                  child: Text(
+                                    '${item.name} / ${item.finnishName}',
+                                    style: const TextStyle(
+                                        fontSize: 24,
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.bold,
+                                        shadows: [
+                                          Shadow(
+                                              color: Colors.black26,
+                                              offset: Offset(1, 2),
+                                              blurRadius: 2)
+                                        ]),
+                                  ),
+                                ),
+                                feedback: Material(
+                                  color: Colors.transparent,
+                                  child: Text(
+                                    '${item.name} / ${item.finnishName}',
+                                    style: const TextStyle(
+                                        fontSize: 26,
+                                        color: Colors.teal,
+                                        fontWeight: FontWeight.bold,
+                                        shadows: [
+                                          Shadow(
+                                              color: Colors.black26,
+                                              offset: Offset(1, 2),
+                                              blurRadius: 3)
+                                        ]),
+                                  ),
+                                ),
+                                child: Text(
+                                  '${item.name} / ${item.finnishName}',
+                                  style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                      shadows: [
+                                        Shadow(
+                                            color: Colors.black26,
+                                            offset: Offset(1, 2),
+                                            blurRadius: 3)
+                                      ]),
+                                ),
                               ),
-                            ),
-                            child: Text(
-                              '${item.name} / ${item.finnishName}',
-                              style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
-                                  shadows: [
-                                    Shadow(
-                                        color: Colors.black26,
-                                        offset: Offset(1, 2),
-                                        blurRadius: 3)
-                                  ]),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      const SizedBox(width: 40),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: itemsToMatch.map((item) {
+                            return DragTarget<ItemModel>(
+                              onAccept: (receivedItem) {
+                                if (item.value == receivedItem.value) {
+                                  setState(() {
+                                    items.remove(receivedItem);
+                                    itemsToMatch.remove(item);
+                                    score += 10;
+                                  });
+                                  checkGameOver();
+                                } else {
+                                  setState(() {
+                                    score -= 5;
+                                  });
+                                }
+                              },
+                              onWillAccept: (receivedItem) => true,
+                              builder:
+                                  (context, acceptedItems, rejectedItems) =>
+                                      Container(
+                                margin: const EdgeInsets.all(8.0),
+                                color: Colors.teal.withOpacity(0.5),
+                                height: 80,
+                                width: 80,
+                                alignment: Alignment.center,
+                                child: Image.network(
+                                  item.imageUrl,
+                                  height: 60,
+                                  width: 60,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
                   ),
-                  // Spacer between columns
-                  const SizedBox(width: 40),
-                  // Pictures Column (on the right)
-                  Expanded(
+                if (isGameOver)
+                  Center(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: itemsToMatch.map((item) {
-                        return DragTarget<ItemModel>(
-                          onAccept: (receivedItem) {
-                            if (item.value == receivedItem.value) {
-                              setState(() {
-                                items.remove(receivedItem);
-                                itemsToMatch.remove(item);
-                                score += 10;
-                              });
-                              checkGameOver();
-                            } else {
-                              setState(() {
-                                score -= 5;
-                              });
-                            }
+                      children: [
+                        const Text(
+                          'Game Over!',
+                          style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            resetGame();
                           },
-                          onWillAccept: (receivedItem) => true,
-                          builder: (context, acceptedItems, rejectedItems) =>
-                              Container(
-                            margin: const EdgeInsets.all(8.0),
-                            color: Colors.teal.withOpacity(0.5),
-                            height: 80,
-                            width: 80,
-                            alignment: Alignment.center,
-                            child: Image.network(
-                              item.imageUrl,
-                              height: 60,
-                              width: 60,
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                          child: const Text('New Game'),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            if (isGameOver)
-              Center(
-                child: Column(
-                  children: [
-                    const Text(
-                      'Game Over!',
-                      style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        resetGame();
-                      },
-                      child: const Text('New Game'),
-                    ),
-                  ],
-                ),
-              ),
-          ],
-        ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBlockedScreen() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.lock, size: 100, color: Colors.grey),
+          SizedBox(height: 20),
+          Text(
+            'REST YOUR EYES',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 18),
+          ),
+        ],
       ),
     );
   }
