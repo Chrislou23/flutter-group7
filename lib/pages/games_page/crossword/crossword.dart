@@ -4,6 +4,7 @@ class CrosswordGame extends StatefulWidget {
   const CrosswordGame({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CrosswordGameState createState() => _CrosswordGameState();
 }
 
@@ -25,7 +26,7 @@ class CrosswordWord {
 }
 
 class _CrosswordGameState extends State<CrosswordGame> {
-  int gridSize = 7;
+  late int gridSize;
   late List<List<String?>> grid;
   late List<List<TextEditingController?>> controllers;
   late List<List<int?>> numbers;
@@ -38,266 +39,210 @@ class _CrosswordGameState extends State<CrosswordGame> {
   final Map<int, List<CrosswordWord>> levels = {
     1: [
       CrosswordWord(
-          word: 'APPLE',
-          clue: '1. A red or green fruit',
-          row: 1,
+          word: 'ANGRY',
+          clue: '1. Feeling mad',
+          row: 4,
           col: 0,
           isHorizontal: true,
           number: 1),
       CrosswordWord(
-          word: 'WATER',
-          clue: '2. Something you drink',
-          row: 0,
+          word: 'SAD',
+          clue: '2. Feeling down',
+          row: 3,
           col: 0,
           isHorizontal: false,
           number: 2),
       CrosswordWord(
-          word: 'LEAF',
-          clue: '3. Part of a tree that turns green in spring',
-          row: 4,
-          col: 3,
-          isHorizontal: true,
+          word: 'HAPPY',
+          clue: '3. Feeling joy',
+          row: 0,
+          col: 4,
+          isHorizontal: false,
           number: 3),
       CrosswordWord(
-          word: 'BOOK',
-          clue: '4. Something you read',
-          row: 3,
+          word: 'EXCITED',
+          clue: '4. Feeling enthusiastic',
+          row: 0,
           col: 5,
           isHorizontal: false,
           number: 4),
       CrosswordWord(
-          word: 'FISH',
-          clue: '5. Lives in water',
+          word: 'SCARED',
+          clue: '5. Feeling fear',
           row: 1,
-          col: 4,
-          isHorizontal: true,
+          col: 3,
+          isHorizontal: false,
           number: 5),
-      CrosswordWord(
-          word: 'FIRE',
-          clue: '6. Hot and burns',
-          row: 5,
-          col: 2,
-          isHorizontal: true,
-          number: 6),
     ],
     2: [
       CrosswordWord(
-          word: 'HELLO',
-          clue: '1. A greeting',
-          row: 1,
-          col: 2,
-          isHorizontal: true,
-          number: 1),
+        word: 'LOVE',
+        clue: '1. Feeling affection',
+        row: 0,
+        col: 4,
+        isHorizontal: false,
+        number: 1,
+      ),
       CrosswordWord(
-          word: 'HOUSE',
-          clue: '2. A place where people live',
-          row: 1,
-          col: 2,
-          isHorizontal: false,
-          number: 2),
+        word: 'HOPE',
+        clue: '1. Feeling optimistic',
+        row: 1,
+        col: 3,
+        isHorizontal: true,
+        number: 2,
+      ),
       CrosswordWord(
-          word: 'TREE',
-          clue: '3. A tall plant',
-          row: 5,
-          col: 0,
-          isHorizontal: true,
-          number: 3),
+        word: 'BRAVE',
+        clue: '1. Feeling courageous',
+        row: 3,
+        col: 0,
+        isHorizontal: true,
+        number: 3,
+      ),
       CrosswordWord(
-          word: 'DOG',
-          clue: '4. A loyal pet',
-          row: 0,
-          col: 6,
-          isHorizontal: false,
-          number: 4),
+        word: 'PROUD',
+        clue: '1. Feeling accomplished',
+        row: 2,
+        col: 1,
+        isHorizontal: false,
+        number: 4,
+      ),
       CrosswordWord(
-          word: 'PLANT',
-          clue: '5. A living thing that grows on earth',
-          row: 1,
-          col: 0,
-          isHorizontal: false,
-          number: 5),
+        word: 'MAD',
+        clue: '1. Feeling angry',
+        row: 2,
+        col: 2,
+        isHorizontal: false,
+        number: 5,
+      ),
     ],
     3: [
       CrosswordWord(
-          word: 'ELEPHANT',
-          clue: '1. A large animal with a trunk',
-          row: 0,
-          col: 0,
-          isHorizontal: true,
-          number: 1),
+        word: 'CHEER',
+        clue: '1. To feel or show joy',
+        row: 0,
+        col: 3,
+        isHorizontal: false,
+        number: 1,
+      ),
       CrosswordWord(
-          word: 'ORANGE',
-          clue: '2. A citrus fruit',
-          row: 1,
-          col: 2,
-          isHorizontal: false,
-          number: 2),
+        word: 'PEACE',
+        clue: '2. Feeling quiet and calm',
+        row: 2,
+        col: 2,
+        isHorizontal: true,
+        number: 2,
+      ),
       CrosswordWord(
-          word: 'GRASS',
-          clue: '3. Green plant covering the ground',
-          row: 6,
-          col: 4,
-          isHorizontal: true,
-          number: 3),
+        word: 'FEAR',
+        clue: '3. Feeling scared',
+        row: 4,
+        col: 0,
+        isHorizontal: true,
+        number: 3,
+      ),
       CrosswordWord(
-          word: 'LION',
-          clue: '4. King of the jungle',
-          row: 3,
-          col: 1,
-          isHorizontal: true,
-          number: 4),
+        word: 'CARED',
+        clue: '4. Taking care of someone or something',
+        row: 2,
+        col: 5,
+        isHorizontal: false,
+        number: 4,
+      ),
       CrosswordWord(
-          word: 'RAIN',
-          clue: '5. Falls from the sky',
-          row: 0,
-          col: 5,
-          isHorizontal: false,
-          number: 5),
-      CrosswordWord(
-          word: 'SHIP',
-          clue: '6. Sails on the sea',
-          row: 2,
-          col: 6,
-          isHorizontal: false,
-          number: 6),
-      CrosswordWord(
-          word: 'CLOCK',
-          clue: '7. Tells time',
-          row: 5,
-          col: 0,
-          isHorizontal: true,
-          number: 7),
+        word: 'KIND',
+        clue: '5. Feeling compassion',
+        row: 6,
+        col: 2,
+        isHorizontal: true,
+        number: 5,
+      ),
     ],
     4: [
       CrosswordWord(
-          word: 'DINOSAUR',
-          clue: '1. A large extinct reptile',
-          row: 1,
-          col: 0,
-          isHorizontal: true,
-          number: 1),
+        word: 'UPSET',
+        clue: '1 Feeling unhappy or disappointed',
+        row: 1,
+        col: 0,
+        isHorizontal: true,
+        number: 1,
+      ),
       CrosswordWord(
-          word: 'PYTHON',
-          clue: '2. A large snake or programming language',
-          row: 3,
-          col: 1,
-          isHorizontal: false,
-          number: 2),
+        word: 'JOYFUL',
+        clue: '2. Feeling full of happiness',
+        row: 2,
+        col: 1,
+        isHorizontal: true,
+        number: 2,
+      ),
       CrosswordWord(
-          word: 'OCEAN',
-          clue: '3. A large body of water',
-          row: 5,
-          col: 3,
-          isHorizontal: true,
-          number: 3),
+        word: 'SORROW',
+        clue: '3. Feeling deep sadness',
+        row: 1,
+        col: 2,
+        isHorizontal: false,
+        number: 3,
+      ),
       CrosswordWord(
-          word: 'BRIDGE',
-          clue: '4. Structure that spans a river',
-          row: 0,
-          col: 4,
-          isHorizontal: false,
-          number: 4),
+        word: 'RELAX',
+        clue: '4. Feeling calm and at ease',
+        row: 0,
+        col: 6,
+        isHorizontal: false,
+        number: 4,
+      ),
       CrosswordWord(
-          word: 'PLANET',
-          clue: '5. Earth is one',
-          row: 2,
-          col: 3,
-          isHorizontal: true,
-          number: 5),
-      CrosswordWord(
-          word: 'MUSIC',
-          clue: '6. Sound created by instruments',
-          row: 6,
-          col: 0,
-          isHorizontal: true,
-          number: 6),
-      CrosswordWord(
-          word: 'STORM',
-          clue: '7. Violent weather with wind and rain',
-          row: 4,
-          col: 2,
-          isHorizontal: false,
-          number: 7),
-      CrosswordWord(
-          word: 'TRAIN',
-          clue: '8. Runs on tracks',
-          row: 0,
-          col: 0,
-          isHorizontal: false,
-          number: 8),
+        word: 'TIRED',
+        clue: '5. Feeling exhausted',
+        row: 4,
+        col: 0,
+        isHorizontal: true,
+        number: 5,
+      ),
     ],
     5: [
       CrosswordWord(
-          word: 'CHAMELEON',
-          clue: '1. A lizard known for changing colors',
-          row: 0,
-          col: 0,
-          isHorizontal: true,
-          number: 1),
+        word: 'SHAME',
+        clue: '1. Feeling embarrassed or guilty',
+        row: 0,
+        col: 1,
+        isHorizontal: true,
+        number: 1,
+      ),
       CrosswordWord(
-          word: 'HIPPOPOTAMUS',
-          clue: '2. A large river-dwelling mammal',
-          row: 2,
-          col: 3,
-          isHorizontal: false,
-          number: 2),
+        word: 'HATE',
+        clue: '2. Feeling intense dislike',
+        row: 0,
+        col: 2,
+        isHorizontal: false,
+        number: 2,
+      ),
       CrosswordWord(
-          word: 'MOUNTAIN',
-          clue: '3. A large natural elevation of the earth’s surface',
-          row: 5,
-          col: 5,
-          isHorizontal: true,
-          number: 3),
+        word: 'FEAR',
+        clue: '3. Feeling scared',
+        row: 3,
+        col: 1,
+        isHorizontal: true,
+        number: 3,
+      ),
       CrosswordWord(
-          word: 'BICYCLE',
-          clue: '4. A vehicle with two wheels',
-          row: 1,
-          col: 1,
-          isHorizontal: true,
-          number: 4),
+        word: 'PRIDE',
+        clue: '4. Feeling proud of oneself',
+        row: 2,
+        col: 4,
+        isHorizontal: false,
+        number: 4,
+      ),
       CrosswordWord(
-          word: 'ASTRONAUT',
-          clue: '5. A person who travels in space',
-          row: 4,
-          col: 0,
-          isHorizontal: false,
-          number: 5),
-      CrosswordWord(
-          word: 'VOLCANO',
-          clue: '6. A mountain that erupts with lava',
-          row: 6,
-          col: 2,
-          isHorizontal: true,
-          number: 6),
-      CrosswordWord(
-          word: 'FOREST',
-          clue: '7. A large area covered chiefly with trees',
-          row: 0,
-          col: 6,
-          isHorizontal: false,
-          number: 7),
-      CrosswordWord(
-          word: 'AIRPLANE',
-          clue: '8. Flies in the sky',
-          row: 2,
-          col: 0,
-          isHorizontal: false,
-          number: 8),
-      CrosswordWord(
-          word: 'CAMEL',
-          clue: '9. Animal with humps',
-          row: 3,
-          col: 5,
-          isHorizontal: true,
-          number: 9),
-      CrosswordWord(
-          word: 'COMPUTER',
-          clue: '10. A machine for calculations or browsing the internet',
-          row: 5,
-          col: 0,
-          isHorizontal: true,
-          number: 10),
-    ],
+        word: 'GRIEF',
+        clue: '5. Feeling deep sadness',
+        row: 6,
+        col: 1,
+        isHorizontal: true,
+        number: 5,
+      ),
+    ]
+    // Additional levels are truncated for brevity
   };
 
   int? selectedClueIndex;
@@ -305,7 +250,6 @@ class _CrosswordGameState extends State<CrosswordGame> {
   @override
   void initState() {
     super.initState();
-    initializeGrid();
     _generateCrossword();
   }
 
@@ -316,6 +260,12 @@ class _CrosswordGameState extends State<CrosswordGame> {
   }
 
   void _generateCrossword() {
+    // Determine the grid size based on the longest word in the current level
+    int longestWordLength = levels[currentLevel]!
+        .map((word) => word.word.length)
+        .reduce((a, b) => a > b ? a : b);
+    gridSize = longestWordLength > 7 ? longestWordLength + 2 : 7;
+
     initializeGrid();
     List<CrosswordWord> crosswordData = levels[currentLevel] ?? [];
     for (var wordData in crosswordData) {
@@ -327,20 +277,27 @@ class _CrosswordGameState extends State<CrosswordGame> {
 
   void _placeWord(
       String word, int row, int col, bool isHorizontal, int number) {
+    // First check if the word can be placed without conflicts
     for (int i = 0; i < word.length; i++) {
       int currentRow = row + (isHorizontal ? 0 : i);
       int currentCol = col + (isHorizontal ? i : 0);
 
       // Check grid limits
       if (currentRow >= gridSize || currentCol >= gridSize) {
-        return;
+        return; // Word doesn't fit within the grid bounds
       }
 
       // If a letter exists but is different, don’t place the word
       if (grid[currentRow][currentCol] != null &&
           grid[currentRow][currentCol] != word[i]) {
-        return;
+        return; // Word conflicts with another already placed word
       }
+    }
+
+    // Place the word in the grid if all checks pass
+    for (int i = 0; i < word.length; i++) {
+      int currentRow = row + (isHorizontal ? 0 : i);
+      int currentCol = col + (isHorizontal ? i : 0);
 
       grid[currentRow][currentCol] = word[i];
       controllers[currentRow][currentCol] ??= TextEditingController();
@@ -399,6 +356,21 @@ class _CrosswordGameState extends State<CrosswordGame> {
     }
   }
 
+  void _showAnswers() {
+    List<CrosswordWord> crosswordData = levels[currentLevel] ?? [];
+    for (var wordData in crosswordData) {
+      for (int i = 0; i < wordData.word.length; i++) {
+        int currentRow = wordData.row + (wordData.isHorizontal ? 0 : i);
+        int currentCol = wordData.col + (wordData.isHorizontal ? i : 0);
+
+        if (currentRow < gridSize && currentCol < gridSize) {
+          controllers[currentRow][currentCol]?.text =
+              wordData.word[i].toUpperCase();
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double cellSize = MediaQuery.of(context).size.width / gridSize;
@@ -428,7 +400,15 @@ class _CrosswordGameState extends State<CrosswordGame> {
                   int? number = numbers[row][col];
 
                   if (letter == null) {
-                    return Container();
+                    return Container(
+                      margin: const EdgeInsets.all(2),
+                      width: cellSize,
+                      height: cellSize,
+                      decoration: BoxDecoration(
+                        color: Colors.lightBlueAccent,
+                        border: Border.all(color: Colors.white, width: 1),
+                      ),
+                    );
                   }
 
                   bool isHighlighted = false;
@@ -458,15 +438,21 @@ class _CrosswordGameState extends State<CrosswordGame> {
                         width: cellSize,
                         height: cellSize,
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black),
-                          color: isHighlighted ? Colors.yellow : Colors.white,
+                          border: Border.all(color: Colors.white, width: 1),
+                          color: isHighlighted
+                              ? Colors.yellow
+                              : Colors.lightGreenAccent,
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: TextField(
                           controller: controllers[row][col],
                           textAlign: TextAlign.center,
                           decoration:
                               const InputDecoration(border: InputBorder.none),
-                          style: const TextStyle(fontSize: 20),
+                          style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
                           maxLength: 1,
                           buildCounter: (_,
                                   {int? currentLength,
@@ -482,7 +468,9 @@ class _CrosswordGameState extends State<CrosswordGame> {
                           child: Text(
                             number.toString(),
                             style: const TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.bold),
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.redAccent),
                           ),
                         ),
                     ],
@@ -495,10 +483,20 @@ class _CrosswordGameState extends State<CrosswordGame> {
             child: ListView.builder(
               itemCount: levels[currentLevel]!.length,
               itemBuilder: (BuildContext context, int index) {
-                return ListTile(
-                  title: Text(levels[currentLevel]![index].clue),
-                  onTap: () => _selectClue(index),
-                  selected: selectedClueIndex == index,
+                return Card(
+                  color: Colors.lightBlue.shade100,
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                  child: ListTile(
+                    title: Text(
+                      levels[currentLevel]![index].clue,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    onTap: () => _selectClue(index),
+                    selected: selectedClueIndex == index,
+                    selectedTileColor: Colors.yellow.shade100,
+                  ),
                 );
               },
             ),
@@ -517,68 +515,93 @@ class _CrosswordGameState extends State<CrosswordGame> {
             ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () {
-                if (_isCrosswordCompleted()) {
-                  if (currentLevel < maxLevel) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Level Complete!'),
-                          content: const Text('You have completed this level.'),
-                          actions: <Widget>[
-                            TextButton(
-                              child: const Text('Next Level'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                _moveToNextLevel();
-                              },
-                            ),
-                          ],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
+                    textStyle: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  onPressed: () {
+                    if (_isCrosswordCompleted()) {
+                      if (currentLevel < maxLevel) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Level Complete!'),
+                              content:
+                                  const Text('You have completed this level.'),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: const Text('Next Level'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    _moveToNextLevel();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
                         );
-                      },
-                    );
-                  } else {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Congratulations!'),
-                          content: const Text('You have completed all levels!'),
-                          actions: <Widget>[
-                            TextButton(
-                              child: const Text('OK'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Congratulations!'),
+                              content:
+                                  const Text('You have completed all levels!'),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: const Text('OK'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
                         );
-                      },
-                    );
-                  }
-                } else {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Try Again'),
-                        content: const Text('Some answers are incorrect.'),
-                        actions: <Widget>[
-                          TextButton(
-                            child: const Text('OK'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
+                      }
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Try Again'),
+                            content: const Text('Some answers are incorrect.'),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text('OK'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
                       );
-                    },
-                  );
-                }
-              },
-              child: const Text('Check Answers'),
+                    }
+                  },
+                  child: const Text('Check Answers'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
+                    textStyle: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  onPressed: _showAnswers,
+                  child: const Text('Show Answers'),
+                ),
+              ],
             ),
           ),
         ],
