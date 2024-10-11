@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:mobile_games/timer_provider.dart';
 
 class CrosswordGame extends StatefulWidget {
   const CrosswordGame({super.key});
@@ -33,41 +35,11 @@ class _CrosswordGameState extends State<CrosswordGame> {
   TextEditingController wordInputController = TextEditingController();
 
   final List<CrosswordWord> crosswordData = [
-    CrosswordWord(
-        word: 'HELLO',
-        clue: '1. A greeting',
-        row: 1,
-        col: 2,
-        isHorizontal: true,
-        number: 1),
-    CrosswordWord(
-        word: 'HOUSE',
-        clue: '2. A place where people live',
-        row: 1,
-        col: 2,
-        isHorizontal: false,
-        number: 2),
-    CrosswordWord(
-        word: 'TREE',
-        clue: '3. A tall plant',
-        row: 5,
-        col: 0,
-        isHorizontal: true,
-        number: 3),
-    CrosswordWord(
-        word: 'DOG',
-        clue: '4. A loyal pet',
-        row: 0,
-        col: 6,
-        isHorizontal: false,
-        number: 4),
-    CrosswordWord(
-        word: 'PLANT',
-        clue: '5. A living thing that grows on earth',
-        row: 1,
-        col: 0,
-        isHorizontal: false,
-        number: 5),
+    CrosswordWord(word: 'HELLO', clue: '1. A greeting', row: 1, col: 2, isHorizontal: true, number: 1),
+    CrosswordWord(word: 'HOUSE', clue: '2. A place where people live', row: 1, col: 2, isHorizontal: false, number: 2),
+    CrosswordWord(word: 'TREE', clue: '3. A tall plant', row: 5, col: 0, isHorizontal: true, number: 3),
+    CrosswordWord(word: 'DOG', clue: '4. A loyal pet', row: 0, col: 6, isHorizontal: false, number: 4),
+    CrosswordWord(word: 'PLANT', clue: '5. A living thing that grows on earth', row: 1, col: 0, isHorizontal: false, number: 5),
   ];
 
   int? selectedClueIndex;
@@ -83,25 +55,20 @@ class _CrosswordGameState extends State<CrosswordGame> {
 
   void _generateCrossword() {
     for (var wordData in crosswordData) {
-      _placeWord(wordData.word, wordData.row, wordData.col,
-          wordData.isHorizontal, wordData.number);
+      _placeWord(wordData.word, wordData.row, wordData.col, wordData.isHorizontal, wordData.number);
     }
   }
 
-  void _placeWord(
-      String word, int row, int col, bool isHorizontal, int number) {
+  void _placeWord(String word, int row, int col, bool isHorizontal, int number) {
     for (int i = 0; i < word.length; i++) {
       int currentRow = row + (isHorizontal ? 0 : i);
       int currentCol = col + (isHorizontal ? i : 0);
 
-      // Vérifier les limites de la grille
       if (currentRow >= gridSize || currentCol >= gridSize) {
         return;
       }
 
-      // Si une lettre existe déjà et est différente, ne pas placer le mot
-      if (grid[currentRow][currentCol] != null &&
-          grid[currentRow][currentCol] != word[i]) {
+      if (grid[currentRow][currentCol] != null && grid[currentRow][currentCol] != word[i]) {
         return;
       }
 
@@ -116,8 +83,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
   bool _isCrosswordCompleted() {
     for (int row = 0; row < gridSize; row++) {
       for (int col = 0; col < gridSize; col++) {
-        if (grid[row][col] != null &&
-            controllers[row][col]?.text.toUpperCase() != grid[row][col]) {
+        if (grid[row][col] != null && controllers[row][col]?.text.toUpperCase() != grid[row][col]) {
           return false;
         }
       }
@@ -155,165 +121,195 @@ class _CrosswordGameState extends State<CrosswordGame> {
 
   @override
   Widget build(BuildContext context) {
-    double cellSize = MediaQuery.of(context).size.width / gridSize;
+    return Consumer<TimerProvider>(
+      builder: (context, timerProvider, child) {
+        if (timerProvider.isBlocked) {
+          return _buildBlockedScreen();
+        }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Custom Crossword"),
-        backgroundColor: Colors.blue,
-      ),
-      body: Column(
-        children: [
-          SizedBox(
-            height: cellSize * gridSize,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: gridSize * gridSize,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: gridSize,
-                  childAspectRatio: 1,
-                ),
-                itemBuilder: (BuildContext context, int index) {
-                  int row = index ~/ gridSize;
-                  int col = index % gridSize;
-                  String? letter = grid[row][col];
-                  int? number = numbers[row][col];
+        double cellSize = MediaQuery.of(context).size.width / gridSize;
 
-                  // Ne pas afficher les cases qui ne contiennent pas de lettres
-                  if (letter == null) {
-                    return Container(); // Retourner un conteneur vide pour les cases vides
-                  }
-
-                  bool isHighlighted = false;
-                  if (selectedClueIndex != null) {
-                    var selectedWord = crosswordData[selectedClueIndex!];
-                    int startRow = selectedWord.row;
-                    int startCol = selectedWord.col;
-                    String word = selectedWord.word;
-                    bool isHorizontal = selectedWord.isHorizontal;
-
-                    if (isHorizontal) {
-                      isHighlighted = row == startRow &&
-                          col >= startCol &&
-                          col < startCol + word.length;
-                    } else {
-                      isHighlighted = col == startCol &&
-                          row >= startRow &&
-                          row < startRow + word.length;
-                    }
-                  }
-
-                  return Stack(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.all(2),
-                        width: cellSize,
-                        height: cellSize,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black),
-                          color: isHighlighted ? Colors.yellow : Colors.white,
-                        ),
-                        child: TextField(
-                          controller: controllers[row][col],
-                          textAlign: TextAlign.center,
-                          decoration:
-                              const InputDecoration(border: InputBorder.none),
-                          style: const TextStyle(fontSize: 20),
-                          maxLength: 1,
-                          buildCounter: (_,
-                                  {int? currentLength,
-                                  bool? isFocused,
-                                  int? maxLength}) =>
-                              null,
-                        ),
-                      ),
-                      if (number != null)
-                        Positioned(
-                          top: 2,
-                          left: 2,
-                          child: Text(
-                            number.toString(),
-                            style: const TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                    ],
-                  );
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text("Custom Crossword"),
+            backgroundColor: Colors.blue,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.settings, color: Colors.black),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/settings');
                 },
               ),
-            ),
+            ],
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: crosswordData.length,
-              itemBuilder: (BuildContext context, int index) {
-                return ListTile(
-                  title: Text(crosswordData[index].clue),
-                  onTap: () => _selectClue(index),
-                  selected: selectedClueIndex == index,
-                );
-              },
-            ),
-          ),
-          if (selectedClueIndex != null)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: wordInputController,
-                decoration: const InputDecoration(
-                  labelText: 'Enter the word for the selected clue',
-                  border: OutlineInputBorder(),
+          body: Column(
+            children: [
+              SizedBox(
+                height: cellSize * gridSize,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: GridView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: gridSize * gridSize,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: gridSize,
+                      childAspectRatio: 1,
+                    ),
+                    itemBuilder: (BuildContext context, int index) {
+                      int row = index ~/ gridSize;
+                      int col = index % gridSize;
+                      String? letter = grid[row][col];
+                      int? number = numbers[row][col];
+
+                      if (letter == null) {
+                        return Container();
+                      }
+
+                      bool isHighlighted = false;
+                      if (selectedClueIndex != null) {
+                        var selectedWord = crosswordData[selectedClueIndex!];
+                        int startRow = selectedWord.row;
+                        int startCol = selectedWord.col;
+                        String word = selectedWord.word;
+                        bool isHorizontal = selectedWord.isHorizontal;
+
+                        if (isHorizontal) {
+                          isHighlighted = row == startRow &&
+                              col >= startCol &&
+                              col < startCol + word.length;
+                        } else {
+                          isHighlighted = col == startCol &&
+                              row >= startRow &&
+                              row < startRow + word.length;
+                        }
+                      }
+
+                      return Stack(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.all(2),
+                            width: cellSize,
+                            height: cellSize,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black),
+                              color: isHighlighted ? Colors.yellow : Colors.white,
+                            ),
+                            child: TextField(
+                              controller: controllers[row][col],
+                              textAlign: TextAlign.center,
+                              decoration: const InputDecoration(border: InputBorder.none),
+                              style: const TextStyle(fontSize: 20),
+                              maxLength: 1,
+                              buildCounter: (_,
+                                      {int? currentLength,
+                                      bool? isFocused,
+                                      int? maxLength}) =>
+                                  null,
+                            ),
+                          ),
+                          if (number != null)
+                            Positioned(
+                              top: 2,
+                              left: 2,
+                              child: Text(
+                                number.toString(),
+                                style: const TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
                 ),
-                onChanged: _updateSelectedWord,
               ),
-            ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () {
-                if (_isCrosswordCompleted()) {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Congratulations!'),
-                        content:
-                            const Text('You have completed the crossword!'),
-                        actions: <Widget>[
-                          TextButton(
-                            child: const Text('OK'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
+              Expanded(
+                child: ListView.builder(
+                  itemCount: crosswordData.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(
+                      title: Text(crosswordData[index].clue),
+                      onTap: () => _selectClue(index),
+                      selected: selectedClueIndex == index,
+                    );
+                  },
+                ),
+              ),
+              if (selectedClueIndex != null)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: wordInputController,
+                    decoration: const InputDecoration(
+                      labelText: 'Enter the word for the selected clue',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: _updateSelectedWord,
+                  ),
+                ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (_isCrosswordCompleted()) {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Congratulations!'),
+                            content: const Text('You have completed the crossword!'),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text('OK'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
                       );
-                    },
-                  );
-                } else {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Try Again'),
-                        content: const Text('Some answers are incorrect.'),
-                        actions: <Widget>[
-                          TextButton(
-                            child: const Text('OK'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Try Again'),
+                            content: const Text('Some answers are incorrect.'),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text('OK'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
                       );
-                    },
-                  );
-                }
-              },
-              child: const Text('Check Answers'),
-            ),
+                    }
+                  },
+                  child: const Text('Check Answers'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBlockedScreen() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.lock, size: 100, color: Colors.grey),
+          SizedBox(height: 20),
+          Text(
+            'REST YOUR EYES',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 18),
           ),
         ],
       ),
