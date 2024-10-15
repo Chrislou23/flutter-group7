@@ -9,7 +9,7 @@ import 'pages/games_page/link/link_game_page.dart';
 import 'pages/games_page/link/link_instructions_en.dart';
 import 'pages/games_page/crossword/crossword_instructions_en.dart';
 import 'pages/games_page/crossword/crossword_instructions_fi.dart';
-import 'pages/account_page/account_page.dart';
+import 'pages/account_page/login_page.dart';
 import 'timer_provider.dart';
 
 void main() {

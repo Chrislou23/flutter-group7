@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatelessWidget {
+  const RegisterPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: const Text('Login', style: TextStyle(color: Colors.black)),
+        title: const Text('Register', style: TextStyle(color: Colors.black)),
         centerTitle: true,
       ),
       body: Padding(
@@ -24,36 +24,37 @@ class LoginPage extends StatelessWidget {
             ),
             const SizedBox(height: 16.0),
             const TextField(
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Choose a Nickname',
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            const TextField(
               obscureText: true,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Password',
+                labelText: 'Enter your Password',
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            const TextField(
+              obscureText: true,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Confirm the Password',
               ),
             ),
             const SizedBox(height: 32.0),
             ElevatedButton(
               onPressed: () {
-                // Action for login button
-              },
-              child: const Text('Login'),
-            ),
-            const SizedBox(height: 16.0), // Add some space between the buttons
-            ElevatedButton(
-              onPressed: () {
                 // Action for register button
-                // You could navigate to the RegisterPage here
               },
               child: const Text('Register'),
-            )
+            ),
           ],
         ),
       ),
     );
   }
-}
-
-void main() {
-  runApp(const MaterialApp(
-    home: LoginPage(),
-  ));
 }
