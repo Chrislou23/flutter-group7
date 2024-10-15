@@ -15,6 +15,7 @@ class _LinkGamePageState extends State<LinkGame> {
   List<ItemModel> items = [];
   List<ItemModel> itemsToMatch = [];
   int score = 0;
+  int totalScore = 0; // Track total score across levels
   int level = 1;
   bool isGameOver = false;
 
@@ -44,7 +45,7 @@ class _LinkGamePageState extends State<LinkGame> {
     }
     items.shuffle();
     itemsToMatch.shuffle();
-    score = 0;
+    score = 0; // Reset the score for the current level
     isGameOver = false;
   }
 
@@ -102,16 +103,16 @@ class _LinkGamePageState extends State<LinkGame> {
     ];
     itemsToMatch = List<ItemModel>.from(items);
   }
-
   void checkGameOver() {
     if (items.isEmpty && itemsToMatch.isEmpty) {
+      totalScore += score; // Add level score to total score
       if (level < 5) {
         level++;
         initGame();
         setState(() {});
       } else {
         isGameOver = true;
-        showFinalScoreDialog();
+        showFinalScoreDialog(); // Show dialog when the game is over
       }
     }
   }
@@ -121,15 +122,19 @@ class _LinkGamePageState extends State<LinkGame> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Congratulations!'),
-          content: Text('You have completed all levels!\nYour final score: $score'),
+          title: Text(widget.isEnglish ? 'Congratulations!' : 'Onnittelut!'),
+          content: Text(
+            widget.isEnglish
+                ? 'You have completed all levels!\nYour final score: $totalScore'
+                : 'Olet suorittanut kaikki tasot!\nLopulliset pisteesi: $totalScore',
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 resetGame();
               },
-              child: const Text('New Game'),
+              child: Text(widget.isEnglish ? 'New Game' : 'Uusi peli'),
             ),
           ],
         );
@@ -140,6 +145,7 @@ class _LinkGamePageState extends State<LinkGame> {
   void resetGame() {
     level = 1;
     score = 0;
+    totalScore = 0; // Reset total score when starting a new game
     initGame();
     setState(() {});
   }
@@ -155,11 +161,15 @@ class _LinkGamePageState extends State<LinkGame> {
         child: Column(
           children: [
             Text(
-              widget.isEnglish ? 'Score: $score' : 'Pisteet: $score', // Switch text
+              widget.isEnglish ? 'Score: $score' : 'Pisteet: $score', // Show current level score
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             Text(
-              widget.isEnglish ? 'Level: $level' : 'Taso: $level', // Switch text
+              widget.isEnglish ? 'Total Score: $totalScore' : 'Kokonaispisteet: $totalScore', // Show total score
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+            ),
+            Text(
+              widget.isEnglish ? 'Level: $level' : 'Taso: $level', // Show current level
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 20),
