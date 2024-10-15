@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_games/pages/games_page/link/link_instructions_fi.dart';
 import 'package:provider/provider.dart';
@@ -12,7 +13,10 @@ import 'pages/games_page/crossword/crossword_instructions_fi.dart';
 import 'pages/account_page/login_page.dart';
 import 'timer_provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(); // Initialize Firebase
+
   runApp(
     MultiProvider(
       providers: [
