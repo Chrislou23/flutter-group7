@@ -75,7 +75,7 @@ class _LinkGamePageState extends State<LinkGamePage> {
                     const SizedBox(height: 20),
                     // Create a private game and Fast game buttons
                     CustomButton(
-                      text: 'Create a private game',
+                      text: isEnglish ? 'Create a private game' : 'Luo yksityinen peli',
                       onPressed: () {
                         if (kDebugMode) {
                           print('Create a private game pressed');
@@ -84,12 +84,12 @@ class _LinkGamePageState extends State<LinkGamePage> {
                     ),
                     const SizedBox(height: 10),
                     CustomButton(
-                      text: 'Fast game',
+                      text: isEnglish ? 'Fast game' : 'Pikapeli',
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const LinkGame(),
+                            builder: (context) => LinkGame(isEnglish: isEnglish), // Pass isEnglish to game page
                           ),
                         );
                       },
@@ -145,7 +145,7 @@ class TabButtons extends StatelessWidget {
               print('Game tab pressed');
             }
           },
-          child: const Text('Game', style: TextStyle(fontSize: 18)),
+          child: Text(isEnglish ? 'Game' : 'Peli', style: const TextStyle(fontSize: 18)),
         ),
         const VerticalDivider(thickness: 2, color: Colors.black),
         GestureDetector(
@@ -154,7 +154,7 @@ class TabButtons extends StatelessWidget {
               print('Rank tab pressed');
             }
           },
-          child: const Text('Rank', style: TextStyle(fontSize: 18)),
+          child: Text(isEnglish ? 'Rank' : 'Sijoitus', style: const TextStyle(fontSize: 18)),
         ),
         const VerticalDivider(thickness: 2, color: Colors.black),
         GestureDetector(
@@ -168,13 +168,13 @@ class TabButtons extends StatelessWidget {
               ),
             );
           },
-          child: const Text('How to play', style: TextStyle(fontSize: 18)),
+          child: Text(isEnglish ? 'How to play' : 'Kuinka pelata', style: const TextStyle(fontSize: 18)),
         ),
         const VerticalDivider(thickness: 2, color: Colors.black),
         GestureDetector(
           onTap: toggleLanguage,
           child: Text(
-            isEnglish ? 'Switch to Finnish' : 'Switch to English',
+            isEnglish ? 'Switch to Finnish' : 'Vaihda Englantiin',
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),

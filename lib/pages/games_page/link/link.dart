@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:mobile_games/timer_provider.dart';
 
 class LinkGame extends StatefulWidget {
-  const LinkGame({Key? key}) : super(key: key);
+  final bool isEnglish; // Add language preference flag
+
+  const LinkGame({Key? key, required this.isEnglish}) : super(key: key);
 
   @override
   _LinkGamePageState createState() => _LinkGamePageState();
@@ -146,18 +148,18 @@ class _LinkGamePageState extends State<LinkGame> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Emotion Linking Game'),
+        title: Text(widget.isEnglish ? 'Emotion Linking Game' : 'Tunteiden Yhdistämispeli'), // Switch title based on language
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             Text(
-              'Score: $score',
+              widget.isEnglish ? 'Score: $score' : 'Pisteet: $score', // Switch text
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             Text(
-              'Level: $level',
+              widget.isEnglish ? 'Level: $level' : 'Taso: $level', // Switch text
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 20),
@@ -190,7 +192,7 @@ class _LinkGamePageState extends State<LinkGame> {
                             feedback: Material(
                               color: Colors.transparent,
                               child: Text(
-                                '${item.name} / ${item.finnishName}',
+                                widget.isEnglish ? item.name : item.finnishName, // Switch based on language
                                 style: const TextStyle(
                                     fontSize: 26,
                                     color: Colors.teal,
@@ -203,24 +205,8 @@ class _LinkGamePageState extends State<LinkGame> {
                                     ]),
                               ),
                             ),
-                            childWhenDragging: Opacity(
-                              opacity: 0.5,
-                              child: Text(
-                                '${item.name} / ${item.finnishName}',
-                                style: const TextStyle(
-                                    fontSize: 24,
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.bold,
-                                    shadows: [
-                                      Shadow(
-                                          color: Colors.black26,
-                                          offset: Offset(1, 2),
-                                          blurRadius: 2)
-                                    ]),
-                              ),
-                            ),
                             child: Text(
-                              '${item.name} / ${item.finnishName}',
+                              widget.isEnglish ? item.name : item.finnishName, // Switch based on language
                               style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
@@ -299,23 +285,6 @@ class _LinkGamePageState extends State<LinkGame> {
               ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildBlockedScreen() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.lock, size: 100, color: Colors.grey),
-          SizedBox(height: 20),
-          Text(
-            'REST YOUR EYES',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 18),
-          ),
-        ],
       ),
     );
   }
