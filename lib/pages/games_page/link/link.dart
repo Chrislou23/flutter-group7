@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_games/timer_provider.dart';
+import 'package:share_plus/share_plus.dart'; // Import the share_plus package
 
 class LinkGame extends StatefulWidget {
   final bool isEnglish; // Add language preference flag
@@ -103,6 +104,7 @@ class _LinkGamePageState extends State<LinkGame> {
     ];
     itemsToMatch = List<ItemModel>.from(items);
   }
+
   void checkGameOver() {
     if (items.isEmpty && itemsToMatch.isEmpty) {
       totalScore += score; // Add level score to total score
@@ -129,6 +131,14 @@ class _LinkGamePageState extends State<LinkGame> {
                 : 'Olet suorittanut kaikki tasot!\nLopulliset pisteesi: $totalScore',
           ),
           actions: [
+            TextButton(
+              onPressed: () {
+                Share.share(widget.isEnglish
+                    ? 'I completed all levels in the Emotion Linking Game! My final score: $totalScore'
+                    : 'Suoritin kaikki tasot Tunteiden Yhdistämispelissä! Lopulliset pisteeni: $totalScore');
+              },
+              child: Text(widget.isEnglish ? 'Share Score' : 'Jaa Pisteet'),
+            ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
