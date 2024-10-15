@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile_games/pages/account_page/profile_page.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_games/timer_provider.dart';
 import 'package:mobile_games/pages/friends_page/friend_page.dart';
@@ -7,7 +9,9 @@ import 'package:mobile_games/pages/games_page/crossword/crossword_game_page.dart
 import 'package:mobile_games/pages/games_page/link/link_game_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final User user;
+
+  const HomePage({super.key, required this.user});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -38,7 +42,12 @@ class _HomePageState extends State<HomePage> {
             leading: IconButton(
               icon: const Icon(Icons.account_circle, color: Colors.black),
               onPressed: () {
-                Navigator.pushNamed(context, '/account');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfilePage(user: widget.user),
+                  ),
+                );
               },
             ),
             title: timerProvider.isBlocked
@@ -70,7 +79,9 @@ class _HomePageState extends State<HomePage> {
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const CrosswordGamePage()),
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CrosswordGamePage()),
                             );
                           },
                           child: Container(
@@ -84,15 +95,15 @@ class _HomePageState extends State<HomePage> {
                               color: Colors.grey[300],
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Center(
-                            ),
+                            child: const Center(),
                           ),
                         ),
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const LinkGamePage()),
+                              MaterialPageRoute(
+                                  builder: (context) => const LinkGamePage()),
                             );
                           },
                           child: Container(
@@ -106,8 +117,7 @@ class _HomePageState extends State<HomePage> {
                               color: Colors.grey[300],
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Center(
-                            ),
+                            child: const Center(),
                           ),
                         ),
                       ],

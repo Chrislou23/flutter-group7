@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart'; // Import this to check initialization
+import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -11,59 +10,35 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance; // Firebase Auth instance
-  final FirebaseFirestore _firestore =
-      FirebaseFirestore.instance; // Firestore instance
-
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _nicknameController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
-
-  String errorMessage = '';
+  String _errorMessage = '';
 
   Future<void> registerUser() async {
     try {
-      // Ensure Firebase is initialized
-      if (Firebase.apps.isEmpty) {
-        await Firebase.initializeApp();
-      }
-
-      if (_passwordController.text != _confirmPasswordController.text) {
-        setState(() {
-          errorMessage = "Passwords do not match!";
-        });
-        return;
-      }
-
-      // Register with Firebase Auth
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: _usernameController.text.trim(),
+      final credential = await _auth.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-
-      print("User created successfully: ${userCredential.user?.uid}");
-
-      // Store additional user info in Firestore
-      await _firestore.collection('users').doc(userCredential.user?.uid).set({
-        'username': _usernameController.text.trim(),
-        'nickname': _nicknameController.text.trim(),
-      });
-
-      // Navigate to login or home screen after registration
-      Navigator.pop(context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
     } on FirebaseAuthException catch (e) {
       setState(() {
-        errorMessage = e.message ?? "An error occurred during registration!";
+        if (e.code == 'weak-password') {
+          _errorMessage = 'The password provided is too weak.';
+        } else if (e.code == 'email-already-in-use') {
+          _errorMessage = 'The account already exists for that email.';
+        } else {
+          _errorMessage = e.message ?? 'An unexpected error occurred!';
+        }
       });
-      print("FirebaseAuthException: ${e.code} - ${e.message}");
     } catch (e) {
       setState(() {
-        errorMessage = "An unexpected error occurred!";
+        _errorMessage = 'An unexpected error occurred: $e';
       });
-      print("Unexpected error: $e");
     }
   }
 
@@ -71,9 +46,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('Register', style: TextStyle(color: Colors.black)),
-        centerTitle: true,
+        title: const Text('Register'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -81,23 +54,15 @@ class _RegisterPageState extends State<RegisterPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
-              controller: _usernameController, // Attach controller
+              controller: _emailController,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Username (Email)',
+                labelText: 'Email',
               ),
             ),
             const SizedBox(height: 16.0),
             TextField(
-              controller: _nicknameController, // Attach controller
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Nickname',
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            TextField(
-              controller: _passwordController, // Attach controller
+              controller: _passwordController,
               obscureText: true,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
@@ -105,23 +70,28 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
             const SizedBox(height: 16.0),
-            TextField(
-              controller: _confirmPasswordController, // Attach controller
-              obscureText: true,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Confirm Password',
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            if (errorMessage.isNotEmpty) ...[
-              Text(errorMessage, style: const TextStyle(color: Colors.red)),
-              const SizedBox(height: 16.0),
-            ],
             ElevatedButton(
               onPressed: registerUser,
               child: const Text('Register'),
             ),
+            const SizedBox(height: 16.0),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
+              },
+              child: const Text('Already have an account? Login'),
+            ),
+            if (_errorMessage.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: Text(
+                  _errorMessage,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
           ],
         ),
       ),
