@@ -37,6 +37,14 @@ class LoginPage extends StatelessWidget {
               },
               child: const Text('Login'),
             ),
+            const SizedBox(height: 16.0), // Add some space between the buttons
+            ElevatedButton(
+              onPressed: () {
+                // Action for register button
+                // You could navigate to the RegisterPage here
+              },
+              child: const Text('Register'),
+            )
           ],
         ),
       ),
