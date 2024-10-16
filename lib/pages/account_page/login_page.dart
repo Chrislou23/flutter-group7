@@ -1,71 +1,108 @@
 import 'package:flutter/material.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import '../home_page/home_page.dart';
 import 'register_page.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  String _errorMessage = '';
+
+  Future<void> _login() async {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      User? user = userCredential.user;
+      if (user != null) {
+        Navigator.pushReplacement(
+          // ignore: use_build_context_synchronously
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(user: user),
+          ),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        if (e.code == 'user-not-found') {
+          _errorMessage = 'No user found for that email.';
+        } else if (e.code == 'wrong-password') {
+          _errorMessage = 'Wrong password provided.';
+        } else {
+          _errorMessage = e.message ?? 'An error occurred';
+        }
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'An error occurred: $e';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('Login', style: TextStyle(color: Colors.black)),
-        centerTitle: true,
+        title: const Text('Login'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const TextField(
-              decoration: InputDecoration(
+            TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Username',
+                labelText: 'Email',
               ),
             ),
             const SizedBox(height: 16.0),
-            const TextField(
+            TextField(
+              controller: _passwordController,
               obscureText: true,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Password',
               ),
             ),
-            const SizedBox(height: 32.0),
+            const SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: () {
-                // Action for login button
-              },
+              onPressed: _login,
               child: const Text('Login'),
             ),
-            const SizedBox(height: 16.0), // Add some space between the buttons
-            const Text(
-              "Do not have an account yet?",
-              style: TextStyle(fontSize: 16.0),
-            ),
-            const SizedBox(
-                height:
-                    8.0), // Adjust the space between the text and the button
-            ElevatedButton(
+            const SizedBox(height: 16.0),
+            TextButton(
               onPressed: () {
-                // Navigate to RegisterPage
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const RegisterPage()),
                 );
               },
-              child: const Text('Register'),
-            )
+              child: const Text('Don\'t have an account? Register'),
+            ),
+            if (_errorMessage.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: Text(
+                  _errorMessage,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
           ],
         ),
       ),
     );
   }
-}
-
-void main() {
-  runApp(const MaterialApp(
-    home: LoginPage(),
-  ));
 }

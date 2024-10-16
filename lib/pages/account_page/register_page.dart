@@ -129,8 +129,6 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             const SizedBox(height: 16.0),
             TextField(
-              controller: _confirmPasswordController,
-              obscureText: true,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Confirm Password',
@@ -139,7 +137,7 @@ class _RegisterPageState extends State<RegisterPage> {
             const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: registerUser,
-              child: const Text('Register'),
+              child: null,
             ),
             const SizedBox(height: 16.0),
             TextButton(

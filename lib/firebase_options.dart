@@ -57,6 +57,7 @@ class DefaultFirebaseOptions {
     appId: '1:556788420487:android:d629eff7a7f3ba5c090d22',
     messagingSenderId: '556788420487',
     projectId: 'mobile-games-2783a',
+    databaseURL: 'https://mobile-games-2783a-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'mobile-games-2783a.appspot.com',
   );
 
