@@ -48,8 +48,8 @@ class _RegisterPageState extends State<RegisterPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Success'),
-            content: const Text('Account created successfully!'),
+            title: const Text('Thank you!'),
+            content: const Text('You account has been created successfully!'),
             actions: [
               TextButton(
                 onPressed: () {
@@ -129,6 +129,8 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             const SizedBox(height: 16.0),
             TextField(
+              controller: _confirmPasswordController,
+              obscureText: true,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Confirm Password',
@@ -137,7 +139,7 @@ class _RegisterPageState extends State<RegisterPage> {
             const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: registerUser,
-              child: null,
+              child: const Text('Register'),
             ),
             const SizedBox(height: 16.0),
             TextButton(
