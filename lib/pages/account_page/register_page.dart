@@ -43,13 +43,19 @@ class _RegisterPageState extends State<RegisterPage> {
         password: _passwordController.text.trim(),
       );
 
+      // Send email verification
+      if (credential.user != null && !credential.user!.emailVerified) {
+        await credential.user!.sendEmailVerification();
+      }
+
       // Show a dialog when the account is created successfully
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Thank you!'),
-            content: const Text('You account has been created successfully!'),
+            content: const Text(
+                'You account has been created. Please check your email to verify your account before logging in.'),
             actions: [
               TextButton(
                 onPressed: () {
