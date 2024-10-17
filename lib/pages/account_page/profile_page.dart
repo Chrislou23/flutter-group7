@@ -211,19 +211,20 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            GestureDetector(
-              onTap: _updateProfilePicture,
-              child: CircleAvatar(
-                radius: 50,
-                backgroundImage: widget.user.photoURL != null &&
-                        widget.user.photoURL!.isNotEmpty
-                    ? NetworkImage(widget.user.photoURL!)
-                    : null,
-                child: widget.user.photoURL == null ||
-                        widget.user.photoURL!.isEmpty
-                    ? const Icon(Icons.account_circle, size: 50)
-                    : null,
-              ),
+            CircleAvatar(
+              radius: 70,
+              backgroundImage: _photoURL != null && _photoURL!.isNotEmpty
+                  ? NetworkImage(_photoURL!)
+                  : null,
+              child: _photoURL == null || _photoURL!.isEmpty
+                  ? const Icon(Icons.account_circle, size: 50)
+                  : null,
+            ),
+            const SizedBox(height: 8.0),
+            IconButton(
+              icon: const Icon(Icons.camera_alt),
+              onPressed: _updateProfilePicture,
+              tooltip: 'Change Profile Picture',
             ),
             const SizedBox(height: 16.0),
             TextField(
