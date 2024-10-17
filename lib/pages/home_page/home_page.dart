@@ -70,7 +70,9 @@ class _HomePageState extends State<HomePage> {
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const CrosswordGamePage()),
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CrosswordGamePage()),
                             );
                           },
                           child: Container(
@@ -84,15 +86,15 @@ class _HomePageState extends State<HomePage> {
                               color: Colors.grey[300],
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Center(
-                            ),
+                            child: const Center(),
                           ),
                         ),
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const LinkGamePage()),
+                              MaterialPageRoute(
+                                  builder: (context) => const LinkGamePage()),
                             );
                           },
                           child: Container(
@@ -106,8 +108,7 @@ class _HomePageState extends State<HomePage> {
                               color: Colors.grey[300],
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Center(
-                            ),
+                            child: const Center(),
                           ),
                         ),
                       ],
