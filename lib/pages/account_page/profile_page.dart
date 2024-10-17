@@ -21,7 +21,6 @@ class _ProfilePageState extends State<ProfilePage> {
   String _errorMessage = '';
   String? _photoURL;
   String _username = ''; // Initialize the username
-  bool _isEditingUsername = false;
 
   @override
   void initState() {
@@ -51,7 +50,9 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _updateUsername() async {
-    if (_usernameController.text.trim().isEmpty) {
+    String newUsername = _usernameController.text.trim();
+
+    if (newUsername.isEmpty) {
       setState(() {
         _errorMessage = 'Username cannot be empty.';
       });
@@ -59,16 +60,22 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     try {
+      // Update the username in Firestore
       await FirebaseFirestore.instance
           .collection('users')
           .doc(widget.user.uid)
-          .update({'username': _usernameController.text.trim()});
+          .update({'username': newUsername});
 
+      // Update the local state to reflect the new username
       setState(() {
-        _username = _usernameController.text.trim();
-        _isEditingUsername = false;
-        _errorMessage = 'Username updated successfully!';
+        _username = newUsername;
+        _errorMessage = ''; // Clear error message if successful
       });
+
+      // Show a success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Username updated successfully!')),
+      );
     } catch (e) {
       setState(() {
         _errorMessage = 'Failed to update username: $e';
@@ -270,9 +277,13 @@ class _ProfilePageState extends State<ProfilePage> {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
-                _updateUsername();
-                Navigator.of(context).pop(); // Close the dialog after updating
+              onPressed: () async {
+                // Call the update method and wait for it to complete
+                await _updateUsername();
+                // If the update is successful, close the dialog
+                if (_errorMessage.isEmpty) {
+                  Navigator.of(context).pop();
+                }
               },
               child: const Text('Save'),
             ),
@@ -336,6 +347,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          const SizedBox(width: 20.0),
                           Text(
                             _username,
                             style: const TextStyle(
