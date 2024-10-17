@@ -43,7 +43,8 @@ class GamePage extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const CrosswordGamePage(),
+                                  builder: (context) =>
+                                      const CrosswordGamePage(),
                                 ),
                               );
                             },
@@ -63,7 +64,9 @@ class GamePage extends StatelessWidget {
                                 ),
                                 const Text(
                                   'Game 1: Crossword',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
@@ -95,7 +98,9 @@ class GamePage extends StatelessWidget {
                                 ),
                                 const Text(
                                   'Game 2: Link Game',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),

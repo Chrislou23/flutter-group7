@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_games/pages/account_page/profile_page.dart';
+import 'package:mobile_games/pages/games_page/game_page.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_games/timer_provider.dart';
 import 'package:mobile_games/pages/friends_page/friend_page.dart';
-import 'package:mobile_games/pages/games_page/game_page.dart';
 import 'package:mobile_games/pages/games_page/crossword/crossword_game_page.dart';
 import 'package:mobile_games/pages/games_page/link/link_game_page.dart';
 

@@ -11,6 +11,7 @@ plugins {
 android {
     namespace = "com.example.mobile_games"
     compileSdk = flutter.compileSdkVersion
+
     ndkVersion = "25.1.8937393"
 
     compileOptions {
