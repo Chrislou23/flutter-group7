@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_games/pages/games_page/link/link_instructions_fi.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'pages/home_page/home_page.dart';
 import 'pages/friends_page/friend_page.dart';
 import 'pages/games_page/crossword/crossword_game_page.dart';
 import 'pages/games_page/link/link_game_page.dart';
 import 'pages/games_page/link/link_instructions_en.dart';
+import 'pages/games_page/link/link_instructions_fi.dart';
 import 'pages/games_page/crossword/crossword_instructions_en.dart';
 import 'pages/games_page/crossword/crossword_instructions_fi.dart';
 import 'pages/account_page/account_page.dart';
+import 'pages/settings_page/settings_page.dart';
+import 'pages/settings_page/data_protection_policy.dart';
+import 'pages/settings_page/privacy_page.dart';
+import 'pages/settings_page/about_page.dart';
 import 'timer_provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(
     MultiProvider(
       providers: [
@@ -33,18 +40,24 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const ResponsiveHomePage(), // Use a responsive home page
+      home: const HomePage(),
       routes: {
         '/game': (context) => const CrosswordGamePage(),
         '/friends': (context) => const FriendPage(),
-        '/account': (context) => const LoginPage(),
         '/crossword': (context) => const CrosswordGamePage(),
-        '/link': (context) => const LinkGamePage(),
-        '/link_instructions_fi': (context) => const LinkInstructionsFi(),
-        '/link_instructions_en': (context) => const LinkInstructionsEn(),
-        '/crossword_instructions': (context) => const CrosswordInstructionsEn(),
+        '/crossword_instructions_en': (context) =>
+            const CrosswordInstructionsEn(),
         '/crossword_instructions_fi': (context) =>
             const CrosswordInstructionsFi(),
+        '/link': (context) => const LinkGamePage(),
+        '/link_instructions_en': (context) => const LinkInstructionsEn(),
+        '/link_instructions_fi': (context) => const LinkInstructionsFi(),
+        '/account': (context) => const LoginPage(),
+        '/settings': (context) => const SettingsPage(),
+        '/data_protection_policy': (context) =>
+            const DataProtectionPolicyPage(),
+        '/privacy': (context) => const PrivacyPage(),
+        '/about': (context) => const AboutPage(),
       },
     );
   }
