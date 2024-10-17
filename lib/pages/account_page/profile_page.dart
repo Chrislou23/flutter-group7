@@ -49,7 +49,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Future<void> _updateUsername() async {
+  Future<void> _updateUsername(BuildContext dialogContext) async {
     String newUsername = _usernameController.text.trim();
 
     if (newUsername.isEmpty) {
@@ -72,9 +72,14 @@ class _ProfilePageState extends State<ProfilePage> {
         _errorMessage = ''; // Clear error message if successful
       });
 
-      // Show a success message
+      // Close the dialog after updating
+      if (mounted) {
+        Navigator.of(dialogContext).pop();
+      }
+
+      // Show a success message using the context from the Scaffold
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Username updated successfully!')),
+        const SnackBar(content: Text('Username updated successfully!')),
       );
     } catch (e) {
       setState(() {
@@ -259,7 +264,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void _showEditUsernameDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: const Text('Edit Username'),
           content: TextField(
@@ -272,17 +277,19 @@ class _ProfilePageState extends State<ProfilePage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(dialogContext).pop(); // Close the dialog
               },
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
                 // Call the update method and wait for it to complete
-                await _updateUsername();
-                // If the update is successful, close the dialog
+                await _updateUsername(dialogContext);
+
+                // If the update is successful, show the SnackBar and close the dialog
                 if (_errorMessage.isEmpty) {
-                  Navigator.of(context).pop();
+                  // ignore: use_build_context_synchronously
+                  Navigator.of(dialogContext).pop(); // Close the dialog
                 }
               },
               child: const Text('Save'),
@@ -322,6 +329,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       Positioned(
                         bottom: 7,
                         right: 0,
+                        left: 87,
                         child: GestureDetector(
                           onTap: _updateProfilePicture,
                           child: Container(
