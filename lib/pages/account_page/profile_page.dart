@@ -232,61 +232,73 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Stack(
-              children: [
-                CircleAvatar(
-                  radius: 80,
-                  backgroundImage: _photoURL != null && _photoURL!.isNotEmpty
-                      ? NetworkImage(_photoURL!)
-                      : null,
-                  child: _photoURL == null || _photoURL!.isEmpty
-                      ? const Icon(Icons.account_circle, size: 50)
-                      : null,
-                ),
-                Positioned(
-                  bottom: 7,
-                  right: 0,
-                  left: 87,
-                  child: GestureDetector(
-                    onTap: _updateProfilePicture,
-                    child: Container(
-                      padding: const EdgeInsets.all(5.0),
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        shape: BoxShape.circle,
+            Center(
+              child: Column(
+                children: [
+                  Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 80,
+                        backgroundImage:
+                            _photoURL != null && _photoURL!.isNotEmpty
+                                ? NetworkImage(_photoURL!)
+                                : null,
+                        child: _photoURL == null || _photoURL!.isEmpty
+                            ? const Icon(Icons.account_circle, size: 50)
+                            : null,
                       ),
-                      child: const Icon(
-                        Icons.camera_alt,
-                        color: Colors.white,
-                        size: 15,
+                      Positioned(
+                        bottom: 7,
+                        right: 0,
+                        left: 87,
+                        child: GestureDetector(
+                          onTap: _updateProfilePicture,
+                          child: Container(
+                            padding: const EdgeInsets.all(5.0),
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.camera_alt,
+                              color: Colors.white,
+                              size: 15,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  _username,
-                  style: const TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
+                  const SizedBox(height: 12.0),
+                  Row(
+                    mainAxisSize:
+                        MainAxisSize.min, // Center the Row within its parent
+                    children: [
+                      const SizedBox(width: 20.0),
+                      Text(
+                        _username,
+                        style: const TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(
+                          width:
+                              8.0), // Space between the username and the icon
+                      GestureDetector(
+                        onTap: () {
+                          // Implement username edit functionality here
+                        },
+                        child: const Icon(
+                          Icons.edit,
+                          color: Color.fromARGB(255, 44, 75, 170),
+                          size: 17,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(width: 8.0),
-                IconButton(
-                  icon: const Icon(
-                    Icons.edit,
-                    color: Colors.blue,
-                  ),
-                  onPressed: () {
-                    // Implement username edit functionality here
-                  },
-                ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(height: 16.0),
             TextField(

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_page.dart';
@@ -47,6 +48,15 @@ class _RegisterPageState extends State<RegisterPage> {
       if (credential.user != null && !credential.user!.emailVerified) {
         await credential.user!.sendEmailVerification();
       }
+
+      // Save user data to Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(credential.user!.uid)
+          .set({
+        'username': _usernameController.text.trim(),
+        'email': _emailController.text.trim(),
+      });
 
       // Show a dialog when the account is created successfully
       showDialog(
