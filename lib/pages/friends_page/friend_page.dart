@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 
-class FriendPage extends StatelessWidget {
+class FriendPage extends StatefulWidget {
   const FriendPage({super.key});
+
+  @override
+  _FriendPageState createState() => _FriendPageState();
+}
+
+class _FriendPageState extends State<FriendPage> {
+  // List to hold the names of friends
+  List<String> _friends = ['Pierre3960', 'Luke', 'Robert'];
 
   @override
   Widget build(BuildContext context) {
@@ -29,21 +37,14 @@ class FriendPage extends StatelessWidget {
         children: [
           // The list of friends
           Expanded(
-            child: ListView(
-              children: const [
-                ListTile(
-                  leading: Icon(Icons.account_circle, size: 40),
-                  title: Text('Pierre3960'),
-                ),
-                ListTile(
-                  leading: Icon(Icons.account_circle, size: 40),
-                  title: Text('Luke'),
-                ),
-                ListTile(
-                  leading: Icon(Icons.account_circle, size: 40),
-                  title: Text('Robert'),
-                ),
-              ],
+            child: ListView.builder(
+              itemCount: _friends.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  leading: const Icon(Icons.account_circle, size: 40),
+                  title: Text(_friends[index]),
+                );
+              },
             ),
           ),
           // The button to add a friend at the bottom
@@ -99,10 +100,14 @@ class FriendPage extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                // Handle adding the friend logic here
+                // Get the entered friend name
                 String friendName = _friendController.text.trim();
                 if (friendName.isNotEmpty) {
-                  // Do something with the friend name (e.g., send a request or add to the list)
+                  setState(() {
+                    // Add the new friend to the list
+                    _friends.add(friendName);
+                  });
+                  // Show a Snackbar with success message
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('$friendName added as a friend!'),
