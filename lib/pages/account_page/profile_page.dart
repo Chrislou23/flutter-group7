@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import 'login_page.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -13,12 +16,108 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
   String _errorMessage = '';
+  String? _photoURL;
+  String _username = ''; // Initialize the username
 
   @override
   void initState() {
     super.initState();
     _emailController.text = widget.user.email ?? '';
+    _photoURL = widget.user.photoURL;
+    _fetchUsername(); // Fetch user data when the profile page is initialized
+  }
+
+  Future<void> _fetchUsername() async {
+    try {
+      // Fetch the username from Firestore or other data source
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.user.uid)
+          .get();
+      if (userDoc.exists) {
+        setState(() {
+          _username = userDoc['username'] ?? 'Unknown'; // Set the username
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to fetch username: $e';
+      });
+    }
+  }
+
+  Future<void> _updateUsername() async {
+    String newUsername = _usernameController.text.trim();
+
+    if (newUsername.isEmpty) {
+      setState(() {
+        _errorMessage = 'Username cannot be empty.';
+      });
+      return;
+    }
+
+    try {
+      // Update the username in Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.user.uid)
+          .update({'username': newUsername});
+
+      // Update the local state to reflect the new username
+      setState(() {
+        _username = newUsername;
+        _errorMessage = ''; // Clear error message if successful
+      });
+
+      // Show a success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Username updated successfully!')),
+      );
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to update username: $e';
+      });
+    }
+  }
+
+  Future<void> _updateProfilePicture() async {
+    try {
+      // Pick an image from the gallery
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+
+      File imageFile = File(image.path);
+
+      // Upload the image to Firebase Storage
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('profile_pictures/${widget.user.uid}.jpg');
+      await storageRef.putFile(imageFile);
+
+      // Get the download URL of the uploaded image
+      String photoURL = await storageRef.getDownloadURL();
+
+      // Update the user's profile
+      await widget.user.updatePhotoURL(photoURL);
+
+      // Update the Firestore user document if necessary
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.user.uid)
+          .update({'photoURL': photoURL});
+
+      setState(() {
+        _photoURL = photoURL;
+        _errorMessage = 'Profile picture updated successfully!';
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to update profile picture: $e';
+      });
+    }
   }
 
   Future<void> _updateEmail() async {
@@ -157,6 +256,43 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  void _showEditUsernameDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit Username'),
+          content: TextField(
+            controller: _usernameController,
+            decoration: const InputDecoration(
+              hintText: 'Enter new username',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Call the update method and wait for it to complete
+                await _updateUsername();
+                // If the update is successful, close the dialog
+                if (_errorMessage.isEmpty) {
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -168,16 +304,72 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: widget.user.photoURL != null &&
-                      widget.user.photoURL!.isNotEmpty
-                  ? NetworkImage(widget.user.photoURL!)
-                  : null,
-              child:
-                  widget.user.photoURL == null || widget.user.photoURL!.isEmpty
-                      ? const Icon(Icons.account_circle, size: 50)
-                      : null,
+            Center(
+              child: Column(
+                children: [
+                  Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 80,
+                        backgroundImage:
+                            _photoURL != null && _photoURL!.isNotEmpty
+                                ? NetworkImage(_photoURL!)
+                                : null,
+                        child: _photoURL == null || _photoURL!.isEmpty
+                            ? const Icon(Icons.account_circle, size: 50)
+                            : null,
+                      ),
+                      Positioned(
+                        bottom: 7,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: _updateProfilePicture,
+                          child: Container(
+                            padding: const EdgeInsets.all(5.0),
+                            decoration: BoxDecoration(
+                              color: Color.fromARGB(255, 44, 75, 170),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.camera_alt,
+                              color: Colors.white,
+                              size: 15,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12.0),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(width: 20.0),
+                          Text(
+                            _username,
+                            style: const TextStyle(
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 8.0),
+                          GestureDetector(
+                            onTap: _showEditUsernameDialog,
+                            child: const Icon(
+                              Icons.edit,
+                              color: Color.fromARGB(255, 44, 75, 170),
+                              size: 17,
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 16.0),
             TextField(

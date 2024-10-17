@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_page.dart';
@@ -43,13 +44,28 @@ class _RegisterPageState extends State<RegisterPage> {
         password: _passwordController.text.trim(),
       );
 
+      // Send email verification
+      if (credential.user != null && !credential.user!.emailVerified) {
+        await credential.user!.sendEmailVerification();
+      }
+
+      // Save user data to Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(credential.user!.uid)
+          .set({
+        'username': _usernameController.text.trim(),
+        'email': _emailController.text.trim(),
+      });
+
       // Show a dialog when the account is created successfully
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Success'),
-            content: const Text('Account created successfully!'),
+            title: const Text('Thank you!'),
+            content: const Text(
+                'You account has been created. Please check your email to verify your account before logging in.'),
             actions: [
               TextButton(
                 onPressed: () {
@@ -129,6 +145,8 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             const SizedBox(height: 16.0),
             TextField(
+              controller: _confirmPasswordController,
+              obscureText: true,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Confirm Password',
@@ -137,7 +155,7 @@ class _RegisterPageState extends State<RegisterPage> {
             const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: registerUser,
-              child: null,
+              child: const Text('Register'),
             ),
             const SizedBox(height: 16.0),
             TextButton(
