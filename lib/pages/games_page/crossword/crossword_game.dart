@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class CrosswordGame extends StatefulWidget {
-  const CrosswordGame({super.key});
+  final bool isFinnish;
+
+  const CrosswordGame({super.key, required this.isFinnish});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -36,7 +38,196 @@ class _CrosswordGameState extends State<CrosswordGame> {
 
   TextEditingController wordInputController = TextEditingController();
 
-  final Map<int, List<CrosswordWord>> levels = {
+  final Map<int, List<CrosswordWord>> finnishLevels = {
+    1: [
+      CrosswordWord(
+          word: 'PELKO',
+          clue: '1. Kun jokin asia pelottaa sinua',
+          row: 0,
+          col: 7,
+          isHorizontal: false,
+          number: 1),
+      CrosswordWord(
+          word: 'SURU',
+          clue: '2. Kun kyyneleet tulevat silmiin',
+          row: 3,
+          col: 3,
+          isHorizontal: false,
+          number: 2),
+      CrosswordWord(
+          word: 'VIHA',
+          clue: '3. Kun jokin harmittaa sinua kovasti',
+          row: 3,
+          col: 5,
+          isHorizontal: false,
+          number: 3),
+      CrosswordWord(
+          word: 'ILO',
+          clue: '4. Kun hymyilet ja naurat',
+          row: 4,
+          col: 5,
+          isHorizontal: true,
+          number: 4),
+      CrosswordWord(
+          word: 'RAUHA',
+          clue: '5. Kun kaikki on hiljaista ja levollista',
+          row: 6,
+          col: 1,
+          isHorizontal: true,
+          number: 5),
+    ],
+    2: [
+      CrosswordWord(
+          word: 'IHASTUS',
+          clue: '1. Kun pidät jostain erityisesti',
+          row: 1,
+          col: 1,
+          isHorizontal: false,
+          number: 1),
+      CrosswordWord(
+          word: 'HÄPEÄ',
+          clue: '2. Kun punastut ja tunnet olosi noloksi',
+          row: 2,
+          col: 1,
+          isHorizontal: true,
+          number: 2),
+      CrosswordWord(
+          word: 'RIEMU',
+          clue: '3. Kun ilo on todella suurta',
+          row: 0,
+          col: 4,
+          isHorizontal: false,
+          number: 3),
+      CrosswordWord(
+          word: 'INHO',
+          clue: '4. Kun joku asia tuntuu epämiellyttävältät',
+          row: 1,
+          col: 4,
+          isHorizontal: true,
+          number: 4),
+      CrosswordWord(
+          word: 'ONNI',
+          clue: '5. Kun kaikki on hyvin ja olet iloinen',
+          row: 1,
+          col: 7,
+          isHorizontal: false,
+          number: 5),
+    ],
+    3: [
+      CrosswordWord(
+          word: 'IKÄVÄ',
+          clue: '1. Kun kaipaat jotain tai jotakuta',
+          row: 2,
+          col: 2,
+          isHorizontal: false,
+          number: 1),
+      CrosswordWord(
+          word: 'TOIVO',
+          clue: '2. Kun uskot, että jotain hyvää tapahtuu',
+          row: 2,
+          col: 0,
+          isHorizontal: true,
+          number: 2),
+      CrosswordWord(
+          word: 'TUSKA',
+          clue: '3. Kun sattuu ja tuntuu pahalta',
+          row: 1,
+          col: 3,
+          isHorizontal: true,
+          number: 3),
+      CrosswordWord(
+          word: 'HUOLI',
+          clue: '4. Kun ajattelet paljon jotain ikävää',
+          row: 0,
+          col: 4,
+          isHorizontal: false,
+          number: 4),
+      CrosswordWord(
+          word: 'YIPEÄ',
+          clue: '5. Kun olet tehnyt jotain hienoa',
+          row: 4,
+          col: 3,
+          isHorizontal: true,
+          number: 5),
+    ],
+    4: [
+      CrosswordWord(
+          word: 'KATEUS',
+          clue: '1. Kun haluaisit sen, mikä toisella on',
+          row: 5,
+          col: 0,
+          isHorizontal: true,
+          number: 1),
+      CrosswordWord(
+          word: 'KIUKKU',
+          clue: '2. Kun jokin saa sinut ärsyyntymään',
+          row: 2,
+          col: 0,
+          isHorizontal: false,
+          number: 2),
+      CrosswordWord(
+          word: 'RAKKAUS',
+          clue: '3. Kun pidät jostain todella paljon',
+          row: 1,
+          col: 1,
+          isHorizontal: false,
+          number: 3),
+      CrosswordWord(
+          word: 'HELPOTUS',
+          clue: '4. Kun huoli katoaa ja hymyilet',
+          row: 0,
+          col: 2,
+          isHorizontal: false,
+          number: 4),
+      CrosswordWord(
+          word: 'IHMETYS',
+          clue: '5. Kun näet jotain uutta ja jännittävää',
+          row: 0,
+          col: 1,
+          isHorizontal: true,
+          number: 5),
+    ],
+    5: [
+      CrosswordWord(
+          word: 'AATOS',
+          clue: '1. Kun mietit jotain asiaa',
+          row: 1,
+          col: 0,
+          isHorizontal: false,
+          number: 1),
+      CrosswordWord(
+          word: 'APU',
+          clue: '2. Kun joku auttaa sinua, tunnet olosi paremmaksi',
+          row: 2,
+          col: 0,
+          isHorizontal: true,
+          number: 2),
+      CrosswordWord(
+          word: 'HUPI',
+          clue: '3. Kun jokin asia saa sinut nauramaan',
+          row: 1,
+          col: 2,
+          isHorizontal: false,
+          number: 3),
+      CrosswordWord(
+          word: 'IHAILU',
+          clue: '4. Kun pidät todella paljon jostain',
+          row: 4,
+          col: 2,
+          isHorizontal: true,
+          number: 4),
+      CrosswordWord(
+          word: 'MIELE',
+          clue: '5. Miten tunnet itsesi juuri nyt',
+          row: 3,
+          col: 6,
+          isHorizontal: false,
+          number: 5),
+    ],
+    // Additional levels are truncated for brevity
+  };
+
+  final Map<int, List<CrosswordWord>> englishLevels = {
     1: [
       CrosswordWord(
           word: 'ANGRY',
@@ -116,132 +307,6 @@ class _CrosswordGameState extends State<CrosswordGame> {
         number: 5,
       ),
     ],
-    3: [
-      CrosswordWord(
-        word: 'CHEER',
-        clue: '1. To feel or show joy',
-        row: 0,
-        col: 3,
-        isHorizontal: false,
-        number: 1,
-      ),
-      CrosswordWord(
-        word: 'PEACE',
-        clue: '2. Feeling quiet and calm',
-        row: 2,
-        col: 2,
-        isHorizontal: true,
-        number: 2,
-      ),
-      CrosswordWord(
-        word: 'FEAR',
-        clue: '3. Feeling scared',
-        row: 4,
-        col: 0,
-        isHorizontal: true,
-        number: 3,
-      ),
-      CrosswordWord(
-        word: 'CARED',
-        clue: '4. Taking care of someone or something',
-        row: 2,
-        col: 5,
-        isHorizontal: false,
-        number: 4,
-      ),
-      CrosswordWord(
-        word: 'KIND',
-        clue: '5. Feeling compassion',
-        row: 6,
-        col: 2,
-        isHorizontal: true,
-        number: 5,
-      ),
-    ],
-    4: [
-      CrosswordWord(
-        word: 'UPSET',
-        clue: '1 Feeling unhappy or disappointed',
-        row: 1,
-        col: 0,
-        isHorizontal: true,
-        number: 1,
-      ),
-      CrosswordWord(
-        word: 'JOYFUL',
-        clue: '2. Feeling full of happiness',
-        row: 2,
-        col: 1,
-        isHorizontal: true,
-        number: 2,
-      ),
-      CrosswordWord(
-        word: 'SORROW',
-        clue: '3. Feeling deep sadness',
-        row: 1,
-        col: 2,
-        isHorizontal: false,
-        number: 3,
-      ),
-      CrosswordWord(
-        word: 'RELAX',
-        clue: '4. Feeling calm and at ease',
-        row: 0,
-        col: 6,
-        isHorizontal: false,
-        number: 4,
-      ),
-      CrosswordWord(
-        word: 'TIRED',
-        clue: '5. Feeling exhausted',
-        row: 4,
-        col: 0,
-        isHorizontal: true,
-        number: 5,
-      ),
-    ],
-    5: [
-      CrosswordWord(
-        word: 'SHAME',
-        clue: '1. Feeling embarrassed or guilty',
-        row: 0,
-        col: 1,
-        isHorizontal: true,
-        number: 1,
-      ),
-      CrosswordWord(
-        word: 'HATE',
-        clue: '2. Feeling intense dislike',
-        row: 0,
-        col: 2,
-        isHorizontal: false,
-        number: 2,
-      ),
-      CrosswordWord(
-        word: 'FEAR',
-        clue: '3. Feeling scared',
-        row: 3,
-        col: 1,
-        isHorizontal: true,
-        number: 3,
-      ),
-      CrosswordWord(
-        word: 'PRIDE',
-        clue: '4. Feeling proud of oneself',
-        row: 2,
-        col: 4,
-        isHorizontal: false,
-        number: 4,
-      ),
-      CrosswordWord(
-        word: 'GRIEF',
-        clue: '5. Feeling deep sadness',
-        row: 6,
-        col: 1,
-        isHorizontal: true,
-        number: 5,
-      ),
-    ]
     // Additional levels are truncated for brevity
   };
 
@@ -260,12 +325,14 @@ class _CrosswordGameState extends State<CrosswordGame> {
   }
 
   void _generateCrossword() {
+    // Choose levels based on language
+    final levels = widget.isFinnish ? finnishLevels : englishLevels;
+
     // Determine the grid size based on the longest word in the current level
     int longestWordLength = levels[currentLevel]!
         .map((word) => word.word.length)
         .reduce((a, b) => a > b ? a : b);
-    gridSize = longestWordLength > 7 ? longestWordLength + 2 : 7;
-
+    gridSize = longestWordLength > 7 ? longestWordLength + 2 : 8;
     initializeGrid();
     List<CrosswordWord> crosswordData = levels[currentLevel] ?? [];
     for (var wordData in crosswordData) {
@@ -329,6 +396,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
   void _updateSelectedWord(String input) {
     if (selectedClueIndex == null) return;
 
+    final levels = widget.isFinnish ? finnishLevels : englishLevels;
     var selectedWordData = levels[currentLevel]![selectedClueIndex!];
     String word = selectedWordData.word;
     int row = selectedWordData.row;
@@ -357,6 +425,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
   }
 
   void _showAnswers() {
+    final levels = widget.isFinnish ? finnishLevels : englishLevels;
     List<CrosswordWord> crosswordData = levels[currentLevel] ?? [];
     for (var wordData in crosswordData) {
       for (int i = 0; i < wordData.word.length; i++) {
@@ -377,7 +446,9 @@ class _CrosswordGameState extends State<CrosswordGame> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Crossword Game - Level $currentLevel"),
+        title: Text(widget.isFinnish
+            ? "Finnish Crossword Game - Level $currentLevel"
+            : "English Crossword Game - Level $currentLevel"),
         backgroundColor: Colors.blue,
       ),
       body: Column(
@@ -413,8 +484,9 @@ class _CrosswordGameState extends State<CrosswordGame> {
 
                   bool isHighlighted = false;
                   if (selectedClueIndex != null) {
-                    var selectedWord =
-                        levels[currentLevel]![selectedClueIndex!];
+                    var selectedWord = (widget.isFinnish
+                        ? finnishLevels
+                        : englishLevels)[currentLevel]![selectedClueIndex!];
                     int startRow = selectedWord.row;
                     int startCol = selectedWord.col;
                     String word = selectedWord.word;
@@ -481,7 +553,10 @@ class _CrosswordGameState extends State<CrosswordGame> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: levels[currentLevel]!.length,
+              itemCount: (widget.isFinnish
+                      ? finnishLevels
+                      : englishLevels)[currentLevel]!
+                  .length,
               itemBuilder: (BuildContext context, int index) {
                 return Card(
                   color: Colors.lightBlue.shade100,
@@ -489,7 +564,10 @@ class _CrosswordGameState extends State<CrosswordGame> {
                       const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                   child: ListTile(
                     title: Text(
-                      levels[currentLevel]![index].clue,
+                      (widget.isFinnish
+                              ? finnishLevels
+                              : englishLevels)[currentLevel]![index]
+                          .clue,
                       style: const TextStyle(
                           fontSize: 18, fontWeight: FontWeight.bold),
                     ),

@@ -1,16 +1,16 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile_games/pages/games_page/Crossword/Crossword_instructions_en.dart';
+import 'package:mobile_games/pages/games_page/Crossword/Crossword_instructions_fi.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_games/timer_provider.dart';
-import 'package:mobile_games/pages/games_page/crossword/crossword.dart';
-import 'package:mobile_games/pages/games_page/crossword/crossword_instructions_en.dart';
-import 'package:mobile_games/pages/games_page/crossword/crossword_instructions_fi.dart';
+import 'package:mobile_games/pages/games_page/Crossword/crossword_game.dart';
 import 'package:mobile_games/widgets.dart';
 
 class CrosswordGamePage extends StatefulWidget {
   const CrosswordGamePage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CrosswordGamePageState createState() => _CrosswordGamePageState();
 }
 
@@ -41,7 +41,8 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
                     "Blocked: ${_formatDuration(timerProvider.remainingBlockTime)}",
                     style: const TextStyle(color: Colors.black),
                   )
-                : const Text('Crossword Game', style: TextStyle(color: Colors.black)),
+                : const Text('Crossword Game',
+                    style: TextStyle(color: Colors.black)),
             centerTitle: true,
             actions: [
               IconButton(
@@ -63,27 +64,31 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
                       height: 150,
                       decoration: BoxDecoration(
                         image: const DecorationImage(
-                          image: AssetImage('assets/game1.png'),
+                          image: AssetImage('assets/game2.png'),
                           fit: BoxFit.cover,
                         ),
                         color: Colors.grey[300],
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Tab buttons for How to play and Language toggle
-                    TabButtons(isEnglish: isEnglish, toggleLanguage: toggleLanguage),
+                    // How to play and language toggle buttons
+                    TabButtons(
+                        isEnglish: isEnglish, toggleLanguage: toggleLanguage),
                     const SizedBox(height: 20),
-                    // Play button
+                    // Play button placed below the other buttons
                     CustomButton(
-                      text: 'Play',
+                      text: isEnglish ? 'Play' : 'Pikapeli',
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const CrosswordGame(),
+                            builder: (context) => CrosswordGame(
+                              isFinnish: !isEnglish,
+                            ),
                           ),
                         );
-                      }, textStyle: const TextStyle(fontSize: 18, color: Colors.black),
+                      },
+                      textStyle: const TextStyle(fontSize: 40),
                     ),
                   ],
                 ),
@@ -112,7 +117,6 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 18),
           ),
-          SizedBox(height: 20),
         ],
       ),
     );
@@ -124,34 +128,42 @@ class TabButtons extends StatelessWidget {
   final bool isEnglish;
   final VoidCallback toggleLanguage;
 
-  const TabButtons({super.key, required this.isEnglish, required this.toggleLanguage});
+  const TabButtons(
+      {super.key, required this.isEnglish, required this.toggleLanguage});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Column(
       children: [
-        GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => isEnglish
-                    ? const CrosswordInstructionsEn()
-                    : const CrosswordInstructionsFi(),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => isEnglish
+                        ? const CrosswordInstructionsEn()
+                        : const CrosswordInstructionsFi(),
+                  ),
+                );
+              },
+              child: Text(isEnglish ? 'How to play' : 'Kuinka pelata',
+                  style: const TextStyle(fontSize: 18)),
+            ),
+            const VerticalDivider(thickness: 2, color: Colors.black),
+            GestureDetector(
+              onTap: toggleLanguage,
+              child: Text(
+                isEnglish ? 'Switch to Finnish' : 'Vaihda Englantiin',
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            );
-          },
-          child: const Text('How to play', style: TextStyle(fontSize: 18)),
+            ),
+          ],
         ),
-        const VerticalDivider(thickness: 2, color: Colors.black),
-        GestureDetector(
-          onTap: toggleLanguage,
-          child: Text(
-            isEnglish ? 'Switch to Finnish' : 'Switch to English',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ),
+        const SizedBox(height: 20),
       ],
     );
   }
