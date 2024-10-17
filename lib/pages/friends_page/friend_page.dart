@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class FriendPage extends StatefulWidget {
   const FriendPage({super.key});
@@ -9,7 +11,32 @@ class FriendPage extends StatefulWidget {
 
 class _FriendPageState extends State<FriendPage> {
   // List to hold the names of friends
-  List<String> _friends = ['Pierre3960', 'Luke', 'Robert'];
+  List<String> _friends = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFriends(); // Load friends when the page is initialized
+  }
+
+  // Method to load friends from SharedPreferences
+  Future<void> _loadFriends() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? friendsData = prefs.getString('friendsList');
+    if (friendsData != null) {
+      List<String> loadedFriends = List<String>.from(json.decode(friendsData));
+      setState(() {
+        _friends = loadedFriends;
+      });
+    }
+  }
+
+  // Method to save friends to SharedPreferences
+  Future<void> _saveFriends() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String friendsData = json.encode(_friends);
+    await prefs.setString('friendsList', friendsData);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,14 +127,12 @@ class _FriendPageState extends State<FriendPage> {
             ),
             TextButton(
               onPressed: () {
-                // Get the entered friend name
                 String friendName = _friendController.text.trim();
                 if (friendName.isNotEmpty) {
                   setState(() {
-                    // Add the new friend to the list
                     _friends.add(friendName);
+                    _saveFriends(); // Save the updated list
                   });
-                  // Show a Snackbar with success message
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('$friendName added as a friend!'),
