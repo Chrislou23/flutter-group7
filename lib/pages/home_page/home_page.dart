@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_games/pages/games_page/game_page.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_games/timer_provider.dart';
 import 'package:mobile_games/pages/friends_page/friend_page.dart';
@@ -17,7 +18,7 @@ class _HomePageState extends State<HomePage> {
 
   static const List<Widget> _pages = <Widget>[
     Center(child: Text('Home Page Content', style: TextStyle(fontSize: 24))),
-    CrosswordGamePage(),
+    GamePage(),
     FriendPage(),
   ];
 
