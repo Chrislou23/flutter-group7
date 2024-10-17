@@ -16,10 +16,12 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   String _errorMessage = '';
   String? _photoURL;
   String _username = ''; // Initialize the username
+  bool _isEditingUsername = false;
 
   @override
   void initState() {
@@ -44,6 +46,32 @@ class _ProfilePageState extends State<ProfilePage> {
     } catch (e) {
       setState(() {
         _errorMessage = 'Failed to fetch username: $e';
+      });
+    }
+  }
+
+  Future<void> _updateUsername() async {
+    if (_usernameController.text.trim().isEmpty) {
+      setState(() {
+        _errorMessage = 'Username cannot be empty.';
+      });
+      return;
+    }
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.user.uid)
+          .update({'username': _usernameController.text.trim()});
+
+      setState(() {
+        _username = _usernameController.text.trim();
+        _isEditingUsername = false;
+        _errorMessage = 'Username updated successfully!';
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to update username: $e';
       });
     }
   }
@@ -221,6 +249,39 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  void _showEditUsernameDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit Username'),
+          content: TextField(
+            controller: _usernameController,
+            decoration: const InputDecoration(
+              hintText: 'Enter new username',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                _updateUsername();
+                Navigator.of(context).pop(); // Close the dialog after updating
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -250,13 +311,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       Positioned(
                         bottom: 7,
                         right: 0,
-                        left: 87,
                         child: GestureDetector(
                           onTap: _updateProfilePicture,
                           child: Container(
                             padding: const EdgeInsets.all(5.0),
                             decoration: BoxDecoration(
-                              color: Colors.blue,
+                              color: Color.fromARGB(255, 44, 75, 170),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
@@ -271,29 +331,28 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   const SizedBox(height: 12.0),
                   Row(
-                    mainAxisSize:
-                        MainAxisSize.min, // Center the Row within its parent
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const SizedBox(width: 20.0),
-                      Text(
-                        _username,
-                        style: const TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(
-                          width:
-                              8.0), // Space between the username and the icon
-                      GestureDetector(
-                        onTap: () {
-                          // Implement username edit functionality here
-                        },
-                        child: const Icon(
-                          Icons.edit,
-                          color: Color.fromARGB(255, 44, 75, 170),
-                          size: 17,
-                        ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _username,
+                            style: const TextStyle(
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 8.0),
+                          GestureDetector(
+                            onTap: _showEditUsernameDialog,
+                            child: const Icon(
+                              Icons.edit,
+                              color: Color.fromARGB(255, 44, 75, 170),
+                              size: 17,
+                            ),
+                          )
+                        ],
                       ),
                     ],
                   ),
