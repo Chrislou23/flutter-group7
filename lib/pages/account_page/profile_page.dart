@@ -79,7 +79,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
       // Show a success message using the context from the Scaffold
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Username updated successfully!')),
+        SnackBar(
+          content: const Text('Username updated successfully!'),
+          backgroundColor: Colors.green, // Set the background color to green
+          behavior: SnackBarBehavior.floating, // Optional: make it floating
+        ),
       );
     } catch (e) {
       setState(() {
@@ -286,7 +290,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 // Call the update method and wait for it to complete
                 await _updateUsername(dialogContext);
 
-                // If the update is successful, show the SnackBar and close the dialog
                 if (_errorMessage.isEmpty) {
                   // ignore: use_build_context_synchronously
                   Navigator.of(dialogContext).pop(); // Close the dialog
