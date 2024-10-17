@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import 'login_page.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -13,12 +16,52 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _emailController = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
   String _errorMessage = '';
+  String? _photoURL;
 
   @override
   void initState() {
     super.initState();
     _emailController.text = widget.user.email ?? '';
+    _photoURL = widget.user.photoURL;
+  }
+
+  Future<void> _updateProfilePicture() async {
+    try {
+      // Pick an image from the gallery
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+
+      File imageFile = File(image.path);
+
+      // Upload the image to Firebase Storage
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('profile_pictures/${widget.user.uid}.jpg');
+      await storageRef.putFile(imageFile);
+
+      // Get the download URL of the uploaded image
+      String photoURL = await storageRef.getDownloadURL();
+
+      // Update the user's profile
+      await widget.user.updatePhotoURL(photoURL);
+
+      // Update the Firestore user document if necessary
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.user.uid)
+          .update({'photoURL': photoURL});
+
+      setState(() {
+        _photoURL = photoURL;
+        _errorMessage = 'Profile picture updated successfully!';
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to update profile picture: $e';
+      });
+    }
   }
 
   Future<void> _updateEmail() async {
@@ -168,16 +211,19 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: widget.user.photoURL != null &&
-                      widget.user.photoURL!.isNotEmpty
-                  ? NetworkImage(widget.user.photoURL!)
-                  : null,
-              child:
-                  widget.user.photoURL == null || widget.user.photoURL!.isEmpty
-                      ? const Icon(Icons.account_circle, size: 50)
-                      : null,
+            GestureDetector(
+              onTap: _updateProfilePicture,
+              child: CircleAvatar(
+                radius: 50,
+                backgroundImage: widget.user.photoURL != null &&
+                        widget.user.photoURL!.isNotEmpty
+                    ? NetworkImage(widget.user.photoURL!)
+                    : null,
+                child: widget.user.photoURL == null ||
+                        widget.user.photoURL!.isEmpty
+                    ? const Icon(Icons.account_circle, size: 50)
+                    : null,
+              ),
             ),
             const SizedBox(height: 16.0),
             TextField(
