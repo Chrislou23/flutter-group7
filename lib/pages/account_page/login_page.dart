@@ -60,7 +60,17 @@ class _LoginPageState extends State<LoginPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            const Text(
+              'Welcome back!',
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(
+                    255, 87, 50, 98), // Change this color as desired
+              ),
+            ),
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(
