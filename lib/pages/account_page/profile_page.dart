@@ -19,12 +19,33 @@ class _ProfilePageState extends State<ProfilePage> {
   final ImagePicker _picker = ImagePicker();
   String _errorMessage = '';
   String? _photoURL;
+  String _username = ''; // Initialize the username
 
   @override
   void initState() {
     super.initState();
     _emailController.text = widget.user.email ?? '';
     _photoURL = widget.user.photoURL;
+    _fetchUsername(); // Fetch user data when the profile page is initialized
+  }
+
+  Future<void> _fetchUsername() async {
+    try {
+      // Fetch the username from Firestore or other data source
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.user.uid)
+          .get();
+      if (userDoc.exists) {
+        setState(() {
+          _username = userDoc['username'] ?? 'Unknown'; // Set the username
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to fetch username: $e';
+      });
+    }
   }
 
   Future<void> _updateProfilePicture() async {
@@ -241,6 +262,29 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                   ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  _username,
+                  style: const TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(width: 8.0),
+                IconButton(
+                  icon: const Icon(
+                    Icons.edit,
+                    color: Colors.blue,
+                  ),
+                  onPressed: () {
+                    // Implement username edit functionality here
+                  },
                 ),
               ],
             ),
