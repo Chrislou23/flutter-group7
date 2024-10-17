@@ -49,7 +49,7 @@ class _RegisterPageState extends State<RegisterPage> {
         await credential.user!.sendEmailVerification();
       }
 
-      // Save user data to Firestore
+      // Save user data to Cloud Firestore
       await FirebaseFirestore.instance
           .collection('users')
           .doc(credential.user!.uid)
