@@ -11,7 +11,6 @@ import 'pages/games_page/link/link_instructions_en.dart';
 import 'pages/games_page/link/link_instructions_fi.dart';
 import 'pages/games_page/crossword/crossword_instructions_en.dart';
 import 'pages/games_page/crossword/crossword_instructions_fi.dart';
-import 'pages/account_page/account_page.dart';
 import 'pages/settings_page/settings_page.dart';
 import 'pages/settings_page/data_protection_policy.dart';
 import 'pages/settings_page/privacy_page.dart';
@@ -76,7 +75,7 @@ class ResponsiveHomePage extends StatelessWidget {
 
     if (screenSize.width < 600) {
       // Mobile layout
-      return const HomePage();
+      return const LoginPage();
     } else {
       // Tablet/Desktop layout
       return Scaffold(
