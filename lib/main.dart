@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'pages/home_page/home_page.dart';
-import 'pages/games_page/game_page.dart';
 import 'pages/friends_page/friend_page.dart';
 import 'pages/games_page/crossword/crossword_game_page.dart';
 import 'pages/games_page/link/link_game_page.dart';
@@ -43,7 +42,7 @@ class MyApp extends StatelessWidget {
       ),
       home: const HomePage(),
       routes: {
-        '/game': (context) => const GamePage(),
+        '/game': (context) => const CrosswordGamePage(),
         '/friends': (context) => const FriendPage(),
         '/crossword': (context) => const CrosswordGamePage(),
         '/crossword_instructions_en': (context) =>
@@ -61,5 +60,29 @@ class MyApp extends StatelessWidget {
         '/about': (context) => const AboutPage(),
       },
     );
+  }
+}
+
+class ResponsiveHomePage extends StatelessWidget {
+  const ResponsiveHomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+
+    if (screenSize.width < 600) {
+      // Mobile layout
+      return const HomePage();
+    } else {
+      // Tablet/Desktop layout
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Game App - Tablet/Desktop Layout'),
+        ),
+        body: const Center(
+          child: Text('Welcome to the desktop version of the Game App'),
+        ),
+      );
+    }
   }
 }
