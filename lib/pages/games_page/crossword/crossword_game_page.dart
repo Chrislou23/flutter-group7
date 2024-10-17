@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_games/timer_provider.dart';
 import 'package:mobile_games/pages/games_page/crossword/crossword.dart';
-import 'package:mobile_games/pages/games_page/link/link_instructions_en.dart';
-import 'package:mobile_games/pages/games_page/link/link_instructions_fi.dart';
 import 'package:mobile_games/pages/games_page/crossword/crossword_instructions_en.dart';
 import 'package:mobile_games/pages/games_page/crossword/crossword_instructions_fi.dart';
 import 'package:mobile_games/widgets.dart';
@@ -59,34 +57,25 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
               : Column(
                   children: [
                     const SizedBox(height: 20),
-                    // Placeholder for the favorite game image or content
+                    // Game image
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 16),
                       height: 150,
-                      color: Colors.grey[300],
-                      child: const Center(
-                        child: Text(
-                          'Game (Image/Info)',
-                          style: TextStyle(fontSize: 18),
+                      decoration: BoxDecoration(
+                        image: const DecorationImage(
+                          image: AssetImage('assets/game1.png'),
+                          fit: BoxFit.cover,
                         ),
+                        color: Colors.grey[300],
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Tab buttons for Game, Rank, How to play, and Language toggle
+                    // Tab buttons for How to play and Language toggle
                     TabButtons(isEnglish: isEnglish, toggleLanguage: toggleLanguage),
                     const SizedBox(height: 20),
-                    // Create a private game and Fast game buttons
+                    // Play button
                     CustomButton(
-                      text: 'Create a private game',
-                      onPressed: () {
-                        if (kDebugMode) {
-                          print('Create a private game pressed');
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    CustomButton(
-                      text: 'Fast game',
+                      text: 'Play',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -94,7 +83,7 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
                             builder: (context) => const CrosswordGame(),
                           ),
                         );
-                      },
+                      }, textStyle: const TextStyle(fontSize: 18, color: Colors.black),
                     ),
                   ],
                 ),
@@ -130,7 +119,7 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
   }
 }
 
-// Widget for Tab Buttons (Game, Rank, How to play, Language toggle)
+// Widget for Tab Buttons (How to play, Language toggle)
 class TabButtons extends StatelessWidget {
   final bool isEnglish;
   final VoidCallback toggleLanguage;
@@ -142,24 +131,6 @@ class TabButtons extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        GestureDetector(
-          onTap: () {
-            if (kDebugMode) {
-              print('Game tab pressed');
-            }
-          },
-          child: const Text('Game', style: TextStyle(fontSize: 18)),
-        ),
-        const VerticalDivider(thickness: 2, color: Colors.black),
-        GestureDetector(
-          onTap: () {
-            if (kDebugMode) {
-              print('Rank tab pressed');
-            }
-          },
-          child: const Text('Rank', style: TextStyle(fontSize: 18)),
-        ),
-        const VerticalDivider(thickness: 2, color: Colors.black),
         GestureDetector(
           onTap: () {
             Navigator.push(

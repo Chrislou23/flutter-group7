@@ -57,34 +57,25 @@ class _LinkGamePageState extends State<LinkGamePage> {
               : Column(
                   children: [
                     const SizedBox(height: 20),
-                    // Placeholder for the favorite game image or content
+                    // Game image
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 16),
                       height: 150,
-                      color: Colors.grey[300],
-                      child: const Center(
-                        child: Text(
-                          'Game (Image/Info)',
-                          style: TextStyle(fontSize: 18),
+                      decoration: BoxDecoration(
+                        image: const DecorationImage(
+                          image: AssetImage('assets/game2.png'),
+                          fit: BoxFit.cover,
                         ),
+                        color: Colors.grey[300],
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Tab buttons for Game, Rank, and How to play
+                    // How to play and language toggle buttons
                     TabButtons(isEnglish: isEnglish, toggleLanguage: toggleLanguage),
                     const SizedBox(height: 20),
-                    // Create a private game and Fast game buttons
+                    // Play button placed below the other buttons
                     CustomButton(
-                      text: isEnglish ? 'Create a private game' : 'Luo yksityinen peli',
-                      onPressed: () {
-                        if (kDebugMode) {
-                          print('Create a private game pressed');
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    CustomButton(
-                      text: isEnglish ? 'Fast game' : 'Pikapeli',
+                      text: isEnglish ? 'Play' : 'Pikapeli',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -93,6 +84,7 @@ class _LinkGamePageState extends State<LinkGamePage> {
                           ),
                         );
                       },
+                      textStyle: const TextStyle(fontSize: 40),
                     ),
                   ],
                 ),
@@ -127,7 +119,7 @@ class _LinkGamePageState extends State<LinkGamePage> {
   }
 }
 
-// Widget for Tab Buttons (Game, Rank, How to play, Language toggle)
+// Widget for Tab Buttons (How to play, Language toggle)
 class TabButtons extends StatelessWidget {
   final bool isEnglish;
   final VoidCallback toggleLanguage;
@@ -136,48 +128,35 @@ class TabButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Column(
       children: [
-        GestureDetector(
-          onTap: () {
-            if (kDebugMode) {
-              print('Game tab pressed');
-            }
-          },
-          child: Text(isEnglish ? 'Game' : 'Peli', style: const TextStyle(fontSize: 18)),
-        ),
-        const VerticalDivider(thickness: 2, color: Colors.black),
-        GestureDetector(
-          onTap: () {
-            if (kDebugMode) {
-              print('Rank tab pressed');
-            }
-          },
-          child: Text(isEnglish ? 'Rank' : 'Sijoitus', style: const TextStyle(fontSize: 18)),
-        ),
-        const VerticalDivider(thickness: 2, color: Colors.black),
-        GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => isEnglish
-                    ? const LinkInstructionsEn()
-                    : const LinkInstructionsFi(),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => isEnglish
+                        ? const LinkInstructionsEn()
+                        : const LinkInstructionsFi(),
+                  ),
+                );
+              },
+              child: Text(isEnglish ? 'How to play' : 'Kuinka pelata', style: const TextStyle(fontSize: 18)),
+            ),
+            const VerticalDivider(thickness: 2, color: Colors.black),
+            GestureDetector(
+              onTap: toggleLanguage,
+              child: Text(
+                isEnglish ? 'Switch to Finnish' : 'Vaihda Englantiin',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            );
-          },
-          child: Text(isEnglish ? 'How to play' : 'Kuinka pelata', style: const TextStyle(fontSize: 18)),
+            ),
+          ],
         ),
-        const VerticalDivider(thickness: 2, color: Colors.black),
-        GestureDetector(
-          onTap: toggleLanguage,
-          child: Text(
-            isEnglish ? 'Switch to Finnish' : 'Vaihda Englantiin',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ),
+        const SizedBox(height: 20),
       ],
     );
   }
