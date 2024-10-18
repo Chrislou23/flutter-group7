@@ -7,7 +7,6 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _LoginPageState createState() => _LoginPageState();
 }
 
@@ -74,15 +73,19 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text(
-              'Welcome back!',
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                color: Color.fromARGB(
-                    255, 87, 50, 98), // Change this color as desired
+            // Add padding to adjust top and bottom spacing around the image
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 2.0, bottom: 10.0), // Adjust these values as needed
+              child: Image.asset(
+                'assets/appname.png', // Path to your logo image
+                height: 350, // Adjust the height of the image as needed
+                width: 450, // Adjust the width of the image as needed
               ),
             ),
+
+            const SizedBox(height: 24.0), // Add some space after the logo
+
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(

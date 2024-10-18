@@ -120,9 +120,25 @@ class _ProfilePageState extends State<ProfilePage> {
 
       setState(() {
         _photoURL = photoURL;
-        _errorMessage = 'Profile picture updated successfully!';
       });
+
+      // Show success SnackBar with green background
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Profile picture updated successfully!'),
+          backgroundColor: Colors.green, // Green background for success
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     } catch (e) {
+      // Show error SnackBar with red background
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to update profile picture: $e'),
+          backgroundColor: Colors.red, // Red background for failure
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
       setState(() {
         _errorMessage = 'Failed to update profile picture: $e';
       });
