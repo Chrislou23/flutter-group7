@@ -16,6 +16,7 @@ import 'pages/settings_page/data_protection_policy.dart';
 import 'pages/settings_page/privacy_page.dart';
 import 'pages/settings_page/about_page.dart';
 import 'timer_provider.dart';
+import 'theme_provider.dart'; // Import the theme provider
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +25,8 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => TimerProvider()),
+        ChangeNotifierProvider(
+            create: (_) => ThemeProvider()), // Add the theme provider
       ],
       child: const MyApp(),
     ),
@@ -35,12 +38,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Game App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        brightness: Brightness.light,
       ),
+      darkTheme: ThemeData(
+        primarySwatch: Colors.blue,
+        brightness: Brightness.dark,
+      ),
+      themeMode: themeProvider.themeMode, // Apply the theme mode dynamically
       home: const LoginPage(),
 
       routes: {
