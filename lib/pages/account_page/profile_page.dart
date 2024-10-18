@@ -72,10 +72,10 @@ class _ProfilePageState extends State<ProfilePage> {
         _errorMessage = ''; // Clear error message if successful
       });
 
-      // Close the dialog after updating
-      if (mounted) {
-        Navigator.of(dialogContext).pop();
-      }
+      // // Close the dialog after updating
+      // if (mounted) {
+      //   Navigator.of(dialogContext).pop();
+      // }
 
       // Show a success message using the context from the Scaffold
       ScaffoldMessenger.of(context).showSnackBar(
@@ -411,7 +411,7 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: _signOut,
-              child: const Text('Disconnect'),
+              child: const Text('Sign Out'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
               ),

@@ -24,9 +24,21 @@ class _LoginPageState extends State<LoginPage> {
         password: _passwordController.text.trim(),
       );
       User? user = userCredential.user;
-      if (user != null) {
+
+      // Check if the user's email is verified
+      if (user != null && !user.emailVerified) {
+        await user
+            .sendEmailVerification(); // Send verification email if not verified
+        setState(() {
+          _errorMessage =
+              'Please verify your email. A verification email has been sent to ${_emailController.text.trim()}';
+        });
+        return; // Do not proceed to login
+      }
+
+      // If email is verified, navigate to home page
+      if (user != null && user.emailVerified) {
         Navigator.pushReplacement(
-          // ignore: use_build_context_synchronously
           context,
           MaterialPageRoute(
             builder: (context) => HomePage(user: user),
