@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_games/timer_provider.dart';
+import 'package:share_plus/share_plus.dart'; // Import the share_plus package
 
 class LinkGame extends StatefulWidget {
-  const LinkGame({Key? key}) : super(key: key);
+  final bool isEnglish; // Add language preference flag
+
+  const LinkGame({Key? key, required this.isEnglish}) : super(key: key);
 
   @override
   _LinkGamePageState createState() => _LinkGamePageState();
@@ -13,6 +16,7 @@ class _LinkGamePageState extends State<LinkGame> {
   List<ItemModel> items = [];
   List<ItemModel> itemsToMatch = [];
   int score = 0;
+  int totalScore = 0; // Track total score across levels
   int level = 1;
   bool isGameOver = false;
 
@@ -42,7 +46,7 @@ class _LinkGamePageState extends State<LinkGame> {
     }
     items.shuffle();
     itemsToMatch.shuffle();
-    score = 0;
+    score = 0; // Reset the score for the current level
     isGameOver = false;
   }
 
@@ -103,13 +107,14 @@ class _LinkGamePageState extends State<LinkGame> {
 
   void checkGameOver() {
     if (items.isEmpty && itemsToMatch.isEmpty) {
+      totalScore += score; // Add level score to total score
       if (level < 5) {
         level++;
         initGame();
         setState(() {});
       } else {
         isGameOver = true;
-        showFinalScoreDialog();
+        showFinalScoreDialog(); // Show dialog when the game is over
       }
     }
   }
@@ -119,15 +124,27 @@ class _LinkGamePageState extends State<LinkGame> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Congratulations!'),
-          content: Text('You have completed all levels!\nYour final score: $score'),
+          title: Text(widget.isEnglish ? 'Congratulations!' : 'Onnittelut!'),
+          content: Text(
+            widget.isEnglish
+                ? 'You have completed all levels!\nYour final score: $totalScore'
+                : 'Olet suorittanut kaikki tasot!\nLopulliset pisteesi: $totalScore',
+          ),
           actions: [
+            TextButton(
+              onPressed: () {
+                Share.share(widget.isEnglish
+                    ? 'I completed all levels in the Emotion Linking Game! My final score: $totalScore'
+                    : 'Suoritin kaikki tasot Tunteiden Yhdistämispelissä! Lopulliset pisteeni: $totalScore');
+              },
+              child: Text(widget.isEnglish ? 'Share Score' : 'Jaa Pisteet'),
+            ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 resetGame();
               },
-              child: const Text('New Game'),
+              child: Text(widget.isEnglish ? 'New Game' : 'Uusi peli'),
             ),
           ],
         );
@@ -138,6 +155,7 @@ class _LinkGamePageState extends State<LinkGame> {
   void resetGame() {
     level = 1;
     score = 0;
+    totalScore = 0; // Reset total score when starting a new game
     initGame();
     setState(() {});
   }
@@ -146,18 +164,22 @@ class _LinkGamePageState extends State<LinkGame> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Emotion Linking Game'),
+        title: Text(widget.isEnglish ? 'Emotion Linking Game' : 'Tunteiden Yhdistämispeli'), // Switch title based on language
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             Text(
-              'Score: $score',
+              widget.isEnglish ? 'Score: $score' : 'Pisteet: $score', // Show current level score
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             Text(
-              'Level: $level',
+              widget.isEnglish ? 'Total Score: $totalScore' : 'Kokonaispisteet: $totalScore', // Show total score
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+            ),
+            Text(
+              widget.isEnglish ? 'Level: $level' : 'Taso: $level', // Show current level
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 20),
@@ -190,7 +212,7 @@ class _LinkGamePageState extends State<LinkGame> {
                             feedback: Material(
                               color: Colors.transparent,
                               child: Text(
-                                '${item.name} / ${item.finnishName}',
+                                widget.isEnglish ? item.name : item.finnishName, // Switch based on language
                                 style: const TextStyle(
                                     fontSize: 26,
                                     color: Colors.teal,
@@ -203,24 +225,8 @@ class _LinkGamePageState extends State<LinkGame> {
                                     ]),
                               ),
                             ),
-                            childWhenDragging: Opacity(
-                              opacity: 0.5,
-                              child: Text(
-                                '${item.name} / ${item.finnishName}',
-                                style: const TextStyle(
-                                    fontSize: 24,
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.bold,
-                                    shadows: [
-                                      Shadow(
-                                          color: Colors.black26,
-                                          offset: Offset(1, 2),
-                                          blurRadius: 2)
-                                    ]),
-                              ),
-                            ),
                             child: Text(
-                              '${item.name} / ${item.finnishName}',
+                              widget.isEnglish ? item.name : item.finnishName, // Switch based on language
                               style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
@@ -299,23 +305,6 @@ class _LinkGamePageState extends State<LinkGame> {
               ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildBlockedScreen() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.lock, size: 100, color: Colors.grey),
-          SizedBox(height: 20),
-          Text(
-            'REST YOUR EYES',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 18),
-          ),
-        ],
       ),
     );
   }
