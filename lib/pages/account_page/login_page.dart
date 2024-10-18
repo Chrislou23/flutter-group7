@@ -73,24 +73,17 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // "Welcome back" text at the top
-            const Text(
-              'Welcome to',
-              style: TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-                color: Color.fromARGB(
-                    255, 87, 50, 98), // Customize the color as needed
+            // Add padding to adjust top and bottom spacing around the image
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 2.0, bottom: 10.0), // Adjust these values as needed
+              child: Image.asset(
+                'assets/appname.png', // Path to your logo image
+                height: 350, // Adjust the height of the image as needed
+                width: 450, // Adjust the width of the image as needed
               ),
             ),
-            const SizedBox(height: 24.0), // Add some space after the text
 
-            // App logo below the "Welcome back" text
-            Image.asset(
-              'assets/images/app_logo.png', // Path to your logo image
-              height: 150, // Adjust the height of the image as needed
-              width: 150, // Adjust the width of the image as needed
-            ),
             const SizedBox(height: 24.0), // Add some space after the logo
 
             TextField(
