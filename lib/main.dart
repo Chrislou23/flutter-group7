@@ -100,4 +100,3 @@ class ResponsiveHomePage extends StatelessWidget {
     }
   }
 }
-
