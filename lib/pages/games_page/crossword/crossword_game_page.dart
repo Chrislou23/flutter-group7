@@ -30,12 +30,6 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
         return Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.white,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
-              onPressed: () {
-                Navigator.pop(context); // Navigate back to previous page
-              },
-            ),
             title: timerProvider.isBlocked
                 ? Text(
                     "Blocked: ${_formatDuration(timerProvider.remainingBlockTime)}",
@@ -44,14 +38,6 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
                 : const Text('Crossword Game',
                     style: TextStyle(color: Colors.black)),
             centerTitle: true,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.settings, color: Colors.black),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/settings');
-                },
-              ),
-            ],
           ),
           body: timerProvider.isBlocked
               ? _buildBlockedScreen()

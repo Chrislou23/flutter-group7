@@ -43,22 +43,8 @@ class _FriendPageState extends State<FriendPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context); // Navigate back to the previous page
-          },
-        ),
         title: const Text('Friends', style: TextStyle(color: Colors.black)),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.black),
-            onPressed: () {
-              // Action for settings icon
-            },
-          ),
-        ],
       ),
       body: Column(
         children: [

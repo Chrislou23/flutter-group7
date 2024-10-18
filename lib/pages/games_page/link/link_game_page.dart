@@ -30,27 +30,14 @@ class _LinkGamePageState extends State<LinkGamePage> {
         return Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.white,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
-              onPressed: () {
-                Navigator.pop(context); // Navigate back to previous page
-              },
-            ),
             title: timerProvider.isBlocked
                 ? Text(
                     "Blocked: ${_formatDuration(timerProvider.remainingBlockTime)}",
                     style: const TextStyle(color: Colors.black),
                   )
-                : const Text('Link Game', style: TextStyle(color: Colors.black)),
+                : const Text('Link Game',
+                    style: TextStyle(color: Colors.black)),
             centerTitle: true,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.settings, color: Colors.black),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/settings');
-                },
-              ),
-            ],
           ),
           body: timerProvider.isBlocked
               ? _buildBlockedScreen()
@@ -71,7 +58,8 @@ class _LinkGamePageState extends State<LinkGamePage> {
                     ),
                     const SizedBox(height: 20),
                     // How to play and language toggle buttons
-                    TabButtons(isEnglish: isEnglish, toggleLanguage: toggleLanguage),
+                    TabButtons(
+                        isEnglish: isEnglish, toggleLanguage: toggleLanguage),
                     const SizedBox(height: 20),
                     // Play button placed below the other buttons
                     CustomButton(
@@ -80,7 +68,9 @@ class _LinkGamePageState extends State<LinkGamePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LinkGame(isEnglish: isEnglish), // Pass isEnglish to game page
+                            builder: (context) => LinkGame(
+                                isEnglish:
+                                    isEnglish), // Pass isEnglish to game page
                           ),
                         );
                       },
@@ -124,7 +114,8 @@ class TabButtons extends StatelessWidget {
   final bool isEnglish;
   final VoidCallback toggleLanguage;
 
-  const TabButtons({super.key, required this.isEnglish, required this.toggleLanguage});
+  const TabButtons(
+      {super.key, required this.isEnglish, required this.toggleLanguage});
 
   @override
   Widget build(BuildContext context) {
@@ -144,14 +135,16 @@ class TabButtons extends StatelessWidget {
                   ),
                 );
               },
-              child: Text(isEnglish ? 'How to play' : 'Kuinka pelata', style: const TextStyle(fontSize: 18)),
+              child: Text(isEnglish ? 'How to play' : 'Kuinka pelata',
+                  style: const TextStyle(fontSize: 18)),
             ),
             const VerticalDivider(thickness: 2, color: Colors.black),
             GestureDetector(
               onTap: toggleLanguage,
               child: Text(
                 isEnglish ? 'Switch to Finnish' : 'Vaihda Englantiin',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
           ],
