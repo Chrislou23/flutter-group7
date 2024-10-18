@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:mobile_games/timer_provider.dart';
 import 'package:share_plus/share_plus.dart'; // Import the share_plus package
 
 class LinkGame extends StatefulWidget {
   final bool isEnglish; // Add language preference flag
 
-  const LinkGame({Key? key, required this.isEnglish}) : super(key: key);
+  const LinkGame({super.key, required this.isEnglish});
 
   @override
+  // ignore: library_private_types_in_public_api
   _LinkGamePageState createState() => _LinkGamePageState();
 }
 
@@ -52,55 +51,180 @@ class _LinkGamePageState extends State<LinkGame> {
 
   void initLevel1() {
     items = [
-      ItemModel(name: 'Happy', finnishName: 'Iloinen', value: 'happy', imageUrl: 'https://icons.iconarchive.com/icons/seanau/flat-smiley/128/Smiley-1-icon.png'),
-      ItemModel(name: 'Sad', finnishName: 'Surullinen', value: 'sad', imageUrl: 'https://icons.iconarchive.com/icons/icons-land/flat-emoticons/128/Cry-icon.png'),
-      ItemModel(name: 'Angry', finnishName: 'Vihainen', value: 'angry', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Angry-Face-Flat-icon.png'),
-      ItemModel(name: 'Scared', finnishName: 'Peloissaan', value: 'scared', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Fearful-Face-Flat-icon.png'),
-      ItemModel(name: 'Surprised', finnishName: 'Yllättynyt', value: 'surprised', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Astonished-Face-Flat-icon.png'),
+      ItemModel(
+          name: 'Happy',
+          finnishName: 'Iloinen',
+          value: 'happy',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/seanau/flat-smiley/128/Smiley-1-icon.png'),
+      ItemModel(
+          name: 'Sad',
+          finnishName: 'Surullinen',
+          value: 'sad',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/icons-land/flat-emoticons/128/Cry-icon.png'),
+      ItemModel(
+          name: 'Angry',
+          finnishName: 'Vihainen',
+          value: 'angry',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Angry-Face-Flat-icon.png'),
+      ItemModel(
+          name: 'Scared',
+          finnishName: 'Peloissaan',
+          value: 'scared',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Fearful-Face-Flat-icon.png'),
+      ItemModel(
+          name: 'Surprised',
+          finnishName: 'Yllättynyt',
+          value: 'surprised',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Astonished-Face-Flat-icon.png'),
     ];
     itemsToMatch = List<ItemModel>.from(items);
   }
 
   void initLevel2() {
     items = [
-      ItemModel(name: 'Excited', finnishName: 'Innoissaan', value: 'excited', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Grinning-Face-With-Big-Eyes-Flat-icon.png'),
-      ItemModel(name: 'Calm', finnishName: 'Rauhallinen', value: 'calm', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Relieved-Face-Flat-icon.png'),
-      ItemModel(name: 'Bored', finnishName: 'Tylsistynyt', value: 'bored', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Unamused-Face-Flat-icon.png'),
-      ItemModel(name: 'Shy', finnishName: 'Ujo', value: 'shy', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Flushed-Face-Flat-icon.png'),
-      ItemModel(name: 'Curious', finnishName: 'Utelias', value: 'curious', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Thinking-Face-Flat-icon.png'),
+      ItemModel(
+          name: 'Excited',
+          finnishName: 'Innoissaan',
+          value: 'excited',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Grinning-Face-With-Big-Eyes-Flat-icon.png'),
+      ItemModel(
+          name: 'Calm',
+          finnishName: 'Rauhallinen',
+          value: 'calm',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Relieved-Face-Flat-icon.png'),
+      ItemModel(
+          name: 'Bored',
+          finnishName: 'Tylsistynyt',
+          value: 'bored',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Unamused-Face-Flat-icon.png'),
+      ItemModel(
+          name: 'Shy',
+          finnishName: 'Ujo',
+          value: 'shy',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Flushed-Face-Flat-icon.png'),
+      ItemModel(
+          name: 'Curious',
+          finnishName: 'Utelias',
+          value: 'curious',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Thinking-Face-Flat-icon.png'),
     ];
     itemsToMatch = List<ItemModel>.from(items);
   }
 
   void initLevel3() {
     items = [
-      ItemModel(name: 'Happy', finnishName: 'Iloinen', value: 'happy', imageUrl: 'https://icons.iconarchive.com/icons/seanau/flat-smiley/128/Smiley-1-icon.png'),
-      ItemModel(name: 'Excited', finnishName: 'Innoissaan', value: 'excited', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Grinning-Face-With-Big-Eyes-Flat-icon.png'),
-      ItemModel(name: 'Sad', finnishName: 'Surullinen', value: 'sad', imageUrl: 'https://icons.iconarchive.com/icons/icons-land/flat-emoticons/128/Cry-icon.png'),
-      ItemModel(name: 'Calm', finnishName: 'Rauhallinen', value: 'calm', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Relieved-Face-Flat-icon.png'),
-      ItemModel(name: 'Angry', finnishName: 'Vihainen', value: 'angry', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Angry-Face-Flat-icon.png'),
+      ItemModel(
+          name: 'Happy',
+          finnishName: 'Iloinen',
+          value: 'happy',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/seanau/flat-smiley/128/Smiley-1-icon.png'),
+      ItemModel(
+          name: 'Excited',
+          finnishName: 'Innoissaan',
+          value: 'excited',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Grinning-Face-With-Big-Eyes-Flat-icon.png'),
+      ItemModel(
+          name: 'Sad',
+          finnishName: 'Surullinen',
+          value: 'sad',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/icons-land/flat-emoticons/128/Cry-icon.png'),
+      ItemModel(
+          name: 'Calm',
+          finnishName: 'Rauhallinen',
+          value: 'calm',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Relieved-Face-Flat-icon.png'),
+      ItemModel(
+          name: 'Angry',
+          finnishName: 'Vihainen',
+          value: 'angry',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Angry-Face-Flat-icon.png'),
     ];
     itemsToMatch = List<ItemModel>.from(items);
   }
 
   void initLevel4() {
     items = [
-      ItemModel(name: 'Scared', finnishName: 'Peloissaan', value: 'scared', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Fearful-Face-Flat-icon.png'),
-      ItemModel(name: 'Shy', finnishName: 'Ujo', value: 'shy', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Flushed-Face-Flat-icon.png'),
-      ItemModel(name: 'Surprised', finnishName: 'Yllättynyt', value: 'surprised', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Astonished-Face-Flat-icon.png'),
-      ItemModel(name: 'Curious', finnishName: 'Utelias', value: 'curious', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Thinking-Face-Flat-icon.png'),
-      ItemModel(name: 'Bored', finnishName: 'Tylsistynyt', value: 'bored', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Unamused-Face-Flat-icon.png'),
+      ItemModel(
+          name: 'Scared',
+          finnishName: 'Peloissaan',
+          value: 'scared',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Fearful-Face-Flat-icon.png'),
+      ItemModel(
+          name: 'Shy',
+          finnishName: 'Ujo',
+          value: 'shy',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Flushed-Face-Flat-icon.png'),
+      ItemModel(
+          name: 'Surprised',
+          finnishName: 'Yllättynyt',
+          value: 'surprised',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Astonished-Face-Flat-icon.png'),
+      ItemModel(
+          name: 'Curious',
+          finnishName: 'Utelias',
+          value: 'curious',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Thinking-Face-Flat-icon.png'),
+      ItemModel(
+          name: 'Bored',
+          finnishName: 'Tylsistynyt',
+          value: 'bored',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Unamused-Face-Flat-icon.png'),
     ];
     itemsToMatch = List<ItemModel>.from(items);
   }
 
   void initLevel5() {
     items = [
-      ItemModel(name: 'Angry', finnishName: 'Vihainen', value: 'angry', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Angry-Face-Flat-icon.png'),
-      ItemModel(name: 'Sad', finnishName: 'Surullinen', value: 'sad', imageUrl: 'https://icons.iconarchive.com/icons/icons-land/flat-emoticons/128/Cry-icon.png'),
-      ItemModel(name: 'Excited', finnishName: 'Innoissaan', value: 'excited', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Grinning-Face-With-Big-Eyes-Flat-icon.png'),
-      ItemModel(name: 'Scared', finnishName: 'Peloissaan', value: 'scared', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Fearful-Face-Flat-icon.png'),
-      ItemModel(name: 'Calm', finnishName: 'Rauhallinen', value: 'calm', imageUrl: 'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Relieved-Face-Flat-icon.png'),
+      ItemModel(
+          name: 'Angry',
+          finnishName: 'Vihainen',
+          value: 'angry',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Angry-Face-Flat-icon.png'),
+      ItemModel(
+          name: 'Sad',
+          finnishName: 'Surullinen',
+          value: 'sad',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/icons-land/flat-emoticons/128/Cry-icon.png'),
+      ItemModel(
+          name: 'Excited',
+          finnishName: 'Innoissaan',
+          value: 'excited',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Grinning-Face-With-Big-Eyes-Flat-icon.png'),
+      ItemModel(
+          name: 'Scared',
+          finnishName: 'Peloissaan',
+          value: 'scared',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Fearful-Face-Flat-icon.png'),
+      ItemModel(
+          name: 'Calm',
+          finnishName: 'Rauhallinen',
+          value: 'calm',
+          imageUrl:
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Relieved-Face-Flat-icon.png'),
     ];
     itemsToMatch = List<ItemModel>.from(items);
   }
@@ -164,22 +288,30 @@ class _LinkGamePageState extends State<LinkGame> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isEnglish ? 'Emotion Linking Game' : 'Tunteiden Yhdistämispeli'), // Switch title based on language
+        title: Text(widget.isEnglish
+            ? 'Emotion Linking Game'
+            : 'Tunteiden Yhdistämispeli'), // Switch title based on language
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             Text(
-              widget.isEnglish ? 'Score: $score' : 'Pisteet: $score', // Show current level score
+              widget.isEnglish
+                  ? 'Score: $score'
+                  : 'Pisteet: $score', // Show current level score
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             Text(
-              widget.isEnglish ? 'Total Score: $totalScore' : 'Kokonaispisteet: $totalScore', // Show total score
+              widget.isEnglish
+                  ? 'Total Score: $totalScore'
+                  : 'Kokonaispisteet: $totalScore', // Show total score
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
             ),
             Text(
-              widget.isEnglish ? 'Level: $level' : 'Taso: $level', // Show current level
+              widget.isEnglish
+                  ? 'Level: $level'
+                  : 'Taso: $level', // Show current level
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 20),
@@ -212,7 +344,10 @@ class _LinkGamePageState extends State<LinkGame> {
                             feedback: Material(
                               color: Colors.transparent,
                               child: Text(
-                                widget.isEnglish ? item.name : item.finnishName, // Switch based on language
+                                widget.isEnglish
+                                    ? item.name
+                                    : item
+                                        .finnishName, // Switch based on language
                                 style: const TextStyle(
                                     fontSize: 26,
                                     color: Colors.teal,
@@ -226,7 +361,10 @@ class _LinkGamePageState extends State<LinkGame> {
                               ),
                             ),
                             child: Text(
-                              widget.isEnglish ? item.name : item.finnishName, // Switch based on language
+                              widget.isEnglish
+                                  ? item.name
+                                  : item
+                                      .finnishName, // Switch based on language
                               style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
