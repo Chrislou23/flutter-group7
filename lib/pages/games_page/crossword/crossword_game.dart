@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 class CrosswordGame extends StatefulWidget {
@@ -35,6 +36,10 @@ class _CrosswordGameState extends State<CrosswordGame> {
 
   int currentLevel = 1;
   int maxLevel = 5;
+  int failedAttempts = 0;
+  int checkAnswerClicks = 0;
+  bool showLightbulb = false;
+  int score = 0;
 
   TextEditingController wordInputController = TextEditingController();
 
@@ -545,30 +550,151 @@ class _CrosswordGameState extends State<CrosswordGame> {
     if (currentLevel < maxLevel) {
       setState(() {
         currentLevel++;
+        failedAttempts = 0; // Reset failed attempts for the new level
+        checkAnswerClicks = 0; // Reset check answer clicks for the new level
+        showLightbulb = false; // Reset lightbulb visibility for the new level
         _generateCrossword();
       });
     }
   }
 
-  void _showAnswers() {
+  void _showRandomLetters() {
     final levels = widget.isFinnish ? finnishLevels : englishLevels;
     List<CrosswordWord> crosswordData = levels[currentLevel] ?? [];
+    Random random = Random();
+    int lettersRevealed = 0;
+    Set<String> revealedPositions = {};
+
+    // Collect all empty positions
+    List<String> emptyPositions = [];
     for (var wordData in crosswordData) {
       for (int i = 0; i < wordData.word.length; i++) {
         int currentRow = wordData.row + (wordData.isHorizontal ? 0 : i);
         int currentCol = wordData.col + (wordData.isHorizontal ? i : 0);
+        String positionKey = '$currentRow-$currentCol';
 
-        if (currentRow < gridSize && currentCol < gridSize) {
-          controllers[currentRow][currentCol]?.text =
-              wordData.word[i].toUpperCase();
+        if (currentRow < gridSize &&
+            currentCol < gridSize &&
+            (controllers[currentRow][currentCol]?.text.isEmpty ?? true)) {
+          emptyPositions.add(positionKey);
         }
       }
+    }
+
+    // Shuffle the empty positions to randomize the selection
+    emptyPositions.shuffle(random);
+
+    // Reveal up to 3 letters
+    for (var positionKey in emptyPositions) {
+      if (lettersRevealed >= 3) break;
+
+      var parts = positionKey.split('-');
+      int currentRow = int.parse(parts[0]);
+      int currentCol = int.parse(parts[1]);
+
+      for (var wordData in crosswordData) {
+        for (int i = 0; i < wordData.word.length; i++) {
+          int wordRow = wordData.row + (wordData.isHorizontal ? 0 : i);
+          int wordCol = wordData.col + (wordData.isHorizontal ? i : 0);
+
+          if (wordRow == currentRow && wordCol == currentCol) {
+            controllers[currentRow][currentCol]?.text =
+                wordData.word[i].toUpperCase();
+            revealedPositions.add(positionKey);
+            lettersRevealed++;
+            break;
+          }
+        }
+      }
+    }
+
+    // Deduct points for using the lightbulb
+    setState(() {
+      score -= 20;
+    });
+  }
+
+  void _incrementFailedAttempts() {
+    setState(() {
+      failedAttempts++;
+      score -= 5; // Deduct points for incorrect attempts
+    });
+  }
+
+  void _checkAnswers() {
+    FocusScope.of(context).unfocus();
+
+    if (_isCrosswordCompleted()) {
+      score += 50; // Add points for completing the crossword
+      if (currentLevel < maxLevel) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Level Complete!'),
+              content: const Text('You have completed this level.'),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Next Level'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _moveToNextLevel();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Congratulations!'),
+              content: const Text('You have completed all levels!'),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } else {
+      _incrementFailedAttempts();
+      checkAnswerClicks++;
+      if (checkAnswerClicks >= 5) {
+        setState(() {
+          showLightbulb = true; // Show the lightbulb after 5 incorrect attempts
+        });
+      }
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Try Again'),
+            content: const Text('Some answers are incorrect.'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    double cellSize = MediaQuery.of(context).size.width / (gridSize + 1);
+    double cellSize = MediaQuery.of(context).size.width / gridSize;
 
     return Scaffold(
       appBar: AppBar(
@@ -576,237 +702,200 @@ class _CrosswordGameState extends State<CrosswordGame> {
             ? "Crossword Game - Level $currentLevel"
             : "Crossword Game - Level $currentLevel"),
         backgroundColor: Colors.blue,
-      ),
-      body: Column(
-        children: [
-          SizedBox(
-            height: cellSize * gridSize,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: gridSize * gridSize,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: gridSize,
-                  childAspectRatio: 1,
-                ),
-                itemBuilder: (BuildContext context, int index) {
-                  int row = index ~/ gridSize;
-                  int col = index % gridSize;
-                  String? letter = grid[row][col];
-                  int? number = numbers[row][col];
-
-                  if (letter == null) {
-                    return Container(
-                      margin: const EdgeInsets.all(2),
-                      width: cellSize,
-                      height: cellSize,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    );
-                  }
-
-                  bool isHighlighted = false;
-                  if (selectedClueIndex != null) {
-                    var selectedWord = (widget.isFinnish
-                        ? finnishLevels
-                        : englishLevels)[currentLevel]![selectedClueIndex!];
-                    int startRow = selectedWord.row;
-                    int startCol = selectedWord.col;
-                    String word = selectedWord.word;
-                    bool isHorizontal = selectedWord.isHorizontal;
-
-                    if (isHorizontal) {
-                      isHighlighted = row == startRow &&
-                          col >= startCol &&
-                          col < startCol + word.length;
-                    } else {
-                      isHighlighted = col == startCol &&
-                          row >= startRow &&
-                          row < startRow + word.length;
-                    }
-                  }
-
-                  return Stack(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.all(2),
-                        width: cellSize,
-                        height: cellSize,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade400),
-                          color: isHighlighted
-                              ? Colors.yellow.shade200
-                              : Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: TextField(
-                          controller: controllers[row][col],
-                          textAlign: TextAlign.center,
-                          decoration:
-                              const InputDecoration(border: InputBorder.none),
-                          style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                          maxLength: 1,
-                          buildCounter: (_,
-                                  {int? currentLength,
-                                  bool? isFocused,
-                                  int? maxLength}) =>
-                              null,
-                        ),
-                      ),
-                      if (number != null)
-                        Positioned(
-                          top: 2,
-                          left: 2,
-                          child: Text(
-                            number.toString(),
-                            style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blueAccent),
-                          ),
-                        ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: (widget.isFinnish
-                      ? finnishLevels
-                      : englishLevels)[currentLevel]!
-                  .length,
-              itemBuilder: (BuildContext context, int index) {
-                return Card(
-                  color: Colors.white,
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                  child: ListTile(
-                    title: Text(
-                      (widget.isFinnish
-                              ? finnishLevels
-                              : englishLevels)[currentLevel]![index]
-                          .clue,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    onTap: () => _selectClue(index),
-                    selected: selectedClueIndex == index,
-                    selectedTileColor: Colors.lightBlue.shade100,
-                  ),
-                );
-              },
-            ),
-          ),
-          if (selectedClueIndex != null)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: wordInputController,
-                decoration: const InputDecoration(
-                  labelText: 'Enter the word for the selected clue',
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: _updateSelectedWord,
-              ),
-            ),
+        actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
-                    textStyle: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: () {
-                    if (_isCrosswordCompleted()) {
-                      if (currentLevel < maxLevel) {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Level Complete!'),
-                              content:
-                                  const Text('You have completed this level.'),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: const Text('Next Level'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                    _moveToNextLevel();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      } else {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Congratulations!'),
-                              content:
-                                  const Text('You have completed all levels!'),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      }
-                    } else {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Try Again'),
-                            content: const Text('Some answers are incorrect.'),
-                            actions: <Widget>[
-                              TextButton(
-                                child: const Text('OK'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    }
-                  },
-                  child: const Text('Check Answers'),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
-                    textStyle: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: _showAnswers,
-                  child: const Text('Show Answers'),
-                ),
-              ],
+            child: Center(
+              child: Text(
+                'Score: $score',
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
             ),
+          ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blue.shade200, Colors.blue.shade800],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+          ),
+          Column(
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height / 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: GridView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: gridSize * gridSize,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: gridSize,
+                      childAspectRatio: 1,
+                    ),
+                    itemBuilder: (BuildContext context, int index) {
+                      int row = index ~/ gridSize;
+                      int col = index % gridSize;
+                      String? letter = grid[row][col];
+                      int? number = numbers[row][col];
+
+                      if (letter == null) {
+                        return Container(); // Empty container for cells without letters
+                      }
+
+                      bool isHighlighted = false;
+                      if (selectedClueIndex != null) {
+                        var selectedWord = (widget.isFinnish
+                            ? finnishLevels
+                            : englishLevels)[currentLevel]![selectedClueIndex!];
+                        int startRow = selectedWord.row;
+                        int startCol = selectedWord.col;
+                        String word = selectedWord.word;
+                        bool isHorizontal = selectedWord.isHorizontal;
+
+                        if (isHorizontal) {
+                          isHighlighted = row == startRow &&
+                              col >= startCol &&
+                              col < startCol + word.length;
+                        } else {
+                          isHighlighted = col == startCol &&
+                              row >= startRow &&
+                              row < startRow + word.length;
+                        }
+                      }
+
+                      return Stack(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.all(2),
+                            width: cellSize,
+                            height: cellSize,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color:
+                                      const Color.fromARGB(255, 255, 255, 255)),
+                              color: isHighlighted
+                                  ? Colors.yellow.shade200
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 4,
+                                  offset: Offset(2, 2),
+                                ),
+                              ],
+                            ),
+                            child: TextField(
+                              controller: controllers[row][col],
+                              textAlign: TextAlign.center,
+                              decoration: const InputDecoration(
+                                  border: InputBorder.none),
+                              style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
+                              maxLength: 1,
+                              buildCounter: (_,
+                                      {int? currentLength,
+                                      bool? isFocused,
+                                      int? maxLength}) =>
+                                  null,
+                            ),
+                          ),
+                          if (number != null)
+                            Positioned(
+                              top: 2,
+                              left: 2,
+                              child: Text(
+                                number.toString(),
+                                style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blueAccent),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: (widget.isFinnish
+                          ? finnishLevels
+                          : englishLevels)[currentLevel]!
+                      .length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      color: Colors.white,
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 4, horizontal: 8),
+                      child: ListTile(
+                        title: Text(
+                          (widget.isFinnish
+                                  ? finnishLevels
+                                  : englishLevels)[currentLevel]![index]
+                              .clue,
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        onTap: () => _selectClue(index),
+                        selected: selectedClueIndex == index,
+                        selectedTileColor: Colors.lightBlue.shade100,
+                      ),
+                    );
+                  },
+                ),
+              ),
+              if (selectedClueIndex != null)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: wordInputController,
+                    decoration: InputDecoration(
+                      labelText: 'Enter the word for the selected clue',
+                      filled: true,
+                      fillColor: const Color.fromARGB(
+                          255, 152, 222, 255), // Custom background color
+                    ),
+                    onChanged: _updateSelectedWord,
+                  ),
+                ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                        textStyle: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      onPressed: _checkAnswers,
+                      child: const Text('Check Answers'),
+                    ),
+                    if (showLightbulb)
+                      IconButton(
+                        icon: const Icon(Icons.lightbulb),
+                        color: Colors.yellow,
+                        iconSize: 40,
+                        onPressed: _showRandomLetters,
+                      ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
