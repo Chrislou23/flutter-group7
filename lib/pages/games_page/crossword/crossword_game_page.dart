@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_games/pages/games_page/Crossword/Crossword_instructions_en.dart';
-import 'package:mobile_games/pages/games_page/Crossword/Crossword_instructions_fi.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_games/timer_provider.dart';
 import 'package:mobile_games/pages/games_page/Crossword/crossword_game.dart';
+import 'package:mobile_games/pages/games_page/Crossword/Instructions/crossword_instructions_en.dart';
+import 'package:mobile_games/pages/games_page/Crossword/Instructions/crossword_instructions_fi.dart';
 import 'package:mobile_games/widgets.dart';
 
 class CrosswordGamePage extends StatefulWidget {

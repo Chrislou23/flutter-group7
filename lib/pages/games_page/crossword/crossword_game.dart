@@ -667,7 +667,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
     } else {
       _incrementFailedAttempts();
       checkAnswerClicks++;
-      if (checkAnswerClicks >= 5) {
+      if (checkAnswerClicks >= 3) {
         setState(() {
           showLightbulb = true; // Show the lightbulb after 5 incorrect attempts
         });
