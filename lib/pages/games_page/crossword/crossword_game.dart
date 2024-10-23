@@ -1,5 +1,8 @@
 import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 class CrosswordGame extends StatefulWidget {
   final bool isFinnish;
@@ -40,6 +43,8 @@ class _CrosswordGameState extends State<CrosswordGame> {
   int checkAnswerClicks = 0;
   bool showLightbulb = false;
   int score = 0;
+  int currentScore = 0;
+  int level = 1;
 
   TextEditingController wordInputController = TextEditingController();
 
@@ -281,7 +286,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'TIRED',
-        clue: '1. When you feel like you need to sleep or rest',
+        clue: '2. When you feel like you need to sleep or rest',
         row: 0,
         col: 0,
         isHorizontal: true,
@@ -289,7 +294,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'EXCITED',
-        clue: '1. When you can’t wait for something fun to happen',
+        clue: '3. When you can’t wait for something fun to happen',
         row: 0,
         col: 3,
         isHorizontal: false,
@@ -297,7 +302,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'LONELY',
-        clue: '1. When you feel like you have no one to play with',
+        clue: '4. When you feel like you have no one to play with',
         row: 5,
         col: 0,
         isHorizontal: true,
@@ -305,7 +310,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'CALM',
-        clue: '1. When everything is quiet and peaceful inside',
+        clue: '5. When everything is quiet and peaceful inside',
         row: 3,
         col: 0,
         isHorizontal: false,
@@ -323,7 +328,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'PROUD',
-        clue: '1. When you feel good about something you’ve done',
+        clue: '2. When you feel good about something you’ve done',
         row: 2,
         col: 0,
         isHorizontal: true,
@@ -331,7 +336,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'NERVOUS',
-        clue: '1.  When you feel a little scared or worried',
+        clue: '3.  When you feel a little scared or worried',
         row: 0,
         col: 1,
         isHorizontal: false,
@@ -339,7 +344,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'CONFUSED',
-        clue: '1. When you don’t understand something and feel mixed up',
+        clue: '4. When you don’t understand something and feel mixed up',
         row: 4,
         col: 0,
         isHorizontal: true,
@@ -347,7 +352,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'MAD',
-        clue: '1.  Another word for feeling angry',
+        clue: '5.  Another word for feeling angry',
         row: 0,
         col: 4,
         isHorizontal: false,
@@ -365,7 +370,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'AFRAID',
-        clue: '1. When you feel like something bad might happen',
+        clue: '2. When you feel like something bad might happen',
         row: 1,
         col: 2,
         isHorizontal: false,
@@ -373,7 +378,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'GRUMPY',
-        clue: '1. When you feel a bit mad or cranky',
+        clue: '3. When you feel a bit mad or cranky',
         row: 3,
         col: 1,
         isHorizontal: true,
@@ -381,7 +386,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'JOYFUL',
-        clue: '1. A word for feeling very, very happy',
+        clue: '4. A word for feeling very, very happy',
         row: 1,
         col: 6,
         isHorizontal: false,
@@ -389,10 +394,10 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'KIND',
-        clue: '1. When you are nice and caring to others',
-        row: 3,
-        col: 0,
-        isHorizontal: false,
+        clue: '5. When you are nice and caring to others',
+        row: 5,
+        col: 1,
+        isHorizontal: true,
         number: 5,
       ),
     ],
@@ -407,7 +412,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'SORRY',
-        clue: '1. When you feel bad about something you did wrong',
+        clue: '2. When you feel bad about something you did wrong',
         row: 1,
         col: 2,
         isHorizontal: false,
@@ -415,7 +420,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'BORED',
-        clue: '1. When there’s nothing fun to do',
+        clue: '3. When there’s nothing fun to do',
         row: 4,
         col: 0,
         isHorizontal: true,
@@ -423,7 +428,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'UPSET',
-        clue: '1. When something makes you feel sad or worried',
+        clue: '4. When something makes you feel sad or worried',
         row: 2,
         col: 6,
         isHorizontal: false,
@@ -431,7 +436,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
       ),
       CrosswordWord(
         word: 'HURT',
-        clue: '1. When you are nice and caring to others',
+        clue: '5. When you feel pain',
         row: 6,
         col: 3,
         isHorizontal: true,
@@ -608,17 +613,59 @@ class _CrosswordGameState extends State<CrosswordGame> {
       }
     }
 
-    // Deduct points for using the lightbulb
+    // Deduct points for using the lightbulb, but ensure score is non-negative
     setState(() {
-      score -= 20;
+      score = max(score - 20, 0);
     });
   }
 
   void _incrementFailedAttempts() {
     setState(() {
       failedAttempts++;
-      score -= 5; // Deduct points for incorrect attempts
+      score =
+          max(score - 5, 0); // Deduct points but ensure score is non-negative
     });
+  }
+
+  void _onGameCompleted(int pointsEarned) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final userDoc =
+          FirebaseFirestore.instance.collection('users').doc(user.uid);
+
+      // Fetch the current points and level from Firestore
+      DocumentSnapshot userSnapshot = await userDoc.get();
+      if (userSnapshot.exists) {
+        Map<String, dynamic> userData =
+            userSnapshot.data() as Map<String, dynamic>;
+
+        int currentPoints = userData.containsKey('currentPoints')
+            ? userData['currentPoints']
+            : 0;
+        int currentLevel =
+            userData.containsKey('level') ? userData['level'] : 1;
+        int pointsForNextLevel = 1000;
+
+        // Update the points and level
+        currentPoints += pointsEarned;
+        if (currentPoints >= pointsForNextLevel) {
+          currentLevel++;
+          currentPoints -= pointsForNextLevel;
+        }
+
+        // Update Firestore with new points and level
+        await userDoc.update({
+          'currentPoints': currentPoints,
+          'level': currentLevel,
+        });
+      } else {
+        // Document does not exist yet, create it with initial values
+        await userDoc.set({
+          'currentPoints': pointsEarned,
+          'level': 1,
+        });
+      }
+    }
   }
 
   void _checkAnswers() {
@@ -626,6 +673,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
 
     if (_isCrosswordCompleted()) {
       score += 50; // Add points for completing the crossword
+
       if (currentLevel < maxLevel) {
         showDialog(
           context: context,
@@ -646,30 +694,16 @@ class _CrosswordGameState extends State<CrosswordGame> {
           },
         );
       } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Congratulations!'),
-              content: const Text('You have completed all levels!'),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
+        _onGameCompleted(score); // Update Firebase with the final score
+        showFinalScoreDialog(); // Show the final score dialog
       }
     } else {
       _incrementFailedAttempts();
       checkAnswerClicks++;
       if (checkAnswerClicks >= 3) {
         setState(() {
-          showLightbulb = true; // Show the lightbulb after 5 incorrect attempts
+          showLightbulb =
+              true; // Show the lightbulb after multiple incorrect attempts
         });
       }
       showDialog(
@@ -692,15 +726,46 @@ class _CrosswordGameState extends State<CrosswordGame> {
     }
   }
 
+  void showFinalScoreDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(widget.isFinnish ? 'Onnittelut!' : 'Congratulations!'),
+          content: Text(
+            widget.isFinnish
+                ? 'Olet suorittanut kaikki tasot!\nLopulliset pisteesi: $score'
+                : 'You have completed all levels!\nYour final score: $score',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Share.share(widget.isFinnish
+                    ? 'Suoritin kaikki tasot ristikossa! Lopulliset pisteeni: $score'
+                    : 'I completed all levels in the crossword puzzle! My final score: $score');
+              },
+              child: Text(widget.isFinnish ? 'Jaa Pisteet' : 'Share Score'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(widget.isFinnish ? 'Uusi peli' : 'New Game'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double cellSize = MediaQuery.of(context).size.width / gridSize;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isFinnish
-            ? "Crossword Game - Level $currentLevel"
-            : "Crossword Game - Level $currentLevel"),
+        title: Text(
+            widget.isFinnish ? "Taso $currentLevel" : "Level $currentLevel"),
         backgroundColor: Colors.blue,
         actions: [
           Padding(

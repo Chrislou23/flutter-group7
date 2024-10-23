@@ -56,6 +56,8 @@ class _RegisterPageState extends State<RegisterPage> {
           .set({
         'username': _usernameController.text.trim(),
         'email': _emailController.text.trim(),
+        'currentLevel': 0,
+        'level': 1,
       });
 
       // Show a dialog when the account is created successfully
