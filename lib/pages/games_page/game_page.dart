@@ -5,7 +5,7 @@ import 'package:mobile_games/pages/games_page/crossword/crossword_game_page.dart
 import 'package:mobile_games/pages/games_page/link/link_game_page.dart';
 
 class GamePage extends StatelessWidget {
-  const GamePage({Key? key}) : super(key: key);
+  const GamePage({super.key});
 
   @override
   Widget build(BuildContext context) {
