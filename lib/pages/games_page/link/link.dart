@@ -426,7 +426,7 @@ class _LinkGamePageState extends State<LinkGame> {
                 child: Column(
                   children: [
                     const Text(
-                      'Game Over!',
+                      'Well Played!',
                       style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
