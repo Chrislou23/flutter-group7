@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mobile_games/pages/home_page/home_page.dart';
 import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -74,7 +75,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   Navigator.of(context).pop(); // Close the dialog
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                    MaterialPageRoute(builder: (context) => const HomePage()),
                   );
                 },
                 child: const Text('OK'),

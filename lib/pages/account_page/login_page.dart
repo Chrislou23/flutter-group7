@@ -40,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomePage(user: user),
+            builder: (context) => HomePage(),
           ),
         );
       }
@@ -104,7 +104,10 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: _login,
+              onPressed: _emailController.text.isNotEmpty &&
+                      _passwordController.text.isNotEmpty
+                  ? _login
+                  : null, // Disable if either field is empty
               child: const Text('Login'),
             ),
             const SizedBox(height: 16.0),

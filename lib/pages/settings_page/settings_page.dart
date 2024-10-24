@@ -21,20 +21,6 @@ class SettingsPage extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.notifications),
-              title: const Text('Notifications'),
-              onTap: () {
-                // Navigate to notification settings
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.lock),
-              title: const Text('Privacy'),
-              onTap: () {
-                Navigator.pushNamed(context, '/privacy');
-              },
-            ),
-            ListTile(
               leading: const Icon(Icons.info),
               title: const Text('About'),
               onTap: () {
