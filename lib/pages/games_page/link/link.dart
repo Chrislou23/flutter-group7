@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart'; // Import the share_plus package
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LinkGame extends StatefulWidget {
   final bool isEnglish; // Add language preference flag
@@ -56,13 +58,13 @@ class _LinkGamePageState extends State<LinkGame> {
           finnishName: 'Iloinen',
           value: 'happy',
           imageUrl:
-              'https://icons.iconarchive.com/icons/seanau/flat-smiley/128/Smiley-1-icon.png'),
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Smiling-Face-Flat-icon.png'),
       ItemModel(
           name: 'Sad',
           finnishName: 'Surullinen',
           value: 'sad',
           imageUrl:
-              'https://icons.iconarchive.com/icons/icons-land/flat-emoticons/128/Cry-icon.png'),
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Crying-Face-Flat-icon.png'),
       ItemModel(
           name: 'Angry',
           finnishName: 'Vihainen',
@@ -128,7 +130,7 @@ class _LinkGamePageState extends State<LinkGame> {
           finnishName: 'Iloinen',
           value: 'happy',
           imageUrl:
-              'https://icons.iconarchive.com/icons/seanau/flat-smiley/128/Smiley-1-icon.png'),
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Smiling-Face-Flat-icon.png'),
       ItemModel(
           name: 'Excited',
           finnishName: 'Innoissaan',
@@ -140,7 +142,7 @@ class _LinkGamePageState extends State<LinkGame> {
           finnishName: 'Surullinen',
           value: 'sad',
           imageUrl:
-              'https://icons.iconarchive.com/icons/icons-land/flat-emoticons/128/Cry-icon.png'),
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Crying-Face-Flat-icon.png'),
       ItemModel(
           name: 'Calm',
           finnishName: 'Rauhallinen',
@@ -206,7 +208,7 @@ class _LinkGamePageState extends State<LinkGame> {
           finnishName: 'Surullinen',
           value: 'sad',
           imageUrl:
-              'https://icons.iconarchive.com/icons/icons-land/flat-emoticons/128/Cry-icon.png'),
+              'https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-flat/128/Crying-Face-Flat-icon.png'),
       ItemModel(
           name: 'Excited',
           finnishName: 'Innoissaan',
@@ -238,7 +240,49 @@ class _LinkGamePageState extends State<LinkGame> {
         setState(() {});
       } else {
         isGameOver = true;
+        _onGameCompleted(totalScore); // Update points and level in Firestore
         showFinalScoreDialog(); // Show dialog when the game is over
+      }
+    }
+  }
+
+  void _onGameCompleted(int pointsEarned) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final userDoc =
+          FirebaseFirestore.instance.collection('users').doc(user.uid);
+
+      // Fetch the current points and level from Firestore
+      DocumentSnapshot userSnapshot = await userDoc.get();
+      if (userSnapshot.exists) {
+        Map<String, dynamic> userData =
+            userSnapshot.data() as Map<String, dynamic>;
+
+        int currentPoints = userData.containsKey('currentPoints')
+            ? userData['currentPoints']
+            : 0;
+        int currentLevel =
+            userData.containsKey('level') ? userData['level'] : 1;
+        int pointsForNextLevel = 1000;
+
+        // Update the points and level
+        currentPoints += pointsEarned;
+        if (currentPoints >= pointsForNextLevel) {
+          currentLevel++;
+          currentPoints -= pointsForNextLevel;
+        }
+
+        // Update Firestore with new points and level
+        await userDoc.update({
+          'currentPoints': currentPoints,
+          'level': currentLevel,
+        });
+      } else {
+        // Document does not exist yet, create it with initial values
+        await userDoc.set({
+          'currentPoints': pointsEarned,
+          'level': 1,
+        });
       }
     }
   }
@@ -397,7 +441,9 @@ class _LinkGamePageState extends State<LinkGame> {
                               checkGameOver();
                             } else {
                               setState(() {
-                                score -= 5;
+                                score = (score - 5)
+                                    .clamp(0, double.infinity)
+                                    .toInt(); // Ensure score doesn't go below 0
                               });
                             }
                           },

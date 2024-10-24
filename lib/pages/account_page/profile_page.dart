@@ -21,18 +21,21 @@ class _ProfilePageState extends State<ProfilePage> {
   String _errorMessage = '';
   String? _photoURL;
   String _username = ''; // Initialize the username
+  int _level = 1; // Initialize the level
+  int _pointsForNextLevel = 1000; // Points required to level up
+  int _currentPoints = 0; // Current points towards next level
 
   @override
   void initState() {
     super.initState();
     _emailController.text = widget.user.email ?? '';
     _photoURL = widget.user.photoURL;
-    _fetchUsername(); // Fetch user data when the profile page is initialized
+    _fetchUserData(); // Fetch user data when the profile page is initialized
   }
 
-  Future<void> _fetchUsername() async {
+  Future<void> _fetchUserData() async {
     try {
-      // Fetch the username from Firestore or other data source
+      // Fetch the user data from Firestore or other data source
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(widget.user.uid)
@@ -40,11 +43,13 @@ class _ProfilePageState extends State<ProfilePage> {
       if (userDoc.exists) {
         setState(() {
           _username = userDoc['username'] ?? 'Unknown'; // Set the username
+          _level = userDoc['level'] ?? 1; // Set the level with default value
+          _currentPoints = userDoc['currentPoints'] ?? 0; // Set current points
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Failed to fetch username: $e';
+        _errorMessage = 'Failed to fetch user data: $e';
       });
     }
   }
@@ -72,11 +77,6 @@ class _ProfilePageState extends State<ProfilePage> {
         _errorMessage = ''; // Clear error message if successful
       });
 
-      // // Close the dialog after updating
-      // if (mounted) {
-      //   Navigator.of(dialogContext).pop();
-      // }
-
       // Show a success message using the context from the Scaffold
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -100,7 +100,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
       File imageFile = File(image.path);
 
-      // Upload the image to Firebase Storage
+      // Upload the image to Storage
       final storageRef = FirebaseStorage.instance
           .ref()
           .child('profile_pictures/${widget.user.uid}.jpg');
@@ -319,8 +319,26 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  void addPoints(int points) {
+    setState(() {
+      _currentPoints += points;
+      if (_currentPoints >= _pointsForNextLevel) {
+        _level++;
+        _currentPoints -= _pointsForNextLevel;
+      }
+    });
+
+    // Update Firestore with new points and level
+    FirebaseFirestore.instance.collection('users').doc(widget.user.uid).update({
+      'level': _level,
+      'currentPoints': _currentPoints,
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    double progress = _currentPoints / _pointsForNextLevel;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
@@ -394,6 +412,28 @@ class _ProfilePageState extends State<ProfilePage> {
                         ],
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 12.0),
+                  Text(
+                    'Level: $_level',
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12.0),
+                  LinearProgressIndicator(
+                    value: progress,
+                    backgroundColor: Colors.grey[300],
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    '$_currentPoints / $_pointsForNextLevel points',
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
