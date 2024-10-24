@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile_games/pages/account_page/login_page.dart';
 import 'package:mobile_games/pages/account_page/profile_page.dart';
+import 'package:mobile_games/pages/account_page/register_page.dart';
 import 'package:mobile_games/pages/games_page/game_page.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_games/timer_provider.dart';
@@ -10,9 +12,7 @@ import 'package:mobile_games/pages/games_page/crossword/crossword_game_page.dart
 import 'package:mobile_games/pages/games_page/link/link_game_page.dart';
 
 class HomePage extends StatefulWidget {
-  final User user;
-
-  const HomePage({super.key, required this.user});
+  const HomePage({super.key});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -36,6 +36,42 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  // Function to show login/register dialog
+  void _showLoginRegisterDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Profile'),
+          content:
+              const Text('Please log in or register to access your profile.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
+              },
+              child: const Text('Login'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const RegisterPage()),
+                );
+              },
+              child: const Text('Register'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer2<TimerProvider, ThemeProvider>(
@@ -46,12 +82,19 @@ class _HomePageState extends State<HomePage> {
             leading: IconButton(
               icon: const Icon(Icons.account_circle, color: Colors.black),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProfilePage(user: widget.user),
-                  ),
-                );
+                User? user = FirebaseAuth.instance.currentUser;
+                if (user != null) {
+                  // Pass the current User to ProfilePage
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfilePage(user: user),
+                    ),
+                  );
+                } else {
+                  // If user is not logged in, show login/register dialog
+                  _showLoginRegisterDialog();
+                }
               },
             ),
             title: timerProvider.isBlocked
@@ -105,7 +148,8 @@ class _HomePageState extends State<HomePage> {
                                 },
                                 child: Container(
                                   margin: const EdgeInsets.all(16.0),
-                                  height: MediaQuery.of(context).size.height * 0.35,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.35,
                                   decoration: BoxDecoration(
                                     image: const DecorationImage(
                                       image: AssetImage('assets/game1.png'),
@@ -122,12 +166,14 @@ class _HomePageState extends State<HomePage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => const LinkGamePage()),
+                                        builder: (context) =>
+                                            const LinkGamePage()),
                                   );
                                 },
                                 child: Container(
                                   margin: const EdgeInsets.all(16.0),
-                                  height: MediaQuery.of(context).size.height * 0.35,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.35,
                                   decoration: BoxDecoration(
                                     image: const DecorationImage(
                                       image: AssetImage('assets/game2.png'),
@@ -177,6 +223,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Helper to format the duration
   String _formatDuration(Duration duration) {
     String minutes =
         duration.inMinutes.remainder(60).toString().padLeft(2, '0');
@@ -185,6 +232,7 @@ class _HomePageState extends State<HomePage> {
     return "$minutes:$seconds";
   }
 
+  // Maintenance Banner
   Widget _buildMaintenanceBanner() {
     return Container(
       width: double.infinity,
@@ -198,6 +246,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Blocked Screen
   Widget _buildBlockedScreen() {
     return Center(
       child: Column(

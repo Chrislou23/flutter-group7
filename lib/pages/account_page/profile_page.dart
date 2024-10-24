@@ -7,7 +7,7 @@ import 'dart:io';
 import 'login_page.dart';
 
 class ProfilePage extends StatefulWidget {
-  final User user;
+  final User? user;
   const ProfilePage({super.key, required this.user});
 
   @override
@@ -28,8 +28,8 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    _emailController.text = widget.user.email ?? '';
-    _photoURL = widget.user.photoURL;
+    _emailController.text = widget.user?.email ?? '';
+    _photoURL = widget.user?.photoURL;
     _fetchUserData(); // Fetch user data when the profile page is initialized
   }
 
@@ -38,7 +38,7 @@ class _ProfilePageState extends State<ProfilePage> {
       // Fetch the user data from Firestore or other data source
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(widget.user.uid)
+          .doc(widget.user?.uid)
           .get();
       if (userDoc.exists) {
         setState(() {
@@ -68,7 +68,7 @@ class _ProfilePageState extends State<ProfilePage> {
       // Update the username in Firestore
       await FirebaseFirestore.instance
           .collection('users')
-          .doc(widget.user.uid)
+          .doc(widget.user?.uid)
           .update({'username': newUsername});
 
       // Update the local state to reflect the new username
@@ -103,19 +103,19 @@ class _ProfilePageState extends State<ProfilePage> {
       // Upload the image to Storage
       final storageRef = FirebaseStorage.instance
           .ref()
-          .child('profile_pictures/${widget.user.uid}.jpg');
+          .child('profile_pictures/${widget.user?.uid}.jpg');
       await storageRef.putFile(imageFile);
 
       // Get the download URL of the uploaded image
       String photoURL = await storageRef.getDownloadURL();
 
       // Update the user's profile
-      await widget.user.updatePhotoURL(photoURL);
+      await widget.user?.updatePhotoURL(photoURL);
 
       // Update the Firestore user document if necessary
       await FirebaseFirestore.instance
           .collection('users')
-          .doc(widget.user.uid)
+          .doc(widget.user?.uid)
           .update({'photoURL': photoURL});
 
       setState(() {
@@ -147,7 +147,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _updateEmail() async {
     try {
-      await widget.user.verifyBeforeUpdateEmail(_emailController.text);
+      await widget.user?.verifyBeforeUpdateEmail(_emailController.text);
       setState(() {
         _errorMessage =
             'Verification email sent. Please verify your new email before updating.';
@@ -170,7 +170,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _sendPasswordResetEmail() async {
     try {
       await FirebaseAuth.instance
-          .sendPasswordResetEmail(email: widget.user.email!);
+          .sendPasswordResetEmail(email: widget.user!.email!);
       setState(() {
         _errorMessage = 'Password reset email sent';
       });
@@ -186,11 +186,11 @@ class _ProfilePageState extends State<ProfilePage> {
       // Delete user data from Firestore
       await FirebaseFirestore.instance
           .collection('users')
-          .doc(widget.user.uid)
+          .doc(widget.user?.uid)
           .delete();
 
       // Delete user account from Firebase Authentication
-      await widget.user.delete();
+      await widget.user?.delete();
 
       Navigator.of(context).popUntil((route) => route.isFirst);
     } on FirebaseAuthException catch (e) {
@@ -267,10 +267,10 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _reauthenticate(String password) async {
     try {
       final AuthCredential credential = EmailAuthProvider.credential(
-        email: widget.user.email!,
+        email: widget.user!.email!,
         password: password,
       );
-      await widget.user.reauthenticateWithCredential(credential);
+      await widget.user?.reauthenticateWithCredential(credential);
       setState(() {
         _errorMessage = 'Re-authentication successful. Please try again.';
       });
@@ -329,7 +329,10 @@ class _ProfilePageState extends State<ProfilePage> {
     });
 
     // Update Firestore with new points and level
-    FirebaseFirestore.instance.collection('users').doc(widget.user.uid).update({
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.user?.uid)
+        .update({
       'level': _level,
       'currentPoints': _currentPoints,
     });
