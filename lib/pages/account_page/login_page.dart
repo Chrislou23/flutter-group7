@@ -15,6 +15,21 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String _errorMessage = '';
+  bool _isButtonEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(_updateButtonState);
+    _passwordController.addListener(_updateButtonState);
+  }
+
+  void _updateButtonState() {
+    setState(() {
+      _isButtonEnabled = _emailController.text.isNotEmpty &&
+          _passwordController.text.isNotEmpty;
+    });
+  }
 
   Future<void> _login() async {
     try {
@@ -40,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomePage(),
+            builder: (context) => const HomePage(),
           ),
         );
       }
@@ -59,6 +74,15 @@ class _LoginPageState extends State<LoginPage> {
         _errorMessage = 'An error occurred: $e';
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _emailController.removeListener(_updateButtonState);
+    _passwordController.removeListener(_updateButtonState);
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -104,10 +128,9 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: _emailController.text.isNotEmpty &&
-                      _passwordController.text.isNotEmpty
+              onPressed: _isButtonEnabled
                   ? _login
-                  : null, // Disable if either field is empty
+                  : null, // Enable or disable the button
               child: const Text('Login'),
             ),
             const SizedBox(height: 16.0),

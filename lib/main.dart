@@ -9,7 +9,6 @@ import 'package:provider/provider.dart';
 import 'pages/home_page/home_page.dart';
 import 'pages/account_page/login_page.dart';
 import 'pages/account_page/register_page.dart';
-import 'pages/account_page/profile_page.dart';
 import 'pages/games_page/game_page.dart';
 import 'pages/friends_page/friend_page.dart';
 import 'pages/games_page/crossword/crossword_game_page.dart';
