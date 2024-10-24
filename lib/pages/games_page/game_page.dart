@@ -21,14 +21,6 @@ class GamePage extends StatelessWidget {
                   )
                 : const Text('Game', style: TextStyle(color: Colors.black)),
             centerTitle: true,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.settings, color: Colors.black),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/settings');
-                },
-              ),
-            ],
           ),
           body: timerProvider.isBlocked
               ? _buildBlockedScreen()

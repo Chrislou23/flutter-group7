@@ -21,6 +21,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
+  // You can change this to `false` when the maintenance is over.
+  bool _isMaintenance = true;
+
   static const List<Widget> _pages = <Widget>[
     Center(child: Text('Home Page Content', style: TextStyle(fontSize: 24))),
     GamePage(),
@@ -85,51 +88,58 @@ class _HomePageState extends State<HomePage> {
               ? _buildBlockedScreen()
               : (_selectedIndex == 0
                   ? Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const CrosswordGamePage()),
-                            );
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.all(16.0),
-                            height: MediaQuery.of(context).size.height * 0.35,
-                            decoration: BoxDecoration(
-                              image: const DecorationImage(
-                                image: AssetImage('assets/game1.png'),
-                                fit: BoxFit.cover,
+                        if (_isMaintenance) _buildMaintenanceBanner(),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const CrosswordGamePage()),
+                                  );
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.all(16.0),
+                                  height: MediaQuery.of(context).size.height * 0.35,
+                                  decoration: BoxDecoration(
+                                    image: const DecorationImage(
+                                      image: AssetImage('assets/game1.png'),
+                                      fit: BoxFit.cover,
+                                    ),
+                                    color: Colors.grey[300],
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Center(),
+                                ),
                               ),
-                              color: Colors.grey[300],
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Center(),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LinkGamePage()),
-                            );
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.all(16.0),
-                            height: MediaQuery.of(context).size.height * 0.35,
-                            decoration: BoxDecoration(
-                              image: const DecorationImage(
-                                image: AssetImage('assets/game2.png'),
-                                fit: BoxFit.cover,
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const LinkGamePage()),
+                                  );
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.all(16.0),
+                                  height: MediaQuery.of(context).size.height * 0.35,
+                                  decoration: BoxDecoration(
+                                    image: const DecorationImage(
+                                      image: AssetImage('assets/game2.png'),
+                                      fit: BoxFit.cover,
+                                    ),
+                                    color: Colors.grey[300],
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Center(),
+                                ),
                               ),
-                              color: Colors.grey[300],
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Center(),
+                            ],
                           ),
                         ),
                       ],
@@ -173,6 +183,19 @@ class _HomePageState extends State<HomePage> {
     String seconds =
         duration.inSeconds.remainder(60).toString().padLeft(2, '0');
     return "$minutes:$seconds";
+  }
+
+  Widget _buildMaintenanceBanner() {
+    return Container(
+      width: double.infinity,
+      color: Colors.amber,
+      padding: const EdgeInsets.all(8.0),
+      child: const Text(
+        "Exceptional maintenance 28/10/24 from 8 - 10 a.m.",
+        textAlign: TextAlign.center,
+        style: TextStyle(color: Colors.black, fontSize: 16),
+      ),
+    );
   }
 
   Widget _buildBlockedScreen() {
