@@ -37,11 +37,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Obtain the ThemeProvider
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Game App',
+      themeMode: themeProvider.themeMode, // Apply the theme mode
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        brightness: Brightness.light,
+        // Define other light theme properties
+      ),
+      darkTheme: ThemeData(
+        primarySwatch: Colors.blueGrey,
+        brightness: Brightness.dark,
+        // Define other dark theme properties
       ),
       home: const HomePage(),
       routes: {
@@ -53,11 +64,9 @@ class MyApp extends StatelessWidget {
         '/link_instructions_fi': (context) => const LinkInstructionsFi(),
         '/link_instructions_en': (context) => const LinkInstructionsEn(),
         '/crossword_instructions': (context) => const CrosswordInstructionsEn(),
-        '/crossword_instructions_fi': (context) =>
-            const CrosswordInstructionsFi(),
+        '/crossword_instructions_fi': (context) => const CrosswordInstructionsFi(),
         '/settings': (context) => const SettingsPage(),
-        '/data_protection_policy': (context) =>
-            const DataProtectionPolicyPage(),
+        '/data_protection_policy': (context) => const DataProtectionPolicyPage(),
         '/about': (context) => const AboutPage(),
         '/register': (context) => const RegisterPage(),
       },

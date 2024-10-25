@@ -6,7 +6,7 @@ import 'package:mobile_games/pages/account_page/register_page.dart';
 import 'package:mobile_games/pages/games_page/game_page.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_games/timer_provider.dart';
-import 'package:mobile_games/theme_provider.dart'; // Import ThemeProvider
+import 'package:mobile_games/theme_provider.dart';
 import 'package:mobile_games/pages/friends_page/friend_page.dart';
 import 'package:mobile_games/pages/games_page/crossword/crossword_game_page.dart';
 import 'package:mobile_games/pages/games_page/link/link_game_page.dart';
@@ -43,8 +43,7 @@ class _HomePageState extends State<HomePage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Profile'),
-          content:
-              const Text('Please log in or register to access your profile.'),
+          content: const Text('Please log in or register to access your profile.'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -78,9 +77,9 @@ class _HomePageState extends State<HomePage> {
       builder: (context, timerProvider, themeProvider, child) {
         return Scaffold(
           appBar: AppBar(
-            backgroundColor: Colors.white,
+            // Removed backgroundColor to use theme's app bar color
             leading: IconButton(
-              icon: const Icon(Icons.account_circle, color: Colors.black),
+              icon: const Icon(Icons.account_circle),
               onPressed: () {
                 User? user = FirebaseAuth.instance.currentUser;
                 if (user != null) {
@@ -100,11 +99,9 @@ class _HomePageState extends State<HomePage> {
             title: timerProvider.isBlocked
                 ? Text(
                     "Blocked: ${_formatDuration(timerProvider.remainingBlockTime)}",
-                    style: const TextStyle(color: Colors.black),
                   )
                 : Text(
                     "Remaining Time: ${_formatDuration(timerProvider.remainingUsageTime)}",
-                    style: const TextStyle(color: Colors.black),
                   ),
             centerTitle: true,
             actions: [
@@ -113,14 +110,13 @@ class _HomePageState extends State<HomePage> {
                   themeProvider.themeMode == ThemeMode.light
                       ? Icons.dark_mode
                       : Icons.light_mode,
-                  color: Colors.black,
                 ),
                 onPressed: () {
                   themeProvider.toggleTheme();
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.settings, color: Colors.black),
+                icon: const Icon(Icons.settings),
                 onPressed: () {
                   Navigator.pushNamed(context, '/settings');
                 },
@@ -155,7 +151,7 @@ class _HomePageState extends State<HomePage> {
                                       image: AssetImage('assets/game1.png'),
                                       fit: BoxFit.cover,
                                     ),
-                                    color: Colors.grey[300],
+                                    color: Theme.of(context).cardColor,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: const Center(),
@@ -179,7 +175,7 @@ class _HomePageState extends State<HomePage> {
                                       image: AssetImage('assets/game2.png'),
                                       fit: BoxFit.cover,
                                     ),
-                                    color: Colors.grey[300],
+                                    color: Theme.of(context).cardColor,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: const Center(),
@@ -207,15 +203,9 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
             currentIndex: _selectedIndex,
-            selectedItemColor: themeProvider.themeMode == ThemeMode.light
-                ? Colors.black
-                : Colors.white,
-            unselectedItemColor: themeProvider.themeMode == ThemeMode.light
-                ? Colors.grey
-                : Colors.grey[400],
-            backgroundColor: themeProvider.themeMode == ThemeMode.light
-                ? Colors.white
-                : Colors.black,
+            selectedItemColor: Theme.of(context).colorScheme.primary,
+            unselectedItemColor: Theme.of(context).unselectedWidgetColor,
+            backgroundColor: Theme.of(context).bottomAppBarTheme.color,
             onTap: _onItemTapped,
           ),
         );
@@ -233,15 +223,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   // Maintenance Banner
-  Widget _buildMaintenanceBanner() {
+   Widget _buildMaintenanceBanner() {
     return Container(
       width: double.infinity,
-      color: Colors.amber,
+      color: Colors.orange, // Set the color to orange
       padding: const EdgeInsets.all(8.0),
       child: const Text(
-        "Exceptional maintenance 28/10/24 from 8 - 10 a.m.",
+        "Periodic maintenance 28/10/24 from 8 - 10 a.m.",
         textAlign: TextAlign.center,
-        style: TextStyle(color: Colors.black, fontSize: 16),
+        style: TextStyle(
+          fontSize: 16,
+          color: Colors.black, // Ensure the text color is readable on an orange background
+        ),
       ),
     );
   }
@@ -251,10 +244,10 @@ class _HomePageState extends State<HomePage> {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.lock, size: 100, color: Colors.grey),
-          SizedBox(height: 20),
-          Text(
+        children: [
+          Icon(Icons.lock, size: 100, color: Theme.of(context).iconTheme.color),
+          const SizedBox(height: 20),
+          const Text(
             'REST YOUR EYES',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 18),
