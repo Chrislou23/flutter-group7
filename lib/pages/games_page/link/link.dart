@@ -27,6 +27,12 @@ class _LinkGamePageState extends State<LinkGame> {
     initGame();
   }
 
+  @override
+  void dispose() {
+    _saveScore(); // Save score when the widget is disposed
+    super.dispose();
+  }
+
   void initGame() {
     switch (level) {
       case 1:
@@ -234,6 +240,7 @@ class _LinkGamePageState extends State<LinkGame> {
   void checkGameOver() {
     if (items.isEmpty && itemsToMatch.isEmpty) {
       totalScore += score; // Add level score to total score
+      _saveScore(); // Save the score after each level
       if (level < 5) {
         level++;
         initGame();
@@ -243,6 +250,18 @@ class _LinkGamePageState extends State<LinkGame> {
         _onGameCompleted(totalScore); // Update points and level in Firestore
         showFinalScoreDialog(); // Show dialog when the game is over
       }
+    }
+  }
+
+  void _saveScore() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
+
+      // Save the current score to Firestore
+      await userDoc.set({
+        'scoreLink': totalScore,
+      }, SetOptions(merge: true));
     }
   }
 
@@ -328,6 +347,43 @@ class _LinkGamePageState extends State<LinkGame> {
     setState(() {});
   }
 
+  Widget _buildLinkRankingList() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .orderBy('scoreLink', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return const Text('Error fetching data');
+        }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final users = snapshot.data?.docs ?? [];
+
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: users.length,
+          itemBuilder: (context, index) {
+            final user = users[index];
+            return ListTile(
+              leading: CircleAvatar(
+                child: Text(
+                  '${index + 1}',
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+              title: Text(user['username'] ?? 'Unknown'),
+              trailing: Text('Score: ${user['scoreLink'] ?? 0}'),
+            );
+          },
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -487,6 +543,7 @@ class _LinkGamePageState extends State<LinkGame> {
                   ],
                 ),
               ),
+            const SizedBox(height: 20),
           ],
         ),
       ),

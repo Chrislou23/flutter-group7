@@ -74,7 +74,7 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
     _remainingUsageTime =
         Duration(seconds: prefs.getInt('remainingUsageTime') ?? _usageDurationMinutes * 60);
     _remainingBlockTime =
-        Duration(seconds: prefs.getInt('remainingBlockTime') ?? _blockDurationMinutes * 60);
+        Duration(seconds: prefs.getInt('remainingBlockTime') ?? _blockDurationMinutes * 1);
     notifyListeners();
   }
 

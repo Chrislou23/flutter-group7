@@ -627,46 +627,34 @@ class _CrosswordGameState extends State<CrosswordGame> {
     });
   }
 
-  void _onGameCompleted(int pointsEarned) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final userDoc =
-          FirebaseFirestore.instance.collection('users').doc(user.uid);
+void _onGameCompleted(int pointsEarned) async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
 
-      // Fetch the current points and level from Firestore
-      DocumentSnapshot userSnapshot = await userDoc.get();
-      if (userSnapshot.exists) {
-        Map<String, dynamic> userData =
-            userSnapshot.data() as Map<String, dynamic>;
+    DocumentSnapshot userSnapshot = await userDoc.get();
+    if (userSnapshot.exists) {
+      Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
 
-        int currentPoints = userData.containsKey('currentPoints')
-            ? userData['currentPoints']
-            : 0;
-        int currentLevel =
-            userData.containsKey('level') ? userData['level'] : 1;
-        int pointsForNextLevel = 1000;
+      int currentCrosswordScore = userData.containsKey('scoreCrossword') ? userData['scoreCrossword'] : 0;
+      int currentTotalScore = userData.containsKey('scoreTotal') ? userData['scoreTotal'] : 0;
 
-        // Update the points and level
-        currentPoints += pointsEarned;
-        if (currentPoints >= pointsForNextLevel) {
-          currentLevel++;
-          currentPoints -= pointsForNextLevel;
-        }
+      currentCrosswordScore += pointsEarned;
+      currentTotalScore += pointsEarned;
 
-        // Update Firestore with new points and level
-        await userDoc.update({
-          'currentPoints': currentPoints,
-          'level': currentLevel,
-        });
-      } else {
-        // Document does not exist yet, create it with initial values
-        await userDoc.set({
-          'currentPoints': pointsEarned,
-          'level': 1,
-        });
-      }
+      // Mettre à jour les scores dans Firestore
+      await userDoc.update({
+        'scoreCrossword': currentCrosswordScore,
+        'scoreTotal': currentTotalScore,
+      });
+    } else {
+      await userDoc.set({
+        'scoreCrossword': pointsEarned,
+        'scoreTotal': pointsEarned,
+      });
     }
   }
+}
 
   void _checkAnswers() {
     FocusScope.of(context).unfocus();
