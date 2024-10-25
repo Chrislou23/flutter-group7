@@ -6,18 +6,34 @@ import 'package:mobile_games/pages/games_page/link/Instructions/link_instruction
 import 'package:mobile_games/pages/games_page/link/Instructions/link_instructions_fi.dart';
 import 'package:mobile_games/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class LinkGamePage extends StatefulWidget {
   const LinkGamePage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _LinkGamePageState createState() => _LinkGamePageState();
 }
 
 class _LinkGamePageState extends State<LinkGamePage> {
   bool isEnglish = true;
+
+  // Variable to hold the Future
+  late Future<QuerySnapshot> _usersFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  // Method to fetch data
+  Future<void> _fetchUserData() async {
+    _usersFuture = FirebaseFirestore.instance.collection('users').get();
+    await _usersFuture;
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   void toggleLanguage() {
     setState(() {
@@ -26,40 +42,80 @@ class _LinkGamePageState extends State<LinkGamePage> {
   }
 
   Widget _buildRankingList() {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('users')
-          .orderBy('scoreLink', descending: true)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return const Text('Error fetching data');
-        }
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    return RefreshIndicator(
+      onRefresh: _fetchUserData,
+      child: FutureBuilder<QuerySnapshot>(
+        future: _usersFuture,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Center(child: Text('Error fetching data'));
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-        final users = snapshot.data?.docs ?? [];
+          final docs = snapshot.data?.docs ?? [];
 
-        return ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: users.length,
-          itemBuilder: (context, index) {
-            final user = users[index];
-            return ListTile(
-              leading: CircleAvatar(
-                child: Text(
-                  '\${index + 1}',
-                  style: const TextStyle(color: Colors.white),
+          // Create a list to hold user data
+          List<Map<String, dynamic>> userDataList = docs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            final scoreLink = data['scoreLink'] ?? 0;
+
+            return {
+              'username': data['username'] ?? 'Unknown',
+              'scoreLink': scoreLink,
+            };
+          }).toList();
+
+          // Sort the userDataList based on 'scoreLink' in descending order
+          userDataList.sort((a, b) => b['scoreLink'].compareTo(a['scoreLink']));
+
+          return ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemCount: userDataList.length,
+            itemBuilder: (context, index) {
+              final user = userDataList[index];
+              final scoreLink = user['scoreLink'];
+
+              return ListTile(
+                leading: CircleAvatar(
+                  child: Text(
+                    '${index + 1}',
+                    style: const TextStyle(color: Colors.white),
+                  ),
                 ),
-              ),
-              title: Text(user['username'] ?? 'Unknown'),
-              trailing: Text(user['scoreLink'].toString()),
-            );
-          },
-        );
-      },
+                title: Text(user['username']),
+                trailing: Text(scoreLink.toString()),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  String _formatDuration(Duration duration) {
+    String minutes =
+        duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    String seconds =
+        duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return "$minutes:$seconds";
+  }
+
+  Widget _buildBlockedScreen() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.lock, size: 100, color: Colors.grey),
+          SizedBox(height: 20),
+          Text(
+            'REST YOUR EYES',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 18),
+          ),
+        ],
+      ),
     );
   }
 
@@ -72,11 +128,10 @@ class _LinkGamePageState extends State<LinkGamePage> {
             backgroundColor: Colors.white,
             title: timerProvider.isBlocked
                 ? Text(
-                    "Blocked: \${_formatDuration(timerProvider.remainingBlockTime)}",
+                    "Blocked: ${_formatDuration(timerProvider.remainingBlockTime)}",
                     style: const TextStyle(color: Colors.black),
                   )
-                : const Text('Link Game',
-                    style: TextStyle(color: Colors.black)),
+                : const Text('Link Game', style: TextStyle(color: Colors.black)),
             centerTitle: true,
           ),
           body: AnimatedSwitcher(
@@ -121,11 +176,10 @@ class _LinkGamePageState extends State<LinkGamePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => LinkGame(
-                                  isEnglish:
-                                      isEnglish), // Pass isEnglish to game page
+                              builder: (context) =>
+                                  LinkGame(isEnglish: isEnglish),
                             ),
-                          );
+                          ).then((_) => _fetchUserData());
                         },
                         textStyle: const TextStyle(fontSize: 40),
                       ),
@@ -134,31 +188,6 @@ class _LinkGamePageState extends State<LinkGamePage> {
           ),
         );
       },
-    );
-  }
-
-  String _formatDuration(Duration duration) {
-    String minutes =
-        duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    String seconds =
-        duration.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return "\$minutes:\$seconds";
-  }
-
-  Widget _buildBlockedScreen() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.lock, size: 100, color: Colors.grey),
-          SizedBox(height: 20),
-          Text(
-            'REST YOUR EYES',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 18),
-          ),
-        ],
-      ),
     );
   }
 }

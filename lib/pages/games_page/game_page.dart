@@ -5,57 +5,124 @@ import 'package:mobile_games/timer_provider.dart';
 import 'package:mobile_games/pages/games_page/crossword/crossword_game_page.dart';
 import 'package:mobile_games/pages/games_page/link/link_game_page.dart';
 
-class GamePage extends StatelessWidget {
+class GamePage extends StatefulWidget {
   const GamePage({super.key});
 
-Widget _buildOverallRankingList() {
-  return StreamBuilder<QuerySnapshot>(
-    stream: FirebaseFirestore.instance
-        .collection('users')
-        .orderBy('scoreTotal', descending: true)
-        .snapshots(),
-    builder: (context, snapshot) {
-      if (snapshot.hasError) {
-        return const Text('Error fetching data');
-      }
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const Center(child: CircularProgressIndicator());
-      }
+  @override
+  _GamePageState createState() => _GamePageState();
+}
 
-      final users = snapshot.data?.docs ?? [];
+class _GamePageState extends State<GamePage> {
+  // Variable to hold the Future
+  late Future<QuerySnapshot> _usersFuture;
 
-      return ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: users.length,
-        itemBuilder: (context, index) {
-          final user = users[index];
-          final scoreLink = user['scoreLink'] ?? 0;
-          final scoreCrossword = user['scoreCrossword'] ?? 0;
-          final scoreTotal = scoreLink + scoreCrossword;
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
 
-          return ListTile(
-            leading: CircleAvatar(
-              child: Text(
-                '${index + 1}',
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
-            title: Text(user['username'] ?? 'Unknown'),
-            subtitle: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Crossword: $scoreCrossword'),
-                Text('Link: $scoreLink'),
-                Text('Total: $scoreTotal'),
-              ],
-            ),
+  // Method to fetch data
+  Future<void> _fetchUserData() async {
+    _usersFuture = FirebaseFirestore.instance.collection('users').get();
+    // Wait for the future to complete before calling setState
+    await _usersFuture;
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Widget _buildOverallRankingList() {
+    return RefreshIndicator(
+      onRefresh: _fetchUserData,
+      child: FutureBuilder<QuerySnapshot>(
+        future: _usersFuture,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Center(child: Text('Error fetching data'));
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final docs = snapshot.data?.docs ?? [];
+
+          // Create a list to hold user data with computed total scores
+          List<Map<String, dynamic>> userDataList = docs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            final scoreCrossword = data['scoreCrossword'] ?? 0;
+            final scoreLink = data['scoreLink'] ?? 0;
+            final scoreTotal = scoreCrossword + scoreLink;
+
+            // Return a new map containing the user data and total score
+            return {
+              'username': data['username'] ?? 'Unknown',
+              'scoreCrossword': scoreCrossword,
+              'scoreLink': scoreLink,
+              'scoreTotal': scoreTotal,
+            };
+          }).toList();
+
+          // Sort the userDataList based on 'scoreTotal' in descending order
+          userDataList.sort((a, b) => b['scoreTotal'].compareTo(a['scoreTotal']));
+
+          return ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemCount: userDataList.length,
+            itemBuilder: (context, index) {
+              final user = userDataList[index];
+              final scoreCrossword = user['scoreCrossword'];
+              final scoreLink = user['scoreLink'];
+              final scoreTotal = user['scoreTotal'];
+
+              return ListTile(
+                leading: CircleAvatar(
+                  child: Text(
+                    '${index + 1}',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+                title: Text(user['username']),
+                subtitle: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Crossword: $scoreCrossword'),
+                    Text('Link: $scoreLink'),
+                    Text('Total: $scoreTotal'),
+                  ],
+                ),
+              );
+            },
           );
         },
-      );
-    },
-  );
-}
+      ),
+    );
+  }
+
+  String _formatDuration(Duration duration) {
+    String minutes =
+        duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    String seconds =
+        duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return "$minutes:$seconds";
+  }
+
+  Widget _buildBlockedScreen() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.lock, size: 100, color: Colors.grey),
+          SizedBox(height: 20),
+          Text(
+            'REST YOUR EYES',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 18),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,9 +152,10 @@ Widget _buildOverallRankingList() {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const CrosswordGamePage(),
+                                  builder: (context) =>
+                                      const CrosswordGamePage(),
                                 ),
-                              );
+                              ).then((_) => _fetchUserData());
                             },
                             child: Column(
                               children: [
@@ -121,7 +189,7 @@ Widget _buildOverallRankingList() {
                                 MaterialPageRoute(
                                   builder: (context) => const LinkGamePage(),
                                 ),
-                              );
+                              ).then((_) => _fetchUserData());
                             },
                             child: Column(
                               children: [
@@ -156,31 +224,6 @@ Widget _buildOverallRankingList() {
                 ),
         );
       },
-    );
-  }
-
-  String _formatDuration(Duration duration) {
-    String minutes =
-        duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    String seconds =
-        duration.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return "\$minutes:\$seconds";
-  }
-
-  Widget _buildBlockedScreen() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.lock, size: 100, color: Colors.grey),
-          SizedBox(height: 20),
-          Text(
-            'REST YOUR EYES',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 18),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -7,7 +7,7 @@ class ScoreRankingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3, // Trois onglets
+      length: 3, // Three tabs
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Score Rankings'),
@@ -34,11 +34,21 @@ class ScoreRankingPage extends StatelessWidget {
   }
 
   Widget _buildRankingList(String scoreField) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: _db
+    Stream<QuerySnapshot> stream;
+
+    if (scoreField == 'scoreTotal') {
+      // For total score, fetch all users without ordering
+      stream = _db.collection('users').snapshots();
+    } else {
+      // For individual games, order by the specific score field
+      stream = _db
           .collection('users')
-          .orderBy(scoreField, descending: true) // Trier par le champ de score
-          .snapshots(),
+          .orderBy(scoreField, descending: true)
+          .snapshots();
+    }
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: stream,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
@@ -47,16 +57,42 @@ class ScoreRankingPage extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final users = snapshot.data?.docs ?? [];
+        List<Map<String, dynamic>> userDataList = [];
+
+        if (scoreField == 'scoreTotal') {
+          // Compute total scores and create a list of user data
+          userDataList = snapshot.data!.docs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            final scoreCrossword = data['scoreCrossword'] ?? 0;
+            final scoreLink = data['scoreLink'] ?? 0;
+            final totalScore = scoreCrossword + scoreLink;
+            final newData = Map<String, dynamic>.from(data);
+            newData['scoreTotal'] = totalScore;
+            return newData;
+          }).toList();
+
+          // Sort userDataList by totalScore descending
+          userDataList.sort((a, b) {
+            final totalA = a['scoreTotal'] ?? 0;
+            final totalB = b['scoreTotal'] ?? 0;
+            return totalB.compareTo(totalA);
+          });
+        } else {
+          // For individual scores, use the data as is
+          userDataList = snapshot.data!.docs.map((doc) {
+            return doc.data() as Map<String, dynamic>;
+          }).toList();
+        }
 
         return ListView.builder(
-          itemCount: users.length,
+          itemCount: userDataList.length,
           itemBuilder: (context, index) {
-            final user = users[index];
+            final data = userDataList[index];
             final rank = index + 1;
 
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -71,7 +107,8 @@ class ScoreRankingPage extends StatelessWidget {
                   ],
                 ),
                 child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 10),
                   leading: CircleAvatar(
                     backgroundColor: Colors.purpleAccent,
                     child: Text(
@@ -83,7 +120,7 @@ class ScoreRankingPage extends StatelessWidget {
                     ),
                   ),
                   title: Text(
-                    user['username'] ?? 'Unknown',
+                    data['username'] ?? 'Unknown',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
@@ -94,10 +131,11 @@ class ScoreRankingPage extends StatelessWidget {
                     children: [
                       Text(
                         'Score',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                        style:
+                            TextStyle(color: Colors.grey[600], fontSize: 12),
                       ),
                       Text(
-                        '${user[scoreField] ?? 0}',
+                        '${data[scoreField] ?? 0}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
