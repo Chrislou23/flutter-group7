@@ -5,6 +5,8 @@ import 'package:mobile_games/pages/games_page/Crossword/crossword_game.dart';
 import 'package:mobile_games/pages/games_page/Crossword/Instructions/crossword_instructions_en.dart';
 import 'package:mobile_games/pages/games_page/Crossword/Instructions/crossword_instructions_fi.dart';
 import 'package:mobile_games/widgets.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CrosswordGamePage extends StatefulWidget {
   const CrosswordGamePage({super.key});
@@ -21,6 +23,44 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
     setState(() {
       isEnglish = !isEnglish;
     });
+  }
+
+  Widget _buildCrosswordRankingList() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .orderBy('scoreCrossword', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return const Text('Error fetching data');
+        }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final users = snapshot.data?.docs ?? [];
+
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: users.length,
+          itemBuilder: (context, index) {
+            final user = users[index];
+            return ListTile(
+              leading: CircleAvatar(
+                child: Text(
+                  '${index + 1}',
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+              title: Text(user['username'] ?? 'Unknown'),
+              trailing: Text('Score: ${user['scoreCrossword'] ?? 0}'),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -56,6 +96,9 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
                         color: Colors.grey[300],
                       ),
                     ),
+                    const SizedBox(height: 20),
+                    // Ranking list
+                    Expanded(child: _buildCrosswordRankingList()),
                     const SizedBox(height: 20),
                     // How to play and language toggle buttons
                     TabButtons(
