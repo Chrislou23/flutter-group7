@@ -451,29 +451,53 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _updateEmail,
-              child: const Text('Update Email'),
-            ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _sendPasswordResetEmail,
-              child: const Text('Change Password'),
-            ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _showDeleteConfirmationDialog,
-              child: const Text('Delete Account'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: _updateEmail,
+                child: const Text('Update Email'),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  textStyle: const TextStyle(fontSize: 18),
+                ),
               ),
             ),
             const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _signOut,
-              child: const Text('Sign Out'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: _sendPasswordResetEmail,
+                child: const Text('Change Password'),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  textStyle: const TextStyle(fontSize: 18),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: _signOut,
+                child: const Text('Sign Out'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  textStyle: const TextStyle(fontSize: 18),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: _showDeleteConfirmationDialog,
+                child: const Text('Delete Account'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  textStyle: const TextStyle(fontSize: 18),
+                ),
               ),
             ),
             if (_errorMessage.isNotEmpty)

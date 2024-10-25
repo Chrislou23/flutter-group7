@@ -14,10 +14,10 @@ class SettingsPage extends StatelessWidget {
         child: ListView(
           children: <Widget>[
             ListTile(
-              leading: const Icon(Icons.language),
-              title: const Text('Language'),
+              leading: const Icon(Icons.security),
+              title: const Text('Data Protection Policy'),
               onTap: () {
-                // Navigate to language settings
+                Navigator.pushNamed(context, '/data_protection_policy');
               },
             ),
             ListTile(
@@ -25,13 +25,6 @@ class SettingsPage extends StatelessWidget {
               title: const Text('About'),
               onTap: () {
                 Navigator.pushNamed(context, '/about');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.security),
-              title: const Text('Data Protection Policy'),
-              onTap: () {
-                Navigator.pushNamed(context, '/data_protection_policy');
               },
             ),
           ],
