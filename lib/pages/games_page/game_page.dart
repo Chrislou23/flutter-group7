@@ -57,6 +57,7 @@ class _GamePageState extends State<GamePage> {
             // Return a new map containing the user data and total score
             return {
               'username': data['username'] ?? 'Unknown',
+              'photoURL': data['photoURL'] ?? '',
               'scoreCrossword': scoreCrossword,
               'scoreLink': scoreLink,
               'scoreTotal': scoreTotal,
@@ -74,22 +75,46 @@ class _GamePageState extends State<GamePage> {
               final scoreCrossword = user['scoreCrossword'];
               final scoreLink = user['scoreLink'];
               final scoreTotal = user['scoreTotal'];
+              final username = user['username'];
+              final photoURL = user['photoURL'];
 
-              return ListTile(
-                leading: CircleAvatar(
-                  child: Text(
-                    '${index + 1}',
-                    style: const TextStyle(color: Colors.white),
-                  ),
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
                 ),
-                title: Text(user['username']),
-                subtitle: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Crossword: $scoreCrossword'),
-                    Text('Link: $scoreLink'),
-                    Text('Total: $scoreTotal'),
-                  ],
+                child: ListTile(
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  leading: CircleAvatar(
+                    radius: 25,
+                    backgroundImage: photoURL.isNotEmpty ? NetworkImage(photoURL) : null,
+                    child: photoURL.isEmpty
+                        ? Text(
+                            '${index + 1}',
+                            style: const TextStyle(color: Colors.white, fontSize: 18.0),
+                          )
+                        : null,
+                  ),
+                  title: Text(
+                    username,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.0,
+                    ),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 4.0),
+                      Text('Crossword: $scoreCrossword'),
+                      Text('Link: $scoreLink'),
+                      Text(
+                        'Total: $scoreTotal',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -100,10 +125,8 @@ class _GamePageState extends State<GamePage> {
   }
 
   String _formatDuration(Duration duration) {
-    String minutes =
-        duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    String seconds =
-        duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    String minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    String seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
     return "$minutes:$seconds";
   }
 
@@ -118,6 +141,100 @@ class _GamePageState extends State<GamePage> {
             'REST YOUR EYES',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 18),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGameButtons() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CrosswordGamePage(),
+                  ),
+                ).then((_) => _fetchUserData());
+              },
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                elevation: 4,
+                child: Column(
+                  children: [
+                    Container(
+                      height: 150,
+                      decoration: BoxDecoration(
+                        image: const DecorationImage(
+                          image: AssetImage('assets/game1.png'),
+                          fit: BoxFit.cover,
+                        ),
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(12.0),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Game 1: Crossword',
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LinkGamePage(),
+                  ),
+                ).then((_) => _fetchUserData());
+              },
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                elevation: 4,
+                child: Column(
+                  children: [
+                    Container(
+                      height: 150,
+                      decoration: BoxDecoration(
+                        image: const DecorationImage(
+                          image: AssetImage('assets/game2.png'),
+                          fit: BoxFit.cover,
+                        ),
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(12.0),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Game 2: Link Game',
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -143,81 +260,21 @@ class _GamePageState extends State<GamePage> {
               ? _buildBlockedScreen()
               : Column(
                   children: [
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const CrosswordGamePage(),
-                                ),
-                              ).then((_) => _fetchUserData());
-                            },
-                            child: Column(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.all(8.0),
-                                  height: 150,
-                                  decoration: BoxDecoration(
-                                    image: const DecorationImage(
-                                      image: AssetImage('assets/game1.png'),
-                                      fit: BoxFit.cover,
-                                    ),
-                                    color: Colors.grey[300],
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                const Text(
-                                  'Game 1: Crossword',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          ),
+                    const SizedBox(height: 10),
+                    _buildGameButtons(),
+                    const SizedBox(height: 10),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Leaderboard',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const LinkGamePage(),
-                                ),
-                              ).then((_) => _fetchUserData());
-                            },
-                            child: Column(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.all(8.0),
-                                  height: 150,
-                                  decoration: BoxDecoration(
-                                    image: const DecorationImage(
-                                      image: AssetImage('assets/game2.png'),
-                                      fit: BoxFit.cover,
-                                    ),
-                                    color: Colors.grey[300],
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                const Text(
-                                  'Game 2: Link Game',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     // Ranking list for all users
                     Expanded(child: _buildOverallRankingList()),
                   ],
