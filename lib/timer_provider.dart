@@ -6,7 +6,7 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
   Timer? _usageTimer;
   Timer? _blockTimer;
   bool _isBlocked = false;
-  static const int _usageDurationMinutes = 5;
+  static const int _usageDurationMinutes = 120;
   static const int _blockDurationMinutes = 1;
   Duration _remainingUsageTime = Duration(minutes: _usageDurationMinutes);
   Duration _remainingBlockTime = Duration(minutes: _blockDurationMinutes);
@@ -74,7 +74,7 @@ class TimerProvider with ChangeNotifier, WidgetsBindingObserver {
     _remainingUsageTime =
         Duration(seconds: prefs.getInt('remainingUsageTime') ?? _usageDurationMinutes * 60);
     _remainingBlockTime =
-        Duration(seconds: prefs.getInt('remainingBlockTime') ?? _blockDurationMinutes * 60);
+        Duration(seconds: prefs.getInt('remainingBlockTime') ?? _blockDurationMinutes * 1);
     notifyListeners();
   }
 

@@ -3,11 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mobile_games/pages/home_page/home_page.dart';
 import 'dart:io';
 import 'login_page.dart';
 
 class ProfilePage extends StatefulWidget {
-  final User user;
+  final User? user;
   const ProfilePage({super.key, required this.user});
 
   @override
@@ -21,30 +22,35 @@ class _ProfilePageState extends State<ProfilePage> {
   String _errorMessage = '';
   String? _photoURL;
   String _username = ''; // Initialize the username
+  int _level = 1; // Initialize the level
+  int _pointsForNextLevel = 1000; // Points required to level up
+  int _currentPoints = 0; // Current points towards next level
 
   @override
   void initState() {
     super.initState();
-    _emailController.text = widget.user.email ?? '';
-    _photoURL = widget.user.photoURL;
-    _fetchUsername(); // Fetch user data when the profile page is initialized
+    _emailController.text = widget.user?.email ?? '';
+    _photoURL = widget.user?.photoURL;
+    _fetchUserData(); // Fetch user data when the profile page is initialized
   }
 
-  Future<void> _fetchUsername() async {
+  Future<void> _fetchUserData() async {
     try {
-      // Fetch the username from Firestore or other data source
+      // Fetch the user data from Firestore or other data source
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(widget.user.uid)
+          .doc(widget.user?.uid)
           .get();
       if (userDoc.exists) {
         setState(() {
           _username = userDoc['username'] ?? 'Unknown'; // Set the username
+          _level = userDoc['level'] ?? 1; // Set the level with default value
+          _currentPoints = userDoc['currentPoints'] ?? 0; // Set current points
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Failed to fetch username: $e';
+        _errorMessage = 'Failed to fetch user data: $e';
       });
     }
   }
@@ -63,7 +69,7 @@ class _ProfilePageState extends State<ProfilePage> {
       // Update the username in Firestore
       await FirebaseFirestore.instance
           .collection('users')
-          .doc(widget.user.uid)
+          .doc(widget.user?.uid)
           .update({'username': newUsername});
 
       // Update the local state to reflect the new username
@@ -71,11 +77,6 @@ class _ProfilePageState extends State<ProfilePage> {
         _username = newUsername;
         _errorMessage = ''; // Clear error message if successful
       });
-
-      // // Close the dialog after updating
-      // if (mounted) {
-      //   Navigator.of(dialogContext).pop();
-      // }
 
       // Show a success message using the context from the Scaffold
       ScaffoldMessenger.of(context).showSnackBar(
@@ -100,29 +101,45 @@ class _ProfilePageState extends State<ProfilePage> {
 
       File imageFile = File(image.path);
 
-      // Upload the image to Firebase Storage
+      // Upload the image to Storage
       final storageRef = FirebaseStorage.instance
           .ref()
-          .child('profile_pictures/${widget.user.uid}.jpg');
+          .child('profile_pictures/${widget.user?.uid}.jpg');
       await storageRef.putFile(imageFile);
 
       // Get the download URL of the uploaded image
       String photoURL = await storageRef.getDownloadURL();
 
       // Update the user's profile
-      await widget.user.updatePhotoURL(photoURL);
+      await widget.user?.updatePhotoURL(photoURL);
 
       // Update the Firestore user document if necessary
       await FirebaseFirestore.instance
           .collection('users')
-          .doc(widget.user.uid)
+          .doc(widget.user?.uid)
           .update({'photoURL': photoURL});
 
       setState(() {
         _photoURL = photoURL;
-        _errorMessage = 'Profile picture updated successfully!';
       });
+
+      // Show success SnackBar with green background
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Profile picture updated successfully!'),
+          backgroundColor: Colors.green, // Green background for success
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     } catch (e) {
+      // Show error SnackBar with red background
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to update profile picture: $e'),
+          backgroundColor: Colors.red, // Red background for failure
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
       setState(() {
         _errorMessage = 'Failed to update profile picture: $e';
       });
@@ -131,7 +148,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _updateEmail() async {
     try {
-      await widget.user.verifyBeforeUpdateEmail(_emailController.text);
+      await widget.user?.verifyBeforeUpdateEmail(_emailController.text);
       setState(() {
         _errorMessage =
             'Verification email sent. Please verify your new email before updating.';
@@ -154,7 +171,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _sendPasswordResetEmail() async {
     try {
       await FirebaseAuth.instance
-          .sendPasswordResetEmail(email: widget.user.email!);
+          .sendPasswordResetEmail(email: widget.user!.email!);
       setState(() {
         _errorMessage = 'Password reset email sent';
       });
@@ -170,11 +187,11 @@ class _ProfilePageState extends State<ProfilePage> {
       // Delete user data from Firestore
       await FirebaseFirestore.instance
           .collection('users')
-          .doc(widget.user.uid)
+          .doc(widget.user?.uid)
           .delete();
 
       // Delete user account from Firebase Authentication
-      await widget.user.delete();
+      await widget.user?.delete();
 
       Navigator.of(context).popUntil((route) => route.isFirst);
     } on FirebaseAuthException catch (e) {
@@ -196,7 +213,7 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       await FirebaseAuth.instance.signOut();
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const LoginPage()),
+        MaterialPageRoute(builder: (context) => const HomePage()),
         (Route<dynamic> route) => false,
       );
     } catch (e) {
@@ -251,10 +268,10 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _reauthenticate(String password) async {
     try {
       final AuthCredential credential = EmailAuthProvider.credential(
-        email: widget.user.email!,
+        email: widget.user!.email!,
         password: password,
       );
-      await widget.user.reauthenticateWithCredential(credential);
+      await widget.user?.reauthenticateWithCredential(credential);
       setState(() {
         _errorMessage = 'Re-authentication successful. Please try again.';
       });
@@ -303,8 +320,29 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  void addPoints(int points) {
+    setState(() {
+      _currentPoints += points;
+      if (_currentPoints >= _pointsForNextLevel) {
+        _level++;
+        _currentPoints -= _pointsForNextLevel;
+      }
+    });
+
+    // Update Firestore with new points and level
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.user?.uid)
+        .update({
+      'level': _level,
+      'currentPoints': _currentPoints,
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    double progress = _currentPoints / _pointsForNextLevel;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
@@ -379,6 +417,28 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 12.0),
+                  Text(
+                    'Level: $_level',
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12.0),
+                  LinearProgressIndicator(
+                    value: progress,
+                    backgroundColor: Colors.grey[300],
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    '$_currentPoints / $_pointsForNextLevel points',
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -391,29 +451,53 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _updateEmail,
-              child: const Text('Update Email'),
-            ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _sendPasswordResetEmail,
-              child: const Text('Change Password'),
-            ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _showDeleteConfirmationDialog,
-              child: const Text('Delete Account'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: _updateEmail,
+                child: const Text('Update Email'),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  textStyle: const TextStyle(fontSize: 18),
+                ),
               ),
             ),
             const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _signOut,
-              child: const Text('Sign Out'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: _sendPasswordResetEmail,
+                child: const Text('Change Password'),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  textStyle: const TextStyle(fontSize: 18),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: _signOut,
+                child: const Text('Sign Out'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  textStyle: const TextStyle(fontSize: 18),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: _showDeleteConfirmationDialog,
+                child: const Text('Delete Account'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  textStyle: const TextStyle(fontSize: 18),
+                ),
               ),
             ),
             if (_errorMessage.isNotEmpty)

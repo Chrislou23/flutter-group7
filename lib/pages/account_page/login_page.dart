@@ -7,7 +7,6 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _LoginPageState createState() => _LoginPageState();
 }
 
@@ -16,6 +15,21 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String _errorMessage = '';
+  bool _isButtonEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(_updateButtonState);
+    _passwordController.addListener(_updateButtonState);
+  }
+
+  void _updateButtonState() {
+    setState(() {
+      _isButtonEnabled = _emailController.text.isNotEmpty &&
+          _passwordController.text.isNotEmpty;
+    });
+  }
 
   Future<void> _login() async {
     try {
@@ -41,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomePage(user: user),
+            builder: (context) => const HomePage(),
           ),
         );
       }
@@ -63,6 +77,15 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void dispose() {
+    _emailController.removeListener(_updateButtonState);
+    _passwordController.removeListener(_updateButtonState);
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -74,15 +97,19 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text(
-              'Welcome back!',
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                color: Color.fromARGB(
-                    255, 87, 50, 98), // Change this color as desired
+            // Add padding to adjust top and bottom spacing around the image
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 2.0, bottom: 10.0), // Adjust these values as needed
+              child: Image.asset(
+                'assets/appname.png', // Path to your logo image
+                height: 350, // Adjust the height of the image as needed
+                width: 450, // Adjust the width of the image as needed
               ),
             ),
+
+            const SizedBox(height: 24.0), // Add some space after the logo
+
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(
@@ -101,7 +128,9 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: _login,
+              onPressed: _isButtonEnabled
+                  ? _login
+                  : null, // Enable or disable the button
               child: const Text('Login'),
             ),
             const SizedBox(height: 16.0),

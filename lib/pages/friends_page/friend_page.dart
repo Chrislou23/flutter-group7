@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:share_plus/share_plus.dart';
 
 class FriendPage extends StatefulWidget {
   const FriendPage({super.key});
@@ -10,16 +11,14 @@ class FriendPage extends StatefulWidget {
 }
 
 class _FriendPageState extends State<FriendPage> {
-  // List to hold the names of friends
   List<String> _friends = [];
 
   @override
   void initState() {
     super.initState();
-    _loadFriends(); // Load friends when the page is initialized
+    _loadFriends();
   }
 
-  // Method to load friends from SharedPreferences
   Future<void> _loadFriends() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? friendsData = prefs.getString('friendsList');
@@ -31,11 +30,16 @@ class _FriendPageState extends State<FriendPage> {
     }
   }
 
-  // Method to save friends to SharedPreferences
   Future<void> _saveFriends() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String friendsData = json.encode(_friends);
     await prefs.setString('friendsList', friendsData);
+  }
+
+  // Function to share the invitation via social media
+  Future<void> _shareOnSocialMedia() async {
+    const String message = "I'm playing on FunLandia, come play with me!";
+    Share.share(message);  // Uses share_plus to share the message
   }
 
   @override
@@ -43,26 +47,11 @@ class _FriendPageState extends State<FriendPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context); // Navigate back to the previous page
-          },
-        ),
         title: const Text('Friends', style: TextStyle(color: Colors.black)),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.black),
-            onPressed: () {
-              // Action for settings icon
-            },
-          ),
-        ],
       ),
       body: Column(
         children: [
-          // The list of friends
           Expanded(
             child: ListView.builder(
               itemCount: _friends.length,
@@ -74,28 +63,44 @@ class _FriendPageState extends State<FriendPage> {
               },
             ),
           ),
-          // The button to add a friend at the bottom
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 12.0, horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
                 backgroundColor: const Color.fromARGB(255, 225, 178, 252),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
-                minimumSize: const Size(
-                    double.infinity, 50), // Makes the button full-width
+                minimumSize: const Size(double.infinity, 50),
               ),
               onPressed: () {
                 _showAddFriendDialog(context);
               },
-              icon: const Icon(Icons.person_add,
-                  color: Color.fromARGB(255, 0, 0, 0)),
+              icon: const Icon(Icons.person_add, color: Color.fromARGB(255, 0, 0, 0)),
               label: const Text(
                 'Add New Friend',
                 style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+              ),
+            ),
+          ),
+          // Invite Friends Button (Only for Social Media Sharing)
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                backgroundColor: const Color.fromARGB(255, 128, 212, 250),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              onPressed: _shareOnSocialMedia, // Share invitation message on social media
+              icon: const Icon(Icons.share, color: Colors.white),
+              label: const Text(
+                'Invite Friends',
+                style: TextStyle(color: Colors.white),
               ),
             ),
           ),
@@ -121,7 +126,7 @@ class _FriendPageState extends State<FriendPage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(dialogContext).pop(); // Close the dialog
+                Navigator.of(dialogContext).pop();
               },
               child: const Text('Cancel'),
             ),
@@ -131,7 +136,7 @@ class _FriendPageState extends State<FriendPage> {
                 if (friendName.isNotEmpty) {
                   setState(() {
                     _friends.add(friendName);
-                    _saveFriends(); // Save the updated list
+                    _saveFriends();
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -140,7 +145,7 @@ class _FriendPageState extends State<FriendPage> {
                     ),
                   );
                 }
-                Navigator.of(dialogContext).pop(); // Close the dialog
+                Navigator.of(dialogContext).pop();
               },
               child: const Text('Add'),
             ),

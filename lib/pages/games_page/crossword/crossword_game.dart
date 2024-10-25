@@ -1,4 +1,8 @@
+import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 class CrosswordGame extends StatefulWidget {
   final bool isFinnish;
@@ -35,6 +39,12 @@ class _CrosswordGameState extends State<CrosswordGame> {
 
   int currentLevel = 1;
   int maxLevel = 5;
+  int failedAttempts = 0;
+  int checkAnswerClicks = 0;
+  bool showLightbulb = false;
+  int score = 0;
+  int currentScore = 0;
+  int level = 1;
 
   TextEditingController wordInputController = TextEditingController();
 
@@ -43,74 +53,74 @@ class _CrosswordGameState extends State<CrosswordGame> {
       CrosswordWord(
           word: 'PELKO',
           clue: '1. Kun jokin asia pelottaa sinua',
-          row: 0,
-          col: 7,
+          row: 1,
+          col: 6,
           isHorizontal: false,
           number: 1),
       CrosswordWord(
           word: 'SURU',
           clue: '2. Kun kyyneleet tulevat silmiin',
-          row: 3,
-          col: 3,
+          row: 2,
+          col: 0,
           isHorizontal: false,
           number: 2),
       CrosswordWord(
-          word: 'VIHA',
-          clue: '3. Kun jokin harmittaa sinua kovasti',
-          row: 3,
-          col: 5,
+          word: 'INHO',
+          clue: '3. Kun joku asia tuntuu epämiellyttävältät',
+          row: 2,
+          col: 3,
           isHorizontal: false,
           number: 3),
       CrosswordWord(
-          word: 'ILO',
-          clue: '4. Kun hymyilet ja naurat',
-          row: 4,
-          col: 5,
+          word: 'MIELE',
+          clue: '4. Miten tunnet itsesi juuri nyt',
+          row: 2,
+          col: 2,
           isHorizontal: true,
           number: 4),
       CrosswordWord(
           word: 'RAUHA',
           clue: '5. Kun kaikki on hiljaista ja levollista',
-          row: 6,
-          col: 1,
+          row: 4,
+          col: 0,
           isHorizontal: true,
           number: 5),
     ],
     2: [
       CrosswordWord(
-          word: 'IHASTUS',
-          clue: '1. Kun pidät jostain erityisesti',
+          word: 'ILO',
+          clue: '1. Kun hymyilet ja naurat',
           row: 1,
-          col: 1,
+          col: 0,
           isHorizontal: false,
           number: 1),
       CrosswordWord(
-          word: 'HÄPEÄ',
-          clue: '2. Kun punastut ja tunnet olosi noloksi',
-          row: 2,
-          col: 1,
+          word: 'TUSKA',
+          clue: '2. Kun sattuu ja tuntuu pahalta',
+          row: 6,
+          col: 2,
           isHorizontal: true,
           number: 2),
       CrosswordWord(
           word: 'RIEMU',
           clue: '3. Kun ilo on todella suurta',
-          row: 0,
-          col: 4,
+          row: 2,
+          col: 3,
           isHorizontal: false,
           number: 3),
       CrosswordWord(
-          word: 'INHO',
-          clue: '4. Kun joku asia tuntuu epämiellyttävältät',
-          row: 1,
-          col: 4,
-          isHorizontal: true,
+          word: 'VIHA',
+          clue: '4. Kun jokin harmittaa sinua kovasti ',
+          row: 3,
+          col: 6,
+          isHorizontal: false,
           number: 4),
       CrosswordWord(
           word: 'ONNI',
           clue: '5. Kun kaikki on hyvin ja olet iloinen',
-          row: 1,
-          col: 7,
-          isHorizontal: false,
+          row: 3,
+          col: 0,
+          isHorizontal: true,
           number: 5),
     ],
     3: [
@@ -129,10 +139,10 @@ class _CrosswordGameState extends State<CrosswordGame> {
           isHorizontal: true,
           number: 2),
       CrosswordWord(
-          word: 'TUSKA',
-          clue: '3. Kun sattuu ja tuntuu pahalta',
-          row: 1,
-          col: 3,
+          word: 'HÄPEÄ',
+          clue: '3. Kun punastut ja tunnet olosi noloksi',
+          row: 6,
+          col: 1,
           isHorizontal: true,
           number: 3),
       CrosswordWord(
@@ -152,75 +162,75 @@ class _CrosswordGameState extends State<CrosswordGame> {
     ],
     4: [
       CrosswordWord(
-          word: 'KATEUS',
-          clue: '1. Kun haluaisit sen, mikä toisella on',
-          row: 5,
-          col: 0,
-          isHorizontal: true,
+          word: 'LEVOTON',
+          clue: '1. Kun et pysty olemaan paikallasi',
+          row: 0,
+          col: 3,
+          isHorizontal: false,
           number: 1),
       CrosswordWord(
+          word: 'REIPAS',
+          clue: '2. Kun sinulla on paljon energiaa ja olet iloinen',
+          row: 1,
+          col: 2,
+          isHorizontal: true,
+          number: 2),
+      CrosswordWord(
+          word: 'INTO',
+          clue: '3. Kun odotat innoissasi jotain kivaa',
+          row: 3,
+          col: 0,
+          isHorizontal: true,
+          number: 3),
+      CrosswordWord(
           word: 'KIUKKU',
-          clue: '2. Kun jokin saa sinut ärsyyntymään',
+          clue: '4. Kun jokin saa sinut ärsyyntymään',
           row: 2,
           col: 0,
           isHorizontal: false,
-          number: 2),
-      CrosswordWord(
-          word: 'RAKKAUS',
-          clue: '3. Kun pidät jostain todella paljon',
-          row: 1,
-          col: 1,
-          isHorizontal: false,
-          number: 3),
-      CrosswordWord(
-          word: 'HELPOTUS',
-          clue: '4. Kun huoli katoaa ja hymyilet',
-          row: 0,
-          col: 2,
-          isHorizontal: false,
           number: 4),
       CrosswordWord(
-          word: 'IHMETYS',
-          clue: '5. Kun näet jotain uutta ja jännittävää',
+          word: 'HAIKEA',
+          clue: '5. Kun tunnet iloa ja surua yhtä aikaa',
           row: 0,
-          col: 1,
-          isHorizontal: true,
+          col: 6,
+          isHorizontal: false,
           number: 5),
     ],
     5: [
       CrosswordWord(
           word: 'AATOS',
           clue: '1. Kun mietit jotain asiaa',
-          row: 1,
-          col: 0,
-          isHorizontal: false,
+          row: 3,
+          col: 1,
+          isHorizontal: true,
           number: 1),
       CrosswordWord(
           word: 'APU',
           clue: '2. Kun joku auttaa sinua, tunnet olosi paremmaksi',
           row: 2,
-          col: 0,
+          col: 5,
           isHorizontal: true,
           number: 2),
       CrosswordWord(
           word: 'HUPI',
           clue: '3. Kun jokin asia saa sinut nauramaan',
-          row: 1,
+          row: 0,
           col: 2,
-          isHorizontal: false,
+          isHorizontal: true,
           number: 3),
       CrosswordWord(
           word: 'IHAILU',
           clue: '4. Kun pidät todella paljon jostain',
-          row: 4,
-          col: 2,
+          row: 5,
+          col: 0,
           isHorizontal: true,
           number: 4),
       CrosswordWord(
-          word: 'MIELE',
-          clue: '5. Miten tunnet itsesi juuri nyt',
-          row: 3,
-          col: 6,
+          word: 'IHASTUS',
+          clue: '5. Kun pidät jostain erityisesti ',
+          row: 0,
+          col: 5,
           isHorizontal: false,
           number: 5),
     ],
@@ -230,80 +240,206 @@ class _CrosswordGameState extends State<CrosswordGame> {
   final Map<int, List<CrosswordWord>> englishLevels = {
     1: [
       CrosswordWord(
-          word: 'ANGRY',
-          clue: '1. Feeling mad',
-          row: 4,
+          word: 'GLAD',
+          clue: '1. Another word for feeling happy or pleased',
+          row: 7,
           col: 0,
           isHorizontal: true,
           number: 1),
       CrosswordWord(
-          word: 'SAD',
-          clue: '2. Feeling down',
-          row: 3,
-          col: 0,
+          word: 'SCARED',
+          clue: '2. When something makes you feel afraid or nervous',
+          row: 2,
+          col: 3,
           isHorizontal: false,
           number: 2),
       CrosswordWord(
           word: 'HAPPY',
-          clue: '3. Feeling joy',
-          row: 0,
-          col: 4,
-          isHorizontal: false,
+          clue: '3. When you feel like smiling and everything is good',
+          row: 4,
+          col: 2,
+          isHorizontal: true,
           number: 3),
       CrosswordWord(
-          word: 'EXCITED',
-          clue: '4. Feeling enthusiastic',
+          word: 'ANGRY',
+          clue: '4. When you feel really mad about something',
           row: 0,
-          col: 5,
+          col: 6,
           isHorizontal: false,
           number: 4),
       CrosswordWord(
-          word: 'SCARED',
-          clue: '5. Feeling fear',
-          row: 1,
-          col: 3,
-          isHorizontal: false,
+          word: 'SAD',
+          clue: '5. When you feel like crying or something makes you upset',
+          row: 0,
+          col: 5,
+          isHorizontal: true,
           number: 5),
     ],
     2: [
       CrosswordWord(
-        word: 'LOVE',
-        clue: '1. Feeling affection',
-        row: 0,
-        col: 4,
-        isHorizontal: false,
+        word: 'SILLY',
+        clue: '1. When you feel playful and like to joke around',
+        row: 3,
+        col: 2,
+        isHorizontal: true,
         number: 1,
       ),
       CrosswordWord(
-        word: 'HOPE',
-        clue: '1. Feeling optimistic',
-        row: 1,
-        col: 3,
+        word: 'TIRED',
+        clue: '2. When you feel like you need to sleep or rest',
+        row: 0,
+        col: 0,
         isHorizontal: true,
         number: 2,
       ),
       CrosswordWord(
-        word: 'BRAVE',
-        clue: '1. Feeling courageous',
+        word: 'EXCITED',
+        clue: '3. When you can’t wait for something fun to happen',
+        row: 0,
+        col: 3,
+        isHorizontal: false,
+        number: 3,
+      ),
+      CrosswordWord(
+        word: 'LONELY',
+        clue: '4. When you feel like you have no one to play with',
+        row: 5,
+        col: 0,
+        isHorizontal: true,
+        number: 4,
+      ),
+      CrosswordWord(
+        word: 'CALM',
+        clue: '5. When everything is quiet and peaceful inside',
         row: 3,
+        col: 0,
+        isHorizontal: false,
+        number: 5,
+      ),
+    ],
+    3: [
+      CrosswordWord(
+        word: 'SHY',
+        clue: '1. When you feel nervous around new people',
+        row: 6,
+        col: 1,
+        isHorizontal: true,
+        number: 1,
+      ),
+      CrosswordWord(
+        word: 'PROUD',
+        clue: '2. When you feel good about something you’ve done',
+        row: 2,
+        col: 0,
+        isHorizontal: true,
+        number: 2,
+      ),
+      CrosswordWord(
+        word: 'NERVOUS',
+        clue: '3.  When you feel a little scared or worried',
+        row: 0,
+        col: 1,
+        isHorizontal: false,
+        number: 3,
+      ),
+      CrosswordWord(
+        word: 'CONFUSED',
+        clue: '4. When you don’t understand something and feel mixed up',
+        row: 4,
+        col: 0,
+        isHorizontal: true,
+        number: 4,
+      ),
+      CrosswordWord(
+        word: 'MAD',
+        clue: '5.  Another word for feeling angry',
+        row: 0,
+        col: 4,
+        isHorizontal: false,
+        number: 5,
+      ),
+    ],
+    4: [
+      CrosswordWord(
+        word: 'BRAVE',
+        clue: '1. When you are not scared to do something hard or new',
+        row: 1,
+        col: 0,
+        isHorizontal: true,
+        number: 1,
+      ),
+      CrosswordWord(
+        word: 'AFRAID',
+        clue: '2. When you feel like something bad might happen',
+        row: 1,
+        col: 2,
+        isHorizontal: false,
+        number: 2,
+      ),
+      CrosswordWord(
+        word: 'GRUMPY',
+        clue: '3. When you feel a bit mad or cranky',
+        row: 3,
+        col: 1,
+        isHorizontal: true,
+        number: 3,
+      ),
+      CrosswordWord(
+        word: 'JOYFUL',
+        clue: '4. A word for feeling very, very happy',
+        row: 1,
+        col: 6,
+        isHorizontal: false,
+        number: 4,
+      ),
+      CrosswordWord(
+        word: 'KIND',
+        clue: '5. When you are nice and caring to others',
+        row: 5,
+        col: 1,
+        isHorizontal: true,
+        number: 5,
+      ),
+    ],
+    5: [
+      CrosswordWord(
+        word: 'HOPEFUL',
+        clue: '1. When you believe something good will happen',
+        row: 2,
+        col: 1,
+        isHorizontal: true,
+        number: 1,
+      ),
+      CrosswordWord(
+        word: 'SORRY',
+        clue: '2. When you feel bad about something you did wrong',
+        row: 1,
+        col: 2,
+        isHorizontal: false,
+        number: 2,
+      ),
+      CrosswordWord(
+        word: 'BORED',
+        clue: '3. When there’s nothing fun to do',
+        row: 4,
         col: 0,
         isHorizontal: true,
         number: 3,
       ),
       CrosswordWord(
-        word: 'PROUD',
-        clue: '1. Feeling accomplished',
+        word: 'UPSET',
+        clue: '4. When something makes you feel sad or worried',
         row: 2,
-        col: 1,
+        col: 6,
         isHorizontal: false,
         number: 4,
       ),
       CrosswordWord(
-        word: 'MAD',
-        clue: '1. Feeling angry',
-        row: 2,
-        col: 2,
-        isHorizontal: false,
+        word: 'HURT',
+        clue: '5. When you feel pain',
+        row: 6,
+        col: 3,
+        isHorizontal: true,
         number: 5,
       ),
     ],
@@ -332,7 +468,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
     int longestWordLength = levels[currentLevel]!
         .map((word) => word.word.length)
         .reduce((a, b) => a > b ? a : b);
-    gridSize = longestWordLength > 7 ? longestWordLength + 2 : 8;
+    gridSize = longestWordLength > 9 ? longestWordLength + 2 : 8;
     initializeGrid();
     List<CrosswordWord> crosswordData = levels[currentLevel] ?? [];
     for (var wordData in crosswordData) {
@@ -419,25 +555,195 @@ class _CrosswordGameState extends State<CrosswordGame> {
     if (currentLevel < maxLevel) {
       setState(() {
         currentLevel++;
+        failedAttempts = 0; // Reset failed attempts for the new level
+        checkAnswerClicks = 0; // Reset check answer clicks for the new level
+        showLightbulb = false; // Reset lightbulb visibility for the new level
         _generateCrossword();
       });
     }
   }
 
-  void _showAnswers() {
+  void _showRandomLetters() {
     final levels = widget.isFinnish ? finnishLevels : englishLevels;
     List<CrosswordWord> crosswordData = levels[currentLevel] ?? [];
+    Random random = Random();
+    int lettersRevealed = 0;
+    Set<String> revealedPositions = {};
+
+    // Collect all empty positions
+    List<String> emptyPositions = [];
     for (var wordData in crosswordData) {
       for (int i = 0; i < wordData.word.length; i++) {
         int currentRow = wordData.row + (wordData.isHorizontal ? 0 : i);
         int currentCol = wordData.col + (wordData.isHorizontal ? i : 0);
+        String positionKey = '$currentRow-$currentCol';
 
-        if (currentRow < gridSize && currentCol < gridSize) {
-          controllers[currentRow][currentCol]?.text =
-              wordData.word[i].toUpperCase();
+        if (currentRow < gridSize &&
+            currentCol < gridSize &&
+            (controllers[currentRow][currentCol]?.text.isEmpty ?? true)) {
+          emptyPositions.add(positionKey);
         }
       }
     }
+
+    // Shuffle the empty positions to randomize the selection
+    emptyPositions.shuffle(random);
+
+    // Reveal up to 3 letters
+    for (var positionKey in emptyPositions) {
+      if (lettersRevealed >= 3) break;
+
+      var parts = positionKey.split('-');
+      int currentRow = int.parse(parts[0]);
+      int currentCol = int.parse(parts[1]);
+
+      for (var wordData in crosswordData) {
+        for (int i = 0; i < wordData.word.length; i++) {
+          int wordRow = wordData.row + (wordData.isHorizontal ? 0 : i);
+          int wordCol = wordData.col + (wordData.isHorizontal ? i : 0);
+
+          if (wordRow == currentRow && wordCol == currentCol) {
+            controllers[currentRow][currentCol]?.text =
+                wordData.word[i].toUpperCase();
+            revealedPositions.add(positionKey);
+            lettersRevealed++;
+            break;
+          }
+        }
+      }
+    }
+
+    // Deduct points for using the lightbulb, but ensure score is non-negative
+    setState(() {
+      score = max(score - 20, 0);
+    });
+  }
+
+  void _incrementFailedAttempts() {
+    setState(() {
+      failedAttempts++;
+      score =
+          max(score - 5, 0); // Deduct points but ensure score is non-negative
+    });
+  }
+
+void _onGameCompleted(int pointsEarned) async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
+
+    DocumentSnapshot userSnapshot = await userDoc.get();
+    if (userSnapshot.exists) {
+      Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
+
+      int currentCrosswordScore = userData.containsKey('scoreCrossword') ? userData['scoreCrossword'] : 0;
+      int currentTotalScore = userData.containsKey('scoreTotal') ? userData['scoreTotal'] : 0;
+
+      currentCrosswordScore += pointsEarned;
+      currentTotalScore += pointsEarned;
+
+      // Mettre à jour les scores dans Firestore
+      await userDoc.update({
+        'scoreCrossword': currentCrosswordScore,
+        'scoreTotal': currentTotalScore,
+      });
+    } else {
+      await userDoc.set({
+        'scoreCrossword': pointsEarned,
+        'scoreTotal': pointsEarned,
+      });
+    }
+  }
+}
+
+  void _checkAnswers() {
+    FocusScope.of(context).unfocus();
+
+    if (_isCrosswordCompleted()) {
+      score += 50; // Add points for completing the crossword
+
+      if (currentLevel < maxLevel) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Level Complete!'),
+              content: const Text('You have completed this level.'),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Next Level'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _moveToNextLevel();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        _onGameCompleted(score); // Update Firebase with the final score
+        showFinalScoreDialog(); // Show the final score dialog
+      }
+    } else {
+      _incrementFailedAttempts();
+      checkAnswerClicks++;
+      if (checkAnswerClicks >= 3) {
+        setState(() {
+          showLightbulb =
+              true; // Show the lightbulb after multiple incorrect attempts
+        });
+      }
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Try Again'),
+            content: const Text('Some answers are incorrect.'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void showFinalScoreDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(widget.isFinnish ? 'Onnittelut!' : 'Congratulations!'),
+          content: Text(
+            widget.isFinnish
+                ? 'Olet suorittanut kaikki tasot!\nLopulliset pisteesi: $score'
+                : 'You have completed all levels!\nYour final score: $score',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Share.share(widget.isFinnish
+                    ? 'Suoritin kaikki tasot ristikossa! Lopulliset pisteeni: $score'
+                    : 'I completed all levels in the crossword puzzle! My final score: $score');
+              },
+              child: Text(widget.isFinnish ? 'Jaa Pisteet' : 'Share Score'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(widget.isFinnish ? 'Uusi peli' : 'New Game'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -446,241 +752,203 @@ class _CrosswordGameState extends State<CrosswordGame> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isFinnish
-            ? "Finnish Crossword Game - Level $currentLevel"
-            : "English Crossword Game - Level $currentLevel"),
+        title: Text(
+            widget.isFinnish ? "Taso $currentLevel" : "Level $currentLevel"),
         backgroundColor: Colors.blue,
-      ),
-      body: Column(
-        children: [
-          SizedBox(
-            height: cellSize * gridSize,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: gridSize * gridSize,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: gridSize,
-                  childAspectRatio: 1,
-                ),
-                itemBuilder: (BuildContext context, int index) {
-                  int row = index ~/ gridSize;
-                  int col = index % gridSize;
-                  String? letter = grid[row][col];
-                  int? number = numbers[row][col];
-
-                  if (letter == null) {
-                    return Container(
-                      margin: const EdgeInsets.all(2),
-                      width: cellSize,
-                      height: cellSize,
-                      decoration: BoxDecoration(
-                        color: Colors.lightBlueAccent,
-                        border: Border.all(color: Colors.white, width: 1),
-                      ),
-                    );
-                  }
-
-                  bool isHighlighted = false;
-                  if (selectedClueIndex != null) {
-                    var selectedWord = (widget.isFinnish
-                        ? finnishLevels
-                        : englishLevels)[currentLevel]![selectedClueIndex!];
-                    int startRow = selectedWord.row;
-                    int startCol = selectedWord.col;
-                    String word = selectedWord.word;
-                    bool isHorizontal = selectedWord.isHorizontal;
-
-                    if (isHorizontal) {
-                      isHighlighted = row == startRow &&
-                          col >= startCol &&
-                          col < startCol + word.length;
-                    } else {
-                      isHighlighted = col == startCol &&
-                          row >= startRow &&
-                          row < startRow + word.length;
-                    }
-                  }
-
-                  return Stack(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.all(2),
-                        width: cellSize,
-                        height: cellSize,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white, width: 1),
-                          color: isHighlighted
-                              ? Colors.yellow
-                              : Colors.lightGreenAccent,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: TextField(
-                          controller: controllers[row][col],
-                          textAlign: TextAlign.center,
-                          decoration:
-                              const InputDecoration(border: InputBorder.none),
-                          style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                          maxLength: 1,
-                          buildCounter: (_,
-                                  {int? currentLength,
-                                  bool? isFocused,
-                                  int? maxLength}) =>
-                              null,
-                        ),
-                      ),
-                      if (number != null)
-                        Positioned(
-                          top: 2,
-                          left: 2,
-                          child: Text(
-                            number.toString(),
-                            style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.redAccent),
-                          ),
-                        ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: (widget.isFinnish
-                      ? finnishLevels
-                      : englishLevels)[currentLevel]!
-                  .length,
-              itemBuilder: (BuildContext context, int index) {
-                return Card(
-                  color: Colors.lightBlue.shade100,
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                  child: ListTile(
-                    title: Text(
-                      (widget.isFinnish
-                              ? finnishLevels
-                              : englishLevels)[currentLevel]![index]
-                          .clue,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    onTap: () => _selectClue(index),
-                    selected: selectedClueIndex == index,
-                    selectedTileColor: Colors.yellow.shade100,
-                  ),
-                );
-              },
-            ),
-          ),
-          if (selectedClueIndex != null)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: wordInputController,
-                decoration: const InputDecoration(
-                  labelText: 'Enter the word for the selected clue',
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: _updateSelectedWord,
-              ),
-            ),
+        actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
-                    textStyle: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: () {
-                    if (_isCrosswordCompleted()) {
-                      if (currentLevel < maxLevel) {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Level Complete!'),
-                              content:
-                                  const Text('You have completed this level.'),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: const Text('Next Level'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                    _moveToNextLevel();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      } else {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Congratulations!'),
-                              content:
-                                  const Text('You have completed all levels!'),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      }
-                    } else {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Try Again'),
-                            content: const Text('Some answers are incorrect.'),
-                            actions: <Widget>[
-                              TextButton(
-                                child: const Text('OK'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    }
-                  },
-                  child: const Text('Check Answers'),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
-                    textStyle: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: _showAnswers,
-                  child: const Text('Show Answers'),
-                ),
-              ],
+            child: Center(
+              child: Text(
+                'Score: $score',
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
             ),
+          ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blue.shade200, Colors.blue.shade800],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+          ),
+          Column(
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height / 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: GridView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: gridSize * gridSize,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: gridSize,
+                      childAspectRatio: 1,
+                    ),
+                    itemBuilder: (BuildContext context, int index) {
+                      int row = index ~/ gridSize;
+                      int col = index % gridSize;
+                      String? letter = grid[row][col];
+                      int? number = numbers[row][col];
+
+                      if (letter == null) {
+                        return Container(); // Empty container for cells without letters
+                      }
+
+                      bool isHighlighted = false;
+                      if (selectedClueIndex != null) {
+                        var selectedWord = (widget.isFinnish
+                            ? finnishLevels
+                            : englishLevels)[currentLevel]![selectedClueIndex!];
+                        int startRow = selectedWord.row;
+                        int startCol = selectedWord.col;
+                        String word = selectedWord.word;
+                        bool isHorizontal = selectedWord.isHorizontal;
+
+                        if (isHorizontal) {
+                          isHighlighted = row == startRow &&
+                              col >= startCol &&
+                              col < startCol + word.length;
+                        } else {
+                          isHighlighted = col == startCol &&
+                              row >= startRow &&
+                              row < startRow + word.length;
+                        }
+                      }
+
+                      return Stack(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.all(2),
+                            width: cellSize,
+                            height: cellSize,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color:
+                                      const Color.fromARGB(255, 255, 255, 255)),
+                              color: isHighlighted
+                                  ? Colors.yellow.shade200
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 4,
+                                  offset: Offset(2, 2),
+                                ),
+                              ],
+                            ),
+                            child: TextField(
+                              controller: controllers[row][col],
+                              textAlign: TextAlign.center,
+                              decoration: const InputDecoration(
+                                  border: InputBorder.none),
+                              style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
+                              maxLength: 1,
+                              buildCounter: (_,
+                                      {int? currentLength,
+                                      bool? isFocused,
+                                      int? maxLength}) =>
+                                  null,
+                            ),
+                          ),
+                          if (number != null)
+                            Positioned(
+                              top: 2,
+                              left: 2,
+                              child: Text(
+                                number.toString(),
+                                style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blueAccent),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: (widget.isFinnish
+                          ? finnishLevels
+                          : englishLevels)[currentLevel]!
+                      .length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      color: Colors.white,
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 4, horizontal: 8),
+                      child: ListTile(
+                        title: Text(
+                          (widget.isFinnish
+                                  ? finnishLevels
+                                  : englishLevels)[currentLevel]![index]
+                              .clue,
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        onTap: () => _selectClue(index),
+                        selected: selectedClueIndex == index,
+                        selectedTileColor: Colors.lightBlue.shade100,
+                      ),
+                    );
+                  },
+                ),
+              ),
+              if (selectedClueIndex != null)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: wordInputController,
+                    decoration: InputDecoration(
+                      labelText: 'Enter the word for the selected clue',
+                      filled: true,
+                      fillColor: const Color.fromARGB(
+                          255, 152, 222, 255), // Custom background color
+                    ),
+                    onChanged: _updateSelectedWord,
+                  ),
+                ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                        textStyle: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      onPressed: _checkAnswers,
+                      child: const Text('Check Answers'),
+                    ),
+                    if (showLightbulb)
+                      IconButton(
+                        icon: const Icon(Icons.lightbulb),
+                        color: Colors.yellow,
+                        iconSize: 40,
+                        onPressed: _showRandomLetters,
+                      ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
