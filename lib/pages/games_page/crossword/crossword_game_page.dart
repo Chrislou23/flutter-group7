@@ -63,6 +63,7 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
 
             return {
               'username': data['username'] ?? 'Unknown',
+              'photoURL': data['photoURL'] ?? '',
               'scoreCrossword': scoreCrossword,
             };
           }).toList();
@@ -77,22 +78,123 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
             itemBuilder: (context, index) {
               final user = userDataList[index];
               final scoreCrossword = user['scoreCrossword'];
+              final username = user['username'];
+              final photoURL = user['photoURL'];
+              final rank = index + 1;
 
-              return ListTile(
-                leading: CircleAvatar(
-                  child: Text(
-                    '${index + 1}',
-                    style: const TextStyle(color: Colors.white),
+              // Determine rank styling
+              double fontSize;
+              Color rankColor;
+
+              if (rank == 1) {
+                fontSize = 24.0;
+                rankColor = const Color(0xFFFFD700); // Gold
+              } else if (rank == 2) {
+                fontSize = 22.0;
+                rankColor = const Color(0xFFC0C0C0); // Silver
+              } else if (rank == 3) {
+                fontSize = 20.0;
+                rankColor = const Color(0xFFCD7F32); // Bronze
+              } else {
+                fontSize = 18.0;
+                rankColor = Colors.black;
+              }
+
+              // Get the ordinal rank string
+              String rankString = getOrdinalSuffix(rank);
+
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  child: Row(
+                    children: [
+                      // Rank Container
+                      Container(
+                        width: 60,
+                        alignment: Alignment.center,
+                        child: Text(
+                          rankString,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: fontSize,
+                            color: rankColor,
+                          ),
+                        ),
+                      ),
+                      // Vertical Divider
+                      Container(
+                        height: 60,
+                        width: 1,
+                        color: Colors.grey[300],
+                      ),
+                      const SizedBox(width: 12.0),
+                      // Rest of the player info
+                      Expanded(
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 25,
+                              backgroundImage:
+                                  photoURL.isNotEmpty ? NetworkImage(photoURL) : null,
+                              child: photoURL.isEmpty
+                                  ? const Icon(Icons.person,
+                                      size: 30.0, color: Colors.white)
+                                  : null,
+                            ),
+                            const SizedBox(width: 12.0),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    username,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16.0,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4.0),
+                                  Text(
+                                    'Score: $scoreCrossword',
+                                    style: const TextStyle(fontSize: 14.0),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                title: Text(user['username']),
-                trailing: Text('Score: $scoreCrossword'),
               );
             },
           );
         },
       ),
     );
+  }
+
+  // Function to get ordinal suffix for rank numbers
+  String getOrdinalSuffix(int number) {
+    if (number >= 11 && number <= 13) {
+      return '${number}th';
+    }
+    switch (number % 10) {
+      case 1:
+        return '${number}st';
+      case 2:
+        return '${number}nd';
+      case 3:
+        return '${number}rd';
+      default:
+        return '${number}th';
+    }
   }
 
   String _formatDuration(Duration duration) {
@@ -120,6 +222,59 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
     );
   }
 
+  Widget _buildGameImage() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      height: 150,
+      decoration: BoxDecoration(
+        image: const DecorationImage(
+          image: AssetImage('assets/game1.png'),
+          fit: BoxFit.cover,
+        ),
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+    );
+  }
+
+  Widget _buildHeaderTitle() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Text(
+        isEnglish ? 'Crossword Game Rankings' : 'Ristikko Pelin Tulokset',
+        style: const TextStyle(
+            fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+      ),
+    );
+  }
+
+  Widget _buildPlayButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          minimumSize: const Size(double.infinity, 50),
+        ),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CrosswordGame(isFinnish: !isEnglish),
+            ),
+          ).then((_) => _fetchUserData());
+        },
+        child: Text(
+          isEnglish ? 'Play' : 'Pelaa',
+          style: const TextStyle(fontSize: 24.0),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<TimerProvider>(
@@ -140,48 +295,20 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
               ? _buildBlockedScreen()
               : Column(
                   children: [
-                    const SizedBox(height: 20),
-                    // Game image
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
-                      height: 150,
-                      decoration: BoxDecoration(
-                        image: const DecorationImage(
-                          image: AssetImage('assets/game1.png'),
-                          fit: BoxFit.cover,
-                        ),
-                        color: Colors.grey[300],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Ranking list
-                    const Text(
-                      'Crossword Game Rankings',
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black),
-                    ),
+                    const SizedBox(height: 10),
+                    _buildGameImage(),
+                    const SizedBox(height: 10),
+                    _buildHeaderTitle(),
+                    const SizedBox(height: 10),
                     Expanded(child: _buildCrosswordRankingList()),
-                    const SizedBox(height: 20),
-                    // How to play and language toggle buttons
+                    const SizedBox(height: 10),
                     TabButtons(
-                        isEnglish: isEnglish, toggleLanguage: toggleLanguage),
-                    const SizedBox(height: 20),
-                    // Play button placed below the other buttons
-                    CustomButton(
-                      text: isEnglish ? 'Play' : 'Pikapeli',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                CrosswordGame(isFinnish: !isEnglish),
-                          ),
-                        ).then((_) => _fetchUserData());
-                      },
-                      textStyle: const TextStyle(fontSize: 40),
+                      isEnglish: isEnglish,
+                      toggleLanguage: toggleLanguage,
                     ),
+                    const SizedBox(height: 10),
+                    _buildPlayButton(),
+                    const SizedBox(height: 10),
                   ],
                 ),
         );
@@ -200,13 +327,21 @@ class TabButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            GestureDetector(
-              onTap: () {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          // How to Play Button
+          Expanded(
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+              onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -216,22 +351,34 @@ class TabButtons extends StatelessWidget {
                   ),
                 );
               },
-              child: Text(isEnglish ? 'How to play' : 'Kuinka pelata',
-                  style: const TextStyle(fontSize: 18)),
-            ),
-            const VerticalDivider(thickness: 2, color: Colors.black),
-            GestureDetector(
-              onTap: toggleLanguage,
-              child: Text(
-                isEnglish ? 'Switch to Finnish' : 'Vaihda Englantiin',
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              icon: const Icon(Icons.help_outline),
+              label: Text(
+                isEnglish ? 'How to Play' : 'Kuinka Pelata',
+                style: const TextStyle(fontSize: 16.0),
               ),
             ),
-          ],
-        ),
-        const SizedBox(height: 20),
-      ],
+          ),
+          const SizedBox(width: 16.0),
+          // Language Toggle Button
+          Expanded(
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
+                backgroundColor: Colors.blueAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+              onPressed: toggleLanguage,
+              icon: const Icon(Icons.language),
+              label: Text(
+                isEnglish ? 'Switch to Finnish' : 'Vaihda Englantiin',
+                style: const TextStyle(fontSize: 16.0),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

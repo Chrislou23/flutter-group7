@@ -16,6 +16,11 @@ class _GamePageState extends State<GamePage> {
   // Variable to hold the Future
   late Future<QuerySnapshot> _usersFuture;
 
+  // Define colors for ranks
+  final Color goldColor = const Color(0xFFFFD700);
+  final Color silverColor = const Color(0xFFC0C0C0);
+  final Color bronzeColor = const Color(0xFFCD7F32);
+
   @override
   void initState() {
     super.initState();
@@ -29,6 +34,23 @@ class _GamePageState extends State<GamePage> {
     await _usersFuture;
     if (mounted) {
       setState(() {});
+    }
+  }
+
+  // Function to get ordinal suffix for rank numbers
+  String getOrdinalSuffix(int number) {
+    if (number >= 11 && number <= 13) {
+      return '${number}th';
+    }
+    switch (number % 10) {
+      case 1:
+        return '${number}st';
+      case 2:
+        return '${number}nd';
+      case 3:
+        return '${number}rd';
+      default:
+        return '${number}th';
     }
   }
 
@@ -77,41 +99,98 @@ class _GamePageState extends State<GamePage> {
               final scoreTotal = user['scoreTotal'];
               final username = user['username'];
               final photoURL = user['photoURL'];
+              final rank = index + 1;
+
+              // Get the ordinal rank string
+              String rankString = getOrdinalSuffix(rank);
+
+              // Determine font size and color based on rank
+              double fontSize;
+              Color rankColor;
+
+              if (rank == 1) {
+                fontSize = 24.0;
+                rankColor = goldColor;
+              } else if (rank == 2) {
+                fontSize = 22.0;
+                rankColor = silverColor;
+              } else if (rank == 3) {
+                fontSize = 20.0;
+                rankColor = bronzeColor;
+              } else {
+                fontSize = 18.0;
+                rankColor = Colors.black;
+              }
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12.0),
                 ),
-                child: ListTile(
-                  contentPadding:
+                child: Padding(
+                  padding:
                       const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  leading: CircleAvatar(
-                    radius: 25,
-                    backgroundImage: photoURL.isNotEmpty ? NetworkImage(photoURL) : null,
-                    child: photoURL.isEmpty
-                        ? Text(
-                            '${index + 1}',
-                            style: const TextStyle(color: Colors.white, fontSize: 18.0),
-                          )
-                        : null,
-                  ),
-                  title: Text(
-                    username,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16.0,
-                    ),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
                     children: [
-                      const SizedBox(height: 4.0),
-                      Text('Crossword: $scoreCrossword'),
-                      Text('Link: $scoreLink'),
-                      Text(
-                        'Total: $scoreTotal',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      // Rank Container
+                      Container(
+                        width: 60,
+                        alignment: Alignment.center,
+                        child: Text(
+                          rankString,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: fontSize,
+                            color: rankColor,
+                          ),
+                        ),
+                      ),
+                      // Vertical Divider
+                      Container(
+                        height: 60,
+                        width: 1,
+                        color: Colors.grey[300],
+                      ),
+                      const SizedBox(width: 12.0),
+                      // Rest of the player info
+                      Expanded(
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 25,
+                              backgroundImage: photoURL.isNotEmpty
+                                  ? NetworkImage(photoURL)
+                                  : null,
+                              child: photoURL.isEmpty
+                                  ? const Icon(Icons.person,
+                                      size: 30.0, color: Colors.white)
+                                  : null,
+                            ),
+                            const SizedBox(width: 12.0),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    username,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16.0,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4.0),
+                                  Text('Crossword: $scoreCrossword'),
+                                  Text('Link: $scoreLink'),
+                                  Text(
+                                    'Total: $scoreTotal',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -125,8 +204,10 @@ class _GamePageState extends State<GamePage> {
   }
 
   String _formatDuration(Duration duration) {
-    String minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    String seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    String minutes =
+        duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    String seconds =
+        duration.inSeconds.remainder(60).toString().padLeft(2, '0');
     return "$minutes:$seconds";
   }
 
@@ -181,12 +262,12 @@ class _GamePageState extends State<GamePage> {
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
                       child: Text(
                         'Game 1: Crossword',
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                        style:
+                            TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
@@ -223,12 +304,12 @@ class _GamePageState extends State<GamePage> {
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
                       child: Text(
                         'Game 2: Link Game',
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                        style:
+                            TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
