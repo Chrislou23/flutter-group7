@@ -45,7 +45,8 @@ class _HomePageState extends State<HomePage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Profile'),
-          content: const Text('Please log in or register to access your profile.'),
+          content:
+              const Text('Please log in or register to access your profile.'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -75,8 +76,10 @@ class _HomePageState extends State<HomePage> {
 
   // Format duration for display
   String _formatDuration(Duration duration) {
-    String minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    String seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    String minutes =
+        duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    String seconds =
+        duration.inSeconds.remainder(60).toString().padLeft(2, '0');
     return "$minutes:$seconds";
   }
 
@@ -114,16 +117,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Build the app name display
+  // Build the app name display as an image
   Widget _buildAppName() {
     return Center(
-      child: Text(
-        'FunLandia',
-        style: TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
-          color: Theme.of(context).primaryColor,
-        ),
+      child: Image.asset(
+        'assets/appname1.png', // Path to your logo image
+        height: 250, // Adjust the size as needed
+        width: 450,
       ),
     );
   }
@@ -138,13 +138,15 @@ class _HomePageState extends State<HomePage> {
       onTap: onTap,
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
         elevation: 4,
         child: Column(
           children: [
             // Game Image
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12.0)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(12.0)),
               child: Image.asset(
                 imagePath,
                 height: 180,
@@ -157,7 +159,8 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(12.0),
               child: Text(
                 title,
-                style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    fontSize: 20.0, fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -243,7 +246,8 @@ class _HomePageState extends State<HomePage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const CrosswordGamePage(),
+                                      builder: (context) =>
+                                          const CrosswordGamePage(),
                                     ),
                                   );
                                 },
@@ -255,7 +259,8 @@ class _HomePageState extends State<HomePage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const LinkGamePage(),
+                                      builder: (context) =>
+                                          const LinkGamePage(),
                                     ),
                                   );
                                 },
