@@ -6,6 +6,7 @@ import 'package:mobile_games/pages/games_page/link/Instructions/link_instruction
 import 'package:mobile_games/pages/games_page/link/Instructions/link_instructions_fi.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// A StatefulWidget representing the Link Game page.
 class LinkGamePage extends StatefulWidget {
   const LinkGamePage({super.key});
 
@@ -14,12 +15,13 @@ class LinkGamePage extends StatefulWidget {
 }
 
 class _LinkGamePageState extends State<LinkGamePage> {
+  // Flag to determine the current language; defaults to English.
   bool isEnglish = true;
 
-  // Variable to hold the Future
+  // Future to hold the user data fetched from Firestore.
   late Future<QuerySnapshot> _usersFuture;
 
-  // Define colors for ranks
+  // Colors for the top three ranks.
   final Color goldColor = const Color(0xFFFFD700);
   final Color silverColor = const Color(0xFFC0C0C0);
   final Color bronzeColor = const Color(0xFFCD7F32);
@@ -30,7 +32,7 @@ class _LinkGamePageState extends State<LinkGamePage> {
     _fetchUserData();
   }
 
-  // Method to fetch data
+  /// Fetches user data from Firestore.
   Future<void> _fetchUserData() async {
     _usersFuture = FirebaseFirestore.instance.collection('users').get();
     await _usersFuture;
@@ -39,13 +41,14 @@ class _LinkGamePageState extends State<LinkGamePage> {
     }
   }
 
+  /// Toggles the language between English and Finnish.
   void toggleLanguage() {
     setState(() {
       isEnglish = !isEnglish;
     });
   }
 
-  // Function to get ordinal suffix for rank numbers
+  /// Returns the ordinal suffix for a given number (e.g., '1st', '2nd').
   String getOrdinalSuffix(int number) {
     if (number >= 11 && number <= 13) {
       return '${number}th';
@@ -62,6 +65,7 @@ class _LinkGamePageState extends State<LinkGamePage> {
     }
   }
 
+  /// Builds the ranking list widget.
   Widget _buildRankingList() {
     return RefreshIndicator(
       onRefresh: _fetchUserData,
@@ -77,7 +81,7 @@ class _LinkGamePageState extends State<LinkGamePage> {
 
           final docs = snapshot.data?.docs ?? [];
 
-          // Create a list to hold user data
+          // List to hold user data.
           List<Map<String, dynamic>> userDataList = docs.map((doc) {
             final data = doc.data() as Map<String, dynamic>;
             final scoreLink = data['scoreLink'] ?? 0;
@@ -89,7 +93,7 @@ class _LinkGamePageState extends State<LinkGamePage> {
             };
           }).toList();
 
-          // Sort the userDataList based on 'scoreLink' in descending order
+          // Sort the list based on 'scoreLink' in descending order.
           userDataList.sort((a, b) => b['scoreLink'].compareTo(a['scoreLink']));
 
           return ListView.builder(
@@ -102,7 +106,7 @@ class _LinkGamePageState extends State<LinkGamePage> {
               final photoURL = user['photoURL'];
               final rank = index + 1;
 
-              // Determine rank styling
+              // Determine styling based on rank.
               double fontSize;
               Color rankColor;
 
@@ -120,7 +124,7 @@ class _LinkGamePageState extends State<LinkGamePage> {
                 rankColor = Colors.black;
               }
 
-              // Get the ordinal rank string
+              // Get the ordinal rank string.
               String rankString = getOrdinalSuffix(rank);
 
               return Card(
@@ -129,8 +133,7 @@ class _LinkGamePageState extends State<LinkGamePage> {
                   borderRadius: BorderRadius.circular(12.0),
                 ),
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                   child: Row(
                     children: [
                       // Rank Container
@@ -153,24 +156,30 @@ class _LinkGamePageState extends State<LinkGamePage> {
                         color: Colors.grey[300],
                       ),
                       const SizedBox(width: 12.0),
-                      // Rest of the player info
+                      // User Information
                       Expanded(
                         child: Row(
                           children: [
+                            // User Avatar
                             CircleAvatar(
                               radius: 25,
                               backgroundImage:
                                   photoURL.isNotEmpty ? NetworkImage(photoURL) : null,
                               child: photoURL.isEmpty
-                                  ? const Icon(Icons.person,
-                                      size: 30.0, color: Colors.white)
+                                  ? const Icon(
+                                      Icons.person,
+                                      size: 30.0,
+                                      color: Colors.white,
+                                    )
                                   : null,
                             ),
                             const SizedBox(width: 12.0),
+                            // User Details
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  // Username
                                   Text(
                                     username,
                                     style: const TextStyle(
@@ -179,6 +188,7 @@ class _LinkGamePageState extends State<LinkGamePage> {
                                     ),
                                   ),
                                   const SizedBox(height: 4.0),
+                                  // User Score
                                   Text(
                                     'Score: $scoreLink',
                                     style: const TextStyle(fontSize: 14.0),
@@ -200,14 +210,14 @@ class _LinkGamePageState extends State<LinkGamePage> {
     );
   }
 
+  /// Formats a [Duration] into a MM:SS string.
   String _formatDuration(Duration duration) {
-    String minutes =
-        duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    String seconds =
-        duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    String minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    String seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
     return "$minutes:$seconds";
   }
 
+  /// Builds the screen displayed when the user is blocked.
   Widget _buildBlockedScreen() {
     return Center(
       child: Column(
@@ -225,6 +235,7 @@ class _LinkGamePageState extends State<LinkGamePage> {
     );
   }
 
+  /// Builds the game image widget.
   Widget _buildGameImage() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -240,17 +251,22 @@ class _LinkGamePageState extends State<LinkGamePage> {
     );
   }
 
+  /// Builds the header title widget.
   Widget _buildHeaderTitle() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Text(
         isEnglish ? 'Link Game Rankings' : 'Link Pelin Tulokset',
         style: const TextStyle(
-            fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
       ),
     );
   }
 
+  /// Builds the play button widget.
   Widget _buildPlayButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -290,7 +306,10 @@ class _LinkGamePageState extends State<LinkGamePage> {
                     "Blocked: ${_formatDuration(timerProvider.remainingBlockTime)}",
                     style: const TextStyle(color: Colors.black),
                   )
-                : const Text('Link Game', style: TextStyle(color: Colors.black)),
+                : const Text(
+                    'Link Game',
+                    style: TextStyle(color: Colors.black),
+                  ),
             centerTitle: true,
           ),
           body: AnimatedSwitcher(
@@ -305,13 +324,16 @@ class _LinkGamePageState extends State<LinkGamePage> {
                       const SizedBox(height: 10),
                       _buildHeaderTitle(),
                       const SizedBox(height: 10),
+                      // Display the ranking list
                       Expanded(child: _buildRankingList()),
                       const SizedBox(height: 10),
+                      // Display tab buttons (How to Play, Language Toggle)
                       TabButtons(
                         isEnglish: isEnglish,
                         toggleLanguage: toggleLanguage,
                       ),
                       const SizedBox(height: 10),
+                      // Play button
                       _buildPlayButton(),
                       const SizedBox(height: 10),
                     ],
@@ -323,13 +345,16 @@ class _LinkGamePageState extends State<LinkGamePage> {
   }
 }
 
-// Widget for Tab Buttons (How to play, Language toggle)
+/// Widget for Tab Buttons (How to Play, Language Toggle)
 class TabButtons extends StatelessWidget {
   final bool isEnglish;
   final VoidCallback toggleLanguage;
 
-  const TabButtons(
-      {super.key, required this.isEnglish, required this.toggleLanguage});
+  const TabButtons({
+    super.key,
+    required this.isEnglish,
+    required this.toggleLanguage,
+  });
 
   @override
   Widget build(BuildContext context) {

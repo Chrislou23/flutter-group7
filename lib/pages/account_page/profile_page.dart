@@ -8,6 +8,7 @@ import 'dart:io';
 
 class ProfilePage extends StatefulWidget {
   final User? user;
+
   const ProfilePage({super.key, required this.user});
 
   @override
@@ -15,10 +16,17 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  // Controllers for email and username input fields
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
+
+  // Image picker for selecting profile picture
   final ImagePicker _picker = ImagePicker();
+
+  // User's profile picture URL
   String? _photoURL;
+
+  // User's username, level, and points
   String _username = '';
   int _level = 1;
   int _pointsForNextLevel = 1000;
@@ -27,17 +35,21 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    // Initialize email field with user's email
     _emailController.text = widget.user?.email ?? '';
     _photoURL = widget.user?.photoURL;
+    // Fetch additional user data from Firestore
     _fetchUserData();
   }
 
+  // Fetch user data from Firestore
   Future<void> _fetchUserData() async {
     try {
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(widget.user?.uid)
           .get();
+
       if (userDoc.exists) {
         setState(() {
           _username = userDoc['username'] ?? 'Unknown';
@@ -50,6 +62,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // Update username in Firestore
   Future<void> _updateUsername() async {
     String newUsername = _usernameController.text.trim();
 
@@ -76,22 +89,28 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // Update profile picture
   Future<void> _updateProfilePicture() async {
     try {
+      // Pick an image from the gallery
       final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
       if (image == null) return;
 
       File imageFile = File(image.path);
 
+      // Upload image to Firebase Storage
       final storageRef = FirebaseStorage.instance
           .ref()
           .child('profile_pictures/${widget.user?.uid}.jpg');
       await storageRef.putFile(imageFile);
 
+      // Get the download URL
       String photoURL = await storageRef.getDownloadURL();
 
+      // Update user profile with new photo URL
       await widget.user?.updatePhotoURL(photoURL);
 
+      // Update photoURL in Firestore
       await FirebaseFirestore.instance
           .collection('users')
           .doc(widget.user?.uid)
@@ -107,6 +126,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // Update user's email
   Future<void> _updateEmail() async {
     try {
       await widget.user?.verifyBeforeUpdateEmail(_emailController.text);
@@ -123,6 +143,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // Send password reset email
   Future<void> _sendPasswordResetEmail() async {
     try {
       await FirebaseAuth.instance
@@ -133,15 +154,19 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // Delete user account
   Future<void> _deleteAccount() async {
     try {
+      // Delete user document from Firestore
       await FirebaseFirestore.instance
           .collection('users')
           .doc(widget.user?.uid)
           .delete();
 
+      // Delete user from FirebaseAuth
       await widget.user?.delete();
 
+      // Navigate back to the first route
       Navigator.of(context).popUntil((route) => route.isFirst);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'requires-recent-login') {
@@ -154,6 +179,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // Sign out the user
   Future<void> _signOut() async {
     try {
       await FirebaseAuth.instance.signOut();
@@ -166,6 +192,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // Show dialog for re-authentication
   void _showReauthenticationDialog() {
     final TextEditingController _passwordController = TextEditingController();
 
@@ -209,6 +236,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  // Re-authenticate the user
   Future<void> _reauthenticate(String password) async {
     try {
       final AuthCredential credential = EmailAuthProvider.credential(
@@ -216,13 +244,13 @@ class _ProfilePageState extends State<ProfilePage> {
         password: password,
       );
       await widget.user?.reauthenticateWithCredential(credential);
-      _showSuccessSnackBar(
-          'Re-authentication successful. Please try again.');
+      _showSuccessSnackBar('Re-authentication successful. Please try again.');
     } catch (e) {
       _showErrorSnackBar('Re-authentication failed: $e');
     }
   }
 
+  // Show dialog to edit username
   void _showEditUsernameDialog() {
     _usernameController.text = _username;
 
@@ -257,6 +285,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  // Add points to user's current points and handle leveling up
   void addPoints(int points) {
     setState(() {
       _currentPoints += points;
@@ -266,6 +295,7 @@ class _ProfilePageState extends State<ProfilePage> {
       }
     });
 
+    // Update user's level and points in Firestore
     FirebaseFirestore.instance
         .collection('users')
         .doc(widget.user?.uid)
@@ -275,6 +305,7 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
+  // Show a success message using SnackBar
   void _showSuccessSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -285,6 +316,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  // Show an error message using SnackBar
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -295,6 +327,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  // Show confirmation dialog before deleting account
   void _showDeleteConfirmationDialog() {
     showDialog(
       context: context,
@@ -328,6 +361,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate progress for level bar
     double progress = _currentPoints / _pointsForNextLevel;
 
     return Scaffold(
@@ -338,7 +372,7 @@ class _ProfilePageState extends State<ProfilePage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Profile Header
+            // Profile Header Card
             Card(
               elevation: 2,
               shape: RoundedRectangleBorder(
@@ -348,15 +382,15 @@ class _ProfilePageState extends State<ProfilePage> {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
+                    // Profile Picture with Edit Icon
                     Stack(
                       alignment: Alignment.center,
                       children: [
                         CircleAvatar(
                           radius: 60,
-                          backgroundImage:
-                              _photoURL != null && _photoURL!.isNotEmpty
-                                  ? NetworkImage(_photoURL!)
-                                  : null,
+                          backgroundImage: _photoURL != null && _photoURL!.isNotEmpty
+                              ? NetworkImage(_photoURL!)
+                              : null,
                           child: _photoURL == null || _photoURL!.isEmpty
                               ? const Icon(Icons.account_circle, size: 60)
                               : null,
@@ -380,6 +414,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                     ),
                     const SizedBox(height: 16.0),
+                    // Username with Edit Icon
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -394,11 +429,13 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                     ),
                     const SizedBox(height: 8.0),
+                    // Level Display
                     Text(
                       'Level $_level',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8.0),
+                    // Level Progress Bar
                     LinearProgressIndicator(
                       value: progress,
                       minHeight: 8.0,
@@ -407,8 +444,9 @@ class _ProfilePageState extends State<ProfilePage> {
                           Theme.of(context).primaryColor),
                     ),
                     const SizedBox(height: 4.0),
+                    // Points Display
                     Text(
-                      '${_currentPoints} / $_pointsForNextLevel points',
+                      '$_currentPoints / $_pointsForNextLevel points',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],

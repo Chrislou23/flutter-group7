@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
+import 'package:pdf/widgets.dart' as pw; // For creating PDF content
+import 'package:printing/printing.dart'; // For PDF printing and preview
 import 'package:url_launcher/url_launcher.dart'; // For email functionality
 
+// DataProtectionPolicyPage widget displays data protection policy details
 class DataProtectionPolicyPage extends StatelessWidget {
   const DataProtectionPolicyPage({super.key});
 
-  // Helper method to build section titles
+  // Helper method to build section titles with padding and styling
   Widget _buildSectionTitle(String text) {
     return Padding(
       padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
@@ -18,7 +19,7 @@ class DataProtectionPolicyPage extends StatelessWidget {
     );
   }
 
-  // Helper method to build paragraphs
+  // Helper method to build paragraphs with padding and styling
   Widget _buildParagraph(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
@@ -29,14 +30,16 @@ class DataProtectionPolicyPage extends StatelessWidget {
     );
   }
 
-  // Helper method to build email link
+  // Helper method to create an email link, allowing user to open email app
   Widget _buildEmailLink(BuildContext context, String email) {
     return GestureDetector(
       onTap: () async {
+        // Construct a mailto URI
         final Uri emailUri = Uri(
           scheme: 'mailto',
           path: email,
         );
+        // Attempt to launch email app, show error if unable
         if (await canLaunchUrl(emailUri)) {
           await launchUrl(emailUri);
         } else {
@@ -61,18 +64,18 @@ class DataProtectionPolicyPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Data Protection Policy',
+          'Data Protection Policy', // AppBar title
           style: TextStyle(color: Colors.black),
         ),
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        elevation: 1,
-        iconTheme: const IconThemeData(color: Colors.black),
+        backgroundColor: Colors.white, // White AppBar background
+        centerTitle: true, // Center title alignment
+        elevation: 1, // Slight shadow below AppBar
+        iconTheme: const IconThemeData(color: Colors.black), // Back icon color
         actions: [
           IconButton(
-            icon: const Icon(Icons.download, color: Colors.black),
+            icon: const Icon(Icons.download, color: Colors.black), // Download icon
             onPressed: () {
-              _downloadPDF(context);
+              _downloadPDF(context); // Trigger PDF download
             },
           ),
         ],
@@ -82,6 +85,7 @@ class DataProtectionPolicyPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            // Content sections with titles and paragraphs
             _buildSectionTitle('Data Protection Policy'),
             _buildSectionTitle('1. Introduction'),
             _buildParagraph(
@@ -109,17 +113,19 @@ class DataProtectionPolicyPage extends StatelessWidget {
             ),
             _buildSectionTitle('7. Contact Us'),
             _buildParagraph('If you have any questions or concerns about our data protection practices, please contact us at:'),
-            _buildEmailLink(context, 'support@example.com'),
-            const SizedBox(height: 20),
+            _buildEmailLink(context, 'support@example.com'), // Email link for contact
+            const SizedBox(height: 20), // Spacer
           ],
         ),
       ),
     );
   }
 
+  // Method to generate and download PDF with data protection content
   Future<void> _downloadPDF(BuildContext context) async {
-    final pdf = pw.Document();
+    final pdf = pw.Document(); // Create a new PDF document
 
+    // Add a page with data protection content
     pdf.addPage(
       pw.Page(
         build: (pw.Context context) => pw.Padding(
@@ -193,6 +199,7 @@ class DataProtectionPolicyPage extends StatelessWidget {
       ),
     );
 
+    // Display PDF layout for download
     await Printing.layoutPdf(
       onLayout: (PdfPageFormat format) async => pdf.save(),
     );

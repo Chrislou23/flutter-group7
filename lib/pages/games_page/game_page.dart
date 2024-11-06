@@ -13,10 +13,10 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
-  // Variable to hold the Future
+  // Future to hold the user data from Firestore
   late Future<QuerySnapshot> _usersFuture;
 
-  // Define colors for ranks
+  // Define colors for the top three ranks
   final Color goldColor = const Color(0xFFFFD700);
   final Color silverColor = const Color(0xFFC0C0C0);
   final Color bronzeColor = const Color(0xFFCD7F32);
@@ -27,17 +27,17 @@ class _GamePageState extends State<GamePage> {
     _fetchUserData();
   }
 
-  // Method to fetch data
+  // Method to fetch user data from Firestore
   Future<void> _fetchUserData() async {
     _usersFuture = FirebaseFirestore.instance.collection('users').get();
-    // Wait for the future to complete before calling setState
+    // Wait for the future to complete before updating the state
     await _usersFuture;
     if (mounted) {
       setState(() {});
     }
   }
 
-  // Function to get ordinal suffix for rank numbers
+  // Function to get ordinal suffix for rank numbers (e.g., 1st, 2nd, 3rd)
   String getOrdinalSuffix(int number) {
     if (number >= 11 && number <= 13) {
       return '${number}th';
@@ -54,6 +54,7 @@ class _GamePageState extends State<GamePage> {
     }
   }
 
+  // Widget to build the overall ranking list
   Widget _buildOverallRankingList() {
     return RefreshIndicator(
       onRefresh: _fetchUserData,
@@ -101,7 +102,7 @@ class _GamePageState extends State<GamePage> {
               final photoURL = user['photoURL'];
               final rank = index + 1;
 
-              // Get the ordinal rank string
+              // Get the ordinal rank string (e.g., 1st, 2nd)
               String rankString = getOrdinalSuffix(rank);
 
               // Determine font size and color based on rank
@@ -128,11 +129,10 @@ class _GamePageState extends State<GamePage> {
                   borderRadius: BorderRadius.circular(12.0),
                 ),
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                   child: Row(
                     children: [
-                      // Rank Container
+                      // Rank display
                       Container(
                         width: 60,
                         alignment: Alignment.center,
@@ -145,32 +145,38 @@ class _GamePageState extends State<GamePage> {
                           ),
                         ),
                       ),
-                      // Vertical Divider
+                      // Vertical divider
                       Container(
                         height: 60,
                         width: 1,
                         color: Colors.grey[300],
                       ),
                       const SizedBox(width: 12.0),
-                      // Rest of the player info
+                      // User information
                       Expanded(
                         child: Row(
                           children: [
+                            // User avatar
                             CircleAvatar(
                               radius: 25,
                               backgroundImage: photoURL.isNotEmpty
                                   ? NetworkImage(photoURL)
                                   : null,
                               child: photoURL.isEmpty
-                                  ? const Icon(Icons.person,
-                                      size: 30.0, color: Colors.white)
+                                  ? const Icon(
+                                      Icons.person,
+                                      size: 30.0,
+                                      color: Colors.white,
+                                    )
                                   : null,
                             ),
                             const SizedBox(width: 12.0),
+                            // User details
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  // Username
                                   Text(
                                     username,
                                     style: const TextStyle(
@@ -179,12 +185,15 @@ class _GamePageState extends State<GamePage> {
                                     ),
                                   ),
                                   const SizedBox(height: 4.0),
+                                  // Individual game scores
                                   Text('Crossword: $scoreCrossword'),
                                   Text('Link: $scoreLink'),
+                                  // Total score
                                   Text(
                                     'Total: $scoreTotal',
                                     style: const TextStyle(
-                                        fontWeight: FontWeight.bold),
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -203,6 +212,7 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
+  // Helper method to format duration into MM:SS format
   String _formatDuration(Duration duration) {
     String minutes =
         duration.inMinutes.remainder(60).toString().padLeft(2, '0');
@@ -211,6 +221,7 @@ class _GamePageState extends State<GamePage> {
     return "$minutes:$seconds";
   }
 
+  // Widget to display when the user is blocked
   Widget _buildBlockedScreen() {
     return Center(
       child: Column(
@@ -228,14 +239,17 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
+  // Widget to build the game buttons
   Widget _buildGameButtons() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: Row(
         children: [
+          // Crossword Game Button
           Expanded(
             child: GestureDetector(
               onTap: () {
+                // Navigate to CrosswordGamePage and refresh data upon return
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -250,6 +264,7 @@ class _GamePageState extends State<GamePage> {
                 elevation: 4,
                 child: Column(
                   children: [
+                    // Game image
                     Container(
                       height: 150,
                       decoration: BoxDecoration(
@@ -262,12 +277,15 @@ class _GamePageState extends State<GamePage> {
                         ),
                       ),
                     ),
+                    // Game title
                     const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Text(
                         'Game 1: Crossword',
-                        style:
-                            TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],
@@ -275,9 +293,11 @@ class _GamePageState extends State<GamePage> {
               ),
             ),
           ),
+          // Link Game Button
           Expanded(
             child: GestureDetector(
               onTap: () {
+                // Navigate to LinkGamePage and refresh data upon return
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -292,6 +312,7 @@ class _GamePageState extends State<GamePage> {
                 elevation: 4,
                 child: Column(
                   children: [
+                    // Game image
                     Container(
                       height: 150,
                       decoration: BoxDecoration(
@@ -304,12 +325,15 @@ class _GamePageState extends State<GamePage> {
                         ),
                       ),
                     ),
+                    // Game title
                     const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Text(
                         'Game 2: Link Game',
-                        style:
-                            TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],
@@ -328,13 +352,11 @@ class _GamePageState extends State<GamePage> {
       builder: (context, timerProvider, child) {
         return Scaffold(
           appBar: AppBar(
-            backgroundColor: Colors.white,
             title: timerProvider.isBlocked
                 ? Text(
                     "Blocked: ${_formatDuration(timerProvider.remainingBlockTime)}",
-                    style: const TextStyle(color: Colors.black),
                   )
-                : const Text('Game', style: TextStyle(color: Colors.black)),
+                : const Text('Games'),
             centerTitle: true,
           ),
           body: timerProvider.isBlocked
@@ -342,8 +364,10 @@ class _GamePageState extends State<GamePage> {
               : Column(
                   children: [
                     const SizedBox(height: 10),
+                    // Display game buttons
                     _buildGameButtons(),
                     const SizedBox(height: 10),
+                    // Leaderboard title
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.0),
                       child: Align(
@@ -351,12 +375,14 @@ class _GamePageState extends State<GamePage> {
                         child: Text(
                           'Leaderboard',
                           style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(height: 10),
-                    // Ranking list for all users
+                    // Display the overall ranking list
                     Expanded(child: _buildOverallRankingList()),
                   ],
                 ),

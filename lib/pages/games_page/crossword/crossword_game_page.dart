@@ -15,9 +15,10 @@ class CrosswordGamePage extends StatefulWidget {
 }
 
 class _CrosswordGamePageState extends State<CrosswordGamePage> {
+  // Flag to track the selected language (English by default)
   bool isEnglish = true;
 
-  // Variable to hold the Future
+  // Future to hold user data from Firestore
   late Future<QuerySnapshot> _usersFuture;
 
   @override
@@ -26,7 +27,7 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
     _fetchUserData();
   }
 
-  // Method to fetch data
+  // Method to fetch user data from Firestore
   Future<void> _fetchUserData() async {
     _usersFuture = FirebaseFirestore.instance.collection('users').get();
     await _usersFuture;
@@ -35,12 +36,14 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
     }
   }
 
+  // Toggle between English and Finnish languages
   void toggleLanguage() {
     setState(() {
       isEnglish = !isEnglish;
     });
   }
 
+  // Build the ranking list for the crossword game
   Widget _buildCrosswordRankingList() {
     return RefreshIndicator(
       onRefresh: _fetchUserData,
@@ -56,7 +59,7 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
 
           final docs = snapshot.data?.docs ?? [];
 
-          // Create a list to hold user data
+          // List to hold user data
           List<Map<String, dynamic>> userDataList = docs.map((doc) {
             final data = doc.data() as Map<String, dynamic>;
             final scoreCrossword = data['scoreCrossword'] ?? 0;
@@ -68,9 +71,8 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
             };
           }).toList();
 
-          // Sort the userDataList based on 'scoreCrossword' in descending order
-          userDataList.sort(
-              (a, b) => b['scoreCrossword'].compareTo(a['scoreCrossword']));
+          // Sort the list based on crossword scores in descending order
+          userDataList.sort((a, b) => b['scoreCrossword'].compareTo(a['scoreCrossword']));
 
           return ListView.builder(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -82,7 +84,7 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
               final photoURL = user['photoURL'];
               final rank = index + 1;
 
-              // Determine rank styling
+              // Determine styling based on rank
               double fontSize;
               Color rankColor;
 
@@ -100,7 +102,7 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
                 rankColor = Colors.black;
               }
 
-              // Get the ordinal rank string
+              // Get the ordinal rank string (e.g., 1st, 2nd)
               String rankString = getOrdinalSuffix(rank);
 
               return Card(
@@ -109,11 +111,10 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
                   borderRadius: BorderRadius.circular(12.0),
                 ),
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                   child: Row(
                     children: [
-                      // Rank Container
+                      // Rank display
                       Container(
                         width: 60,
                         alignment: Alignment.center,
@@ -126,31 +127,37 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
                           ),
                         ),
                       ),
-                      // Vertical Divider
+                      // Vertical divider
                       Container(
                         height: 60,
                         width: 1,
                         color: Colors.grey[300],
                       ),
                       const SizedBox(width: 12.0),
-                      // Rest of the player info
+                      // User information
                       Expanded(
                         child: Row(
                           children: [
+                            // User avatar
                             CircleAvatar(
                               radius: 25,
                               backgroundImage:
                                   photoURL.isNotEmpty ? NetworkImage(photoURL) : null,
                               child: photoURL.isEmpty
-                                  ? const Icon(Icons.person,
-                                      size: 30.0, color: Colors.white)
+                                  ? const Icon(
+                                      Icons.person,
+                                      size: 30.0,
+                                      color: Colors.white,
+                                    )
                                   : null,
                             ),
                             const SizedBox(width: 12.0),
+                            // User details
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  // Username
                                   Text(
                                     username,
                                     style: const TextStyle(
@@ -159,6 +166,7 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
                                     ),
                                   ),
                                   const SizedBox(height: 4.0),
+                                  // User score
                                   Text(
                                     'Score: $scoreCrossword',
                                     style: const TextStyle(fontSize: 14.0),
@@ -180,7 +188,7 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
     );
   }
 
-  // Function to get ordinal suffix for rank numbers
+  // Function to get ordinal suffix for rank numbers (e.g., 1st, 2nd)
   String getOrdinalSuffix(int number) {
     if (number >= 11 && number <= 13) {
       return '${number}th';
@@ -197,14 +205,14 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
     }
   }
 
+  // Format duration into MM:SS format
   String _formatDuration(Duration duration) {
-    String minutes =
-        duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    String seconds =
-        duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    String minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    String seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
     return "$minutes:$seconds";
   }
 
+  // Widget to display when the user is blocked
   Widget _buildBlockedScreen() {
     return Center(
       child: Column(
@@ -222,6 +230,7 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
     );
   }
 
+  // Widget to display the game image
   Widget _buildGameImage() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -237,17 +246,22 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
     );
   }
 
+  // Widget to display the header title
   Widget _buildHeaderTitle() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Text(
         isEnglish ? 'Crossword Game Rankings' : 'Ristikko Pelin Tulokset',
         style: const TextStyle(
-            fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
       ),
     );
   }
 
+  // Widget for the play button
   Widget _buildPlayButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -287,8 +301,10 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
                     "Blocked: ${_formatDuration(timerProvider.remainingBlockTime)}",
                     style: const TextStyle(color: Colors.black),
                   )
-                : const Text('Crossword Game',
-                    style: TextStyle(color: Colors.black)),
+                : const Text(
+                    'Crossword Game',
+                    style: TextStyle(color: Colors.black),
+                  ),
             centerTitle: true,
           ),
           body: timerProvider.isBlocked
@@ -300,8 +316,10 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
                     const SizedBox(height: 10),
                     _buildHeaderTitle(),
                     const SizedBox(height: 10),
+                    // Ranking list
                     Expanded(child: _buildCrosswordRankingList()),
                     const SizedBox(height: 10),
+                    // Buttons for instructions and language toggle
                     TabButtons(
                       isEnglish: isEnglish,
                       toggleLanguage: toggleLanguage,
@@ -317,13 +335,16 @@ class _CrosswordGamePageState extends State<CrosswordGamePage> {
   }
 }
 
-// Widget for Tab Buttons (How to play, Language toggle)
+// Widget for Tab Buttons (How to Play, Language Toggle)
 class TabButtons extends StatelessWidget {
   final bool isEnglish;
   final VoidCallback toggleLanguage;
 
-  const TabButtons(
-      {super.key, required this.isEnglish, required this.toggleLanguage});
+  const TabButtons({
+    super.key,
+    required this.isEnglish,
+    required this.toggleLanguage,
+  });
 
   @override
   Widget build(BuildContext context) {

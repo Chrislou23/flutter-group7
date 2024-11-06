@@ -21,16 +21,17 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  // You can change this to `false` when the maintenance is over.
+  // Set to `false` when maintenance is over
   final bool _isMaintenance = true;
 
+  // List of pages for navigation
   static const List<Widget> _pages = <Widget>[
-    // The first page will be replaced by the home content
-    SizedBox.shrink(),
+    SizedBox.shrink(), // Placeholder for home content
     GamePage(),
     FriendPage(),
   ];
 
+  // Handle bottom navigation bar item taps
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -72,31 +73,128 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Format duration for display
+  String _formatDuration(Duration duration) {
+    String minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    String seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return "$minutes:$seconds";
+  }
+
+  // Build the maintenance banner
+  Widget _buildMaintenanceBanner() {
+    return Container(
+      width: double.infinity,
+      color: Colors.orangeAccent,
+      padding: const EdgeInsets.all(8.0),
+      child: const Text(
+        "Periodic maintenance 12/11/24 from 8 - 10 a.m.",
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 16,
+        ),
+      ),
+    );
+  }
+
+  // Build the blocked screen when the user is blocked
+  Widget _buildBlockedScreen() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.lock, size: 100, color: Theme.of(context).iconTheme.color),
+          const SizedBox(height: 20),
+          const Text(
+            'REST YOUR EYES',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 18),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Build the app name display
+  Widget _buildAppName() {
+    return Center(
+      child: Text(
+        'FunLandia',
+        style: TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).primaryColor,
+        ),
+      ),
+    );
+  }
+
+  // Build a card for each game
+  Widget _buildGameCard({
+    required String imagePath,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+        elevation: 4,
+        child: Column(
+          children: [
+            // Game Image
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(12.0)),
+              child: Image.asset(
+                imagePath,
+                height: 180,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
+            // Game Title
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Text(
+                title,
+                style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer2<TimerProvider, ThemeProvider>(
       builder: (context, timerProvider, themeProvider, child) {
+        // Obtain theme and mode
+        final theme = Theme.of(context);
+        final isDarkMode = themeProvider.themeMode == ThemeMode.dark;
+
         return Scaffold(
           appBar: AppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: theme.appBarTheme.backgroundColor,
             title: timerProvider.isBlocked
                 ? Text(
                     "Blocked: ${_formatDuration(timerProvider.remainingBlockTime)}",
-                    style: const TextStyle(color: Colors.black),
+                    style: theme.appBarTheme.titleTextStyle,
                   )
                 : Text(
                     "Remaining Time: ${_formatDuration(timerProvider.remainingUsageTime)}",
-                    style: const TextStyle(color: Colors.black),
+                    style: theme.appBarTheme.titleTextStyle,
                   ),
             centerTitle: true,
             elevation: 1,
-            iconTheme: const IconThemeData(color: Colors.black),
+            iconTheme: theme.iconTheme,
             leading: IconButton(
               icon: const Icon(Icons.account_circle),
               onPressed: () {
                 User? user = FirebaseAuth.instance.currentUser;
                 if (user != null) {
-                  // Pass the current User to ProfilePage
+                  // Navigate to ProfilePage if user is logged in
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -104,7 +202,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   );
                 } else {
-                  // If user is not logged in, show login/register dialog
+                  // Show login/register dialog if not logged in
                   _showLoginRegisterDialog();
                 }
               },
@@ -112,17 +210,14 @@ class _HomePageState extends State<HomePage> {
             actions: [
               IconButton(
                 icon: Icon(
-                  themeProvider.themeMode == ThemeMode.light
-                      ? Icons.dark_mode
-                      : Icons.light_mode,
-                  color: Colors.black,
+                  isDarkMode ? Icons.light_mode : Icons.dark_mode,
                 ),
                 onPressed: () {
                   themeProvider.toggleTheme();
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.settings, color: Colors.black),
+                icon: const Icon(Icons.settings),
                 onPressed: () {
                   Navigator.pushNamed(context, '/settings');
                 },
@@ -187,106 +282,12 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
             currentIndex: _selectedIndex,
-            selectedItemColor: Theme.of(context).primaryColor,
-            unselectedItemColor: Colors.grey,
+            selectedItemColor: theme.primaryColor,
+            unselectedItemColor: theme.disabledColor,
             onTap: _onItemTapped,
           ),
         );
       },
-    );
-  }
-
-  // Helper to format the duration
-  String _formatDuration(Duration duration) {
-    String minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    String seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return "$minutes:$seconds";
-  }
-
-  // Maintenance Banner
-  Widget _buildMaintenanceBanner() {
-    return Container(
-      width: double.infinity,
-      color: Colors.orangeAccent,
-      padding: const EdgeInsets.all(8.0),
-      child: const Text(
-        "Periodic maintenance 28/10/24 from 8 - 10 a.m.",
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 16,
-          color: Colors.black,
-        ),
-      ),
-    );
-  }
-
-  // Blocked Screen
-  Widget _buildBlockedScreen() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.lock, size: 100, color: Theme.of(context).iconTheme.color),
-          const SizedBox(height: 20),
-          const Text(
-            'REST YOUR EYES',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 18),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // App Name Widget
-  Widget _buildAppName() {
-    return Center(
-      child: Text(
-        'FunLandia',
-        style: TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
-          color: Theme.of(context).primaryColor,
-        ),
-      ),
-    );
-  }
-
-  // Game Card Widget
-  Widget _buildGameCard({
-    required String imagePath,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-        elevation: 4,
-        child: Column(
-          children: [
-            // Game Image
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12.0)),
-              child: Image.asset(
-                imagePath,
-                height: 180,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            ),
-            // Game Title
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Text(
-                title,
-                style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
