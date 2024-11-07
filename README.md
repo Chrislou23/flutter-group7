@@ -1,16 +1,71 @@
-# mobile_games
+# Funlandia
 
-A new Flutter project.
+**Funlandia** is a fun and educational app that combines learning with play, designed specifically for kids. With games like **Crossword** and **Emotion Linking**, the app helps kids enhance vocabulary, problem-solving skills, and emotional intelligence.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 🌟 Vision and Mission
 
-A few resources to get you started if this is your first Flutter project:
+- **Vision**: To be the go-to platform for fun, learning, and social connection, encouraging users worldwide to engage, learn, and play together.
+- **Mission**: To deliver an engaging, educational, and social experience through interactive games and activities that bring friends and families closer, spark joy, and create memorable moments for all ages.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 📋 Features
+
+- **Game Selection**: Access different games from the main menu, including:
+  - **Crossword Game**: Improve vocabulary and spelling with fun crossword puzzles.
+  - **Emotion Linking Game**: Enhance emotional intelligence by linking emojis with emotions.
+- **Multilingual Support**: Switch between English and Finnish for a personalized language experience.
+- **Leaderboard**: Compete with friends and other users to achieve top scores.
+- **Friend System**: Add friends, view their scores, and share achievements.
+- **Profile Management**: Customize your profile with a photo, track points, and view level progress.
+- **Time Management**: Set reminders for breaks to ensure healthy screen time.
+
+---
+
+## 🚀 Getting Started
+
+To get Funlandia running on your local machine:
+
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/YourUsername/Funlandia.git
+
+2. **Navigate to the Project Directory**
+3. **Install Dependencies**: Ensure that Flutter and Dart are installed in your System, then run:
+     ```bash
+     flutter pub get
+4.**Launch the App**:
+    ```bash
+    flutter run 
+
+
+## 📖 User Manual 
+
+The User Manual (PDF) provides detailed guidance on:
+
+- **Getting Started**: How to register, set up your profile, and select games.
+- **Games**: Instructions for playing games, viewing scores, and switching languages.
+- **Settings**: Information on privacy policies, app details, and managing screen time.
+- **Friends Feature**: Adding friends, inviting others to join, and viewing shared achievements.
+
+For full details, download the manual from the link above or access it directly within the app under "Settings."
+[Funlandia_User_Manual.pdf](https://github.com/user-attachments/files/17664826/Funlandia_User_Manual.pdf)
+
+
+## Privacy Policy
+
+Funlandia values user privacy. Our [Data Protection Policy (PDF)](docs/Data_Protection_Policy.pdf) is available within the app’s settings and can be downloaded directly to your device.
+
+## 🎉 Have Fun!
+
+Enjoy Funlandia! For questions or support, reach out at [support@funlandia.com](mailto:support@funlandia.com).
+
+---
+
+## 📄 Additional Resources
+
+- [Flutter Documentation](https://docs.flutter.dev/)
+- [Dart Documentation](https://dart.dev/guides)
+
