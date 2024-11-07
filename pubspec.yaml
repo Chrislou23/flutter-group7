@@ -70,6 +70,7 @@ flutter:
     - assets/game1.png
     - assets/game2.png
     - assets/appname.png
+    - assets/appname1.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

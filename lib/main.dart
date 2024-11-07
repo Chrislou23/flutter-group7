@@ -19,8 +19,13 @@ import 'pages/settings_page/about_page.dart';
 import 'timer_provider.dart';
 
 void main() async {
+  // Ensures that widget binding is initialized before runApp
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initializes Firebase before the app starts
   await Firebase.initializeApp();
+
+  // Runs the app with multiple providers for state management
   runApp(
     MultiProvider(
       providers: [
@@ -37,29 +42,48 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Obtain the ThemeProvider to manage theme changes
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Game App',
+      // Apply the current theme mode (light or dark)
+      themeMode: themeProvider.themeMode,
+      // Define the light theme settings
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        brightness: Brightness.light,
+        // You can define other light theme properties here
       ),
+      // Define the dark theme settings
+      darkTheme: ThemeData(
+        primarySwatch: Colors.blueGrey,
+        brightness: Brightness.dark,
+        primaryColor: Colors.blue,
+        buttonTheme: ButtonThemeData(
+          buttonColor: Colors.blue, // Set the button color
+          textTheme: ButtonTextTheme.primary,
+        ),
+        // You can define other dark theme properties here
+      ),
+      // Set the initial route of the app
       home: const HomePage(),
+      // Define the routes for navigation within the app
       routes: {
         '/game': (context) => const GamePage(),
         '/friends': (context) => const FriendPage(),
         '/account': (context) => const LoginPage(),
+        '/register': (context) => const RegisterPage(),
         '/crossword': (context) => const CrosswordGamePage(),
         '/link': (context) => const LinkGamePage(),
-        '/link_instructions_fi': (context) => const LinkInstructionsFi(),
         '/link_instructions_en': (context) => const LinkInstructionsEn(),
-        '/crossword_instructions': (context) => const CrosswordInstructionsEn(),
-        '/crossword_instructions_fi': (context) =>
-            const CrosswordInstructionsFi(),
+        '/link_instructions_fi': (context) => const LinkInstructionsFi(),
+        '/crossword_instructions_en': (context) => const CrosswordInstructionsEn(),
+        '/crossword_instructions_fi': (context) => const CrosswordInstructionsFi(),
         '/settings': (context) => const SettingsPage(),
-        '/data_protection_policy': (context) =>
-            const DataProtectionPolicyPage(),
+        '/data_protection_policy': (context) => const DataProtectionPolicyPage(),
         '/about': (context) => const AboutPage(),
-        '/register': (context) => const RegisterPage(),
       },
     );
   }

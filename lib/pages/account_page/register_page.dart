@@ -12,15 +12,22 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  // Instance of FirebaseAuth for authentication
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // Controllers for input fields
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+
+  // Error message to display in case of registration failure
   String _errorMessage = '';
 
+  // Method to handle user registration
   Future<void> registerUser() async {
+    // Check if any of the fields are empty
     if (_emailController.text.trim().isEmpty ||
         _usernameController.text.trim().isEmpty ||
         _passwordController.text.trim().isEmpty ||
@@ -31,6 +38,7 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
+    // Check if passwords match
     if (_passwordController.text.trim() !=
         _confirmPasswordController.text.trim()) {
       setState(() {
@@ -40,12 +48,13 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     try {
+      // Create a new user with email and password
       final credential = await _auth.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      // Send email verification
+      // Send email verification if not verified
       if (credential.user != null && !credential.user!.emailVerified) {
         await credential.user!.sendEmailVerification();
       }
@@ -57,7 +66,7 @@ class _RegisterPageState extends State<RegisterPage> {
           .set({
         'username': _usernameController.text.trim(),
         'email': _emailController.text.trim(),
-        'currentLevel': 0,
+        'currentPoints': 0,
         'level': 1,
       });
 
@@ -68,11 +77,12 @@ class _RegisterPageState extends State<RegisterPage> {
           return AlertDialog(
             title: const Text('Thank you!'),
             content: const Text(
-                'You account has been created. Please check your email to verify your account before logging in.'),
+                'Your account has been created. Please check your email to verify your account before logging in.'),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop(); // Close the dialog
+                  // Navigate to the home page
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => const HomePage()),
@@ -85,16 +95,18 @@ class _RegisterPageState extends State<RegisterPage> {
         },
       );
     } on FirebaseAuthException catch (e) {
+      // Handle authentication errors
       setState(() {
         if (e.code == 'weak-password') {
           _errorMessage = 'The password provided is too weak.';
         } else if (e.code == 'email-already-in-use') {
-          _errorMessage = 'The account already exists for that email.';
+          _errorMessage = 'An account already exists for that email.';
         } else {
           _errorMessage = e.message ?? 'An unexpected error occurred!';
         }
       });
     } catch (e) {
+      // Handle other errors
       setState(() {
         _errorMessage = 'An unexpected error occurred: $e';
       });
@@ -103,7 +115,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   void dispose() {
-    // Dispose controllers to free resources when widget is removed
+    // Dispose controllers to free up resources
     _emailController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
@@ -122,6 +134,7 @@ class _RegisterPageState extends State<RegisterPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // Email input field
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(
@@ -130,6 +143,8 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
             const SizedBox(height: 16.0),
+
+            // Username input field
             TextField(
               controller: _usernameController,
               decoration: const InputDecoration(
@@ -138,29 +153,37 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
             const SizedBox(height: 16.0),
+
+            // Password input field
             TextField(
               controller: _passwordController,
-              obscureText: true,
+              obscureText: true, // Hide the password
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Password',
               ),
             ),
             const SizedBox(height: 16.0),
+
+            // Confirm password input field
             TextField(
               controller: _confirmPasswordController,
-              obscureText: true,
+              obscureText: true, // Hide the password
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Confirm Password',
               ),
             ),
             const SizedBox(height: 16.0),
+
+            // Register button
             ElevatedButton(
               onPressed: registerUser,
               child: const Text('Register'),
             ),
             const SizedBox(height: 16.0),
+
+            // Navigate to login page
             TextButton(
               onPressed: () {
                 Navigator.push(
@@ -170,6 +193,8 @@ class _RegisterPageState extends State<RegisterPage> {
               },
               child: const Text('Already have an account? Login'),
             ),
+
+            // Display error message if any
             if (_errorMessage.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),

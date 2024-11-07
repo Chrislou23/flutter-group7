@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ScoreRankingPage extends StatelessWidget {
+  // Reference to Firestore database
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3, // Trois onglets
+      length: 3, // Number of tabs
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Score Rankings'),
@@ -33,49 +34,93 @@ class ScoreRankingPage extends StatelessWidget {
     );
   }
 
+  // Widget to build the ranking list based on the score field
   Widget _buildRankingList(String scoreField) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: _db
+    Stream<QuerySnapshot> stream;
+
+    if (scoreField == 'scoreTotal') {
+      // For total score, fetch all users without ordering
+      stream = _db.collection('users').snapshots();
+    } else {
+      // For individual games, order by the specific score field descending
+      stream = _db
           .collection('users')
-          .orderBy(scoreField, descending: true) // Trier par le champ de score
-          .snapshots(),
+          .orderBy(scoreField, descending: true)
+          .snapshots();
+    }
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: stream,
       builder: (context, snapshot) {
+        // Error handling
         if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         }
+        // Loading indicator while waiting for data
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final users = snapshot.data?.docs ?? [];
+        // List to store user data
+        List<Map<String, dynamic>> userDataList = [];
 
+        if (scoreField == 'scoreTotal') {
+          // Compute total scores for each user
+          userDataList = snapshot.data!.docs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            final scoreCrossword = data['scoreCrossword'] ?? 0;
+            final scoreLink = data['scoreLink'] ?? 0;
+            final totalScore = scoreCrossword + scoreLink;
+
+            // Create a new data map including totalScore
+            final newData = Map<String, dynamic>.from(data);
+            newData['scoreTotal'] = totalScore;
+            return newData;
+          }).toList();
+
+          // Sort the list by totalScore in descending order
+          userDataList.sort((a, b) {
+            final totalA = a['scoreTotal'] ?? 0;
+            final totalB = b['scoreTotal'] ?? 0;
+            return totalB.compareTo(totalA);
+          });
+        } else {
+          // For individual game scores, use the data as is
+          userDataList = snapshot.data!.docs.map((doc) {
+            return doc.data() as Map<String, dynamic>;
+          }).toList();
+        }
+
+        // Build the list view of rankings
         return ListView.builder(
-          itemCount: users.length,
+          itemCount: userDataList.length,
           itemBuilder: (context, index) {
-            final user = users[index];
-            final rank = index + 1;
+            final data = userDataList[index];
+            final rank = index + 1; // Calculate rank
 
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white, // Background color
+                  borderRadius: BorderRadius.circular(20), // Rounded corners
                   boxShadow: [
+                    // Shadow effect
                     BoxShadow(
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 2,
                       blurRadius: 7,
-                      offset: const Offset(0, 3),
+                      offset: const Offset(0, 3), // Position of the shadow
                     ),
                   ],
                 ),
                 child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   leading: CircleAvatar(
                     backgroundColor: Colors.purpleAccent,
                     child: Text(
-                      '#$rank',
+                      '#$rank', // Display rank number
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -83,7 +128,7 @@ class ScoreRankingPage extends StatelessWidget {
                     ),
                   ),
                   title: Text(
-                    user['username'] ?? 'Unknown',
+                    data['username'] ?? 'Unknown', // Display username
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
@@ -94,10 +139,13 @@ class ScoreRankingPage extends StatelessWidget {
                     children: [
                       Text(
                         'Score',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 12,
+                        ),
                       ),
                       Text(
-                        '${user[scoreField] ?? 0}',
+                        '${data[scoreField] ?? 0}', // Display user's score
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,

@@ -4,23 +4,25 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
+/// A StatefulWidget representing the Crossword Game.
 class CrosswordGame extends StatefulWidget {
-  final bool isFinnish;
+  final bool isFinnish; // Flag to determine the language (Finnish or English)
 
   const CrosswordGame({super.key, required this.isFinnish});
 
   @override
-  // ignore: library_private_types_in_public_api
   _CrosswordGameState createState() => _CrosswordGameState();
 }
 
+/// Class to represent each word in the crossword.
 class CrosswordWord {
-  String word;
-  String clue;
-  int row;
-  int col;
-  bool isHorizontal;
-  int number;
+  String word;       // The actual word
+  String clue;       // Clue for the word
+  int row;           // Starting row in the grid
+  int col;           // Starting column in the grid
+  bool isHorizontal; // Direction of the word
+  int number;        // Clue number
+
   CrosswordWord({
     required this.word,
     required this.clue,
@@ -32,11 +34,13 @@ class CrosswordWord {
 }
 
 class _CrosswordGameState extends State<CrosswordGame> {
+  // Grid variables
   late int gridSize;
   late List<List<String?>> grid;
   late List<List<TextEditingController?>> controllers;
   late List<List<int?>> numbers;
 
+  // Game state variables
   int currentLevel = 1;
   int maxLevel = 5;
   int failedAttempts = 0;
@@ -45,10 +49,13 @@ class _CrosswordGameState extends State<CrosswordGame> {
   int score = 0;
   int currentScore = 0;
   int level = 1;
+  int? selectedClueIndex; // Index of the currently selected clue
 
+  // Controller for word input
   TextEditingController wordInputController = TextEditingController();
 
-  final Map<int, List<CrosswordWord>> finnishLevels = {
+  // Levels data for Finnish
+final Map<int, List<CrosswordWord>> finnishLevels = {
     1: [
       CrosswordWord(
           word: 'PELKO',
@@ -237,6 +244,7 @@ class _CrosswordGameState extends State<CrosswordGame> {
     // Additional levels are truncated for brevity
   };
 
+  // Levels data for English
   final Map<int, List<CrosswordWord>> englishLevels = {
     1: [
       CrosswordWord(
@@ -446,82 +454,97 @@ class _CrosswordGameState extends State<CrosswordGame> {
     // Additional levels are truncated for brevity
   };
 
-  int? selectedClueIndex;
-
   @override
   void initState() {
     super.initState();
-    _generateCrossword();
+    _generateCrossword(); // Generate the crossword grid
   }
 
+  /// Initializes the grid, controllers, and numbers matrices.
   void initializeGrid() {
     grid = List.generate(gridSize, (_) => List.filled(gridSize, null));
     controllers = List.generate(gridSize, (_) => List.filled(gridSize, null));
     numbers = List.generate(gridSize, (_) => List.filled(gridSize, null));
   }
 
+  /// Generates the crossword based on the current level and language.
   void _generateCrossword() {
     // Choose levels based on language
     final levels = widget.isFinnish ? finnishLevels : englishLevels;
 
-    // Determine the grid size based on the longest word in the current level
+    // Determine the grid size based on the longest word
     int longestWordLength = levels[currentLevel]!
         .map((word) => word.word.length)
         .reduce((a, b) => a > b ? a : b);
+
     gridSize = longestWordLength > 9 ? longestWordLength + 2 : 8;
     initializeGrid();
+
+    // Get the crossword data for the current level
     List<CrosswordWord> crosswordData = levels[currentLevel] ?? [];
+
+    // Place each word in the grid
     for (var wordData in crosswordData) {
-      _placeWord(wordData.word, wordData.row, wordData.col,
-          wordData.isHorizontal, wordData.number);
+      _placeWord(
+        wordData.word,
+        wordData.row,
+        wordData.col,
+        wordData.isHorizontal,
+        wordData.number,
+      );
     }
     setState(() {});
   }
 
+  /// Places a word in the grid if possible.
   void _placeWord(
       String word, int row, int col, bool isHorizontal, int number) {
-    // First check if the word can be placed without conflicts
+    // Check if the word can be placed without conflicts
     for (int i = 0; i < word.length; i++) {
       int currentRow = row + (isHorizontal ? 0 : i);
       int currentCol = col + (isHorizontal ? i : 0);
 
-      // Check grid limits
+      // Check grid bounds
       if (currentRow >= gridSize || currentCol >= gridSize) {
-        return; // Word doesn't fit within the grid bounds
+        return; // Word doesn't fit
       }
 
-      // If a letter exists but is different, don’t place the word
+      // Check for conflicting letters
       if (grid[currentRow][currentCol] != null &&
           grid[currentRow][currentCol] != word[i]) {
-        return; // Word conflicts with another already placed word
+        return; // Conflict with existing word
       }
     }
 
-    // Place the word in the grid if all checks pass
+    // Place the word in the grid
     for (int i = 0; i < word.length; i++) {
       int currentRow = row + (isHorizontal ? 0 : i);
       int currentCol = col + (isHorizontal ? i : 0);
 
       grid[currentRow][currentCol] = word[i];
       controllers[currentRow][currentCol] ??= TextEditingController();
+
+      // Assign clue number to the first letter
       if (i == 0) {
         numbers[currentRow][currentCol] = number;
       }
     }
   }
 
+  /// Checks if the crossword is completely and correctly filled.
   bool _isCrosswordCompleted() {
     for (int row = 0; row < gridSize; row++) {
       for (int col = 0; col < gridSize; col++) {
         if (grid[row][col] != null &&
             controllers[row][col]?.text.toUpperCase() != grid[row][col]) {
-          return false;
+          return false; // Incomplete or incorrect letter
         }
       }
     }
-    return true;
+    return true; // All letters are correct
   }
 
+  /// Selects a clue and clears the word input controller.
   void _selectClue(int index) {
     setState(() {
       selectedClueIndex = index;
@@ -529,11 +552,13 @@ class _CrosswordGameState extends State<CrosswordGame> {
     });
   }
 
+  /// Updates the selected word based on user input.
   void _updateSelectedWord(String input) {
     if (selectedClueIndex == null) return;
 
     final levels = widget.isFinnish ? finnishLevels : englishLevels;
     var selectedWordData = levels[currentLevel]![selectedClueIndex!];
+
     String word = selectedWordData.word;
     int row = selectedWordData.row;
     int col = selectedWordData.col;
@@ -543,31 +568,32 @@ class _CrosswordGameState extends State<CrosswordGame> {
       int currentRow = row + (isHorizontal ? 0 : i);
       int currentCol = col + (isHorizontal ? i : 0);
 
-      if (currentRow >= gridSize || currentCol >= gridSize) {
-        continue;
-      }
+      if (currentRow >= gridSize || currentCol >= gridSize) continue;
 
       controllers[currentRow][currentCol]?.text = input[i].toUpperCase();
     }
   }
 
+  /// Moves the game to the next level.
   void _moveToNextLevel() {
     if (currentLevel < maxLevel) {
       setState(() {
         currentLevel++;
-        failedAttempts = 0; // Reset failed attempts for the new level
-        checkAnswerClicks = 0; // Reset check answer clicks for the new level
-        showLightbulb = false; // Reset lightbulb visibility for the new level
+        failedAttempts = 0;
+        checkAnswerClicks = 0;
+        showLightbulb = false;
         _generateCrossword();
       });
     }
   }
 
+  /// Reveals up to 3 random letters in the crossword.
   void _showRandomLetters() {
     final levels = widget.isFinnish ? finnishLevels : englishLevels;
     List<CrosswordWord> crosswordData = levels[currentLevel] ?? [];
     Random random = Random();
     int lettersRevealed = 0;
+
     Set<String> revealedPositions = {};
 
     // Collect all empty positions
@@ -586,10 +612,8 @@ class _CrosswordGameState extends State<CrosswordGame> {
       }
     }
 
-    // Shuffle the empty positions to randomize the selection
+    // Shuffle and reveal letters
     emptyPositions.shuffle(random);
-
-    // Reveal up to 3 letters
     for (var positionKey in emptyPositions) {
       if (lettersRevealed >= 3) break;
 
@@ -613,56 +637,60 @@ class _CrosswordGameState extends State<CrosswordGame> {
       }
     }
 
-    // Deduct points for using the lightbulb, but ensure score is non-negative
+    // Deduct points for using the lightbulb
     setState(() {
       score = max(score - 20, 0);
     });
   }
 
+  /// Increments the number of failed attempts and deducts points.
   void _incrementFailedAttempts() {
     setState(() {
       failedAttempts++;
-      score =
-          max(score - 5, 0); // Deduct points but ensure score is non-negative
+      score = max(score - 5, 0); // Ensure score is not negative
     });
   }
 
-void _onGameCompleted(int pointsEarned) async {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user != null) {
-    final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
+  /// Updates the user's score in Firebase when the game is completed.
+  void _onGameCompleted(int pointsEarned) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
 
-    DocumentSnapshot userSnapshot = await userDoc.get();
-    if (userSnapshot.exists) {
-      Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
+      DocumentSnapshot userSnapshot = await userDoc.get();
+      if (userSnapshot.exists) {
+        Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
 
-      int currentCrosswordScore = userData.containsKey('scoreCrossword') ? userData['scoreCrossword'] : 0;
-      int currentTotalScore = userData.containsKey('scoreTotal') ? userData['scoreTotal'] : 0;
+        int currentCrosswordScore = userData['scoreCrossword'] ?? 0;
+        int currentTotalScore = userData['scoreTotal'] ?? 0;
 
-      currentCrosswordScore += pointsEarned;
-      currentTotalScore += pointsEarned;
+        currentCrosswordScore += pointsEarned;
+        currentTotalScore += pointsEarned;
 
-      // Mettre à jour les scores dans Firestore
-      await userDoc.update({
-        'scoreCrossword': currentCrosswordScore,
-        'scoreTotal': currentTotalScore,
-      });
-    } else {
-      await userDoc.set({
-        'scoreCrossword': pointsEarned,
-        'scoreTotal': pointsEarned,
-      });
+        // Update scores in Firestore
+        await userDoc.update({
+          'scoreCrossword': currentCrosswordScore,
+          'scoreTotal': currentTotalScore,
+        });
+      } else {
+        // Set initial scores if user data doesn't exist
+        await userDoc.set({
+          'scoreCrossword': pointsEarned,
+          'scoreTotal': pointsEarned,
+        });
+      }
     }
   }
-}
 
+  /// Checks the user's answers and provides feedback.
   void _checkAnswers() {
-    FocusScope.of(context).unfocus();
+    FocusScope.of(context).unfocus(); // Dismiss the keyboard
 
     if (_isCrosswordCompleted()) {
-      score += 50; // Add points for completing the crossword
+      score += 50; // Add points for completion
 
       if (currentLevel < maxLevel) {
+        // Show level completion dialog
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -683,17 +711,17 @@ void _onGameCompleted(int pointsEarned) async {
         );
       } else {
         _onGameCompleted(score); // Update Firebase with the final score
-        showFinalScoreDialog(); // Show the final score dialog
+        showFinalScoreDialog();  // Show the final score dialog
       }
     } else {
       _incrementFailedAttempts();
       checkAnswerClicks++;
       if (checkAnswerClicks >= 3) {
         setState(() {
-          showLightbulb =
-              true; // Show the lightbulb after multiple incorrect attempts
+          showLightbulb = true; // Show hint option after multiple attempts
         });
       }
+      // Show try again dialog
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -714,6 +742,7 @@ void _onGameCompleted(int pointsEarned) async {
     }
   }
 
+  /// Displays the final score dialog with sharing options.
   void showFinalScoreDialog() {
     showDialog(
       context: context,
@@ -728,9 +757,11 @@ void _onGameCompleted(int pointsEarned) async {
           actions: [
             TextButton(
               onPressed: () {
-                Share.share(widget.isFinnish
-                    ? 'Suoritin kaikki tasot ristikossa! Lopulliset pisteeni: $score'
-                    : 'I completed all levels in the crossword puzzle! My final score: $score');
+                Share.share(
+                  widget.isFinnish
+                      ? 'Suoritin kaikki tasot ristikossa! Lopulliset pisteeni: $score'
+                      : 'I completed all levels in the crossword puzzle! My final score: $score',
+                );
               },
               child: Text(widget.isFinnish ? 'Jaa Pisteet' : 'Share Score'),
             ),
@@ -752,8 +783,7 @@ void _onGameCompleted(int pointsEarned) async {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-            widget.isFinnish ? "Taso $currentLevel" : "Level $currentLevel"),
+        title: Text(widget.isFinnish ? "Taso $currentLevel" : "Level $currentLevel"),
         backgroundColor: Colors.blue,
         actions: [
           Padding(
@@ -761,8 +791,7 @@ void _onGameCompleted(int pointsEarned) async {
             child: Center(
               child: Text(
                 'Score: $score',
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -770,6 +799,7 @@ void _onGameCompleted(int pointsEarned) async {
       ),
       body: Stack(
         children: [
+          // Background gradient
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -781,6 +811,7 @@ void _onGameCompleted(int pointsEarned) async {
           ),
           Column(
             children: [
+              // Crossword grid
               SizedBox(
                 height: MediaQuery.of(context).size.height / 2,
                 child: Padding(
@@ -799,14 +830,15 @@ void _onGameCompleted(int pointsEarned) async {
                       int? number = numbers[row][col];
 
                       if (letter == null) {
-                        return Container(); // Empty container for cells without letters
+                        return Container(); // Empty cell
                       }
 
+                      // Highlight selected word cells
                       bool isHighlighted = false;
                       if (selectedClueIndex != null) {
                         var selectedWord = (widget.isFinnish
-                            ? finnishLevels
-                            : englishLevels)[currentLevel]![selectedClueIndex!];
+                                ? finnishLevels
+                                : englishLevels)[currentLevel]![selectedClueIndex!];
                         int startRow = selectedWord.row;
                         int startCol = selectedWord.col;
                         String word = selectedWord.word;
@@ -825,19 +857,18 @@ void _onGameCompleted(int pointsEarned) async {
 
                       return Stack(
                         children: [
+                          // Cell background
                           Container(
                             margin: const EdgeInsets.all(2),
                             width: cellSize,
                             height: cellSize,
                             decoration: BoxDecoration(
-                              border: Border.all(
-                                  color:
-                                      const Color.fromARGB(255, 255, 255, 255)),
+                              border: Border.all(color: Colors.white),
                               color: isHighlighted
                                   ? Colors.yellow.shade200
                                   : Colors.white,
                               borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
+                              boxShadow: const [
                                 BoxShadow(
                                   color: Colors.black26,
                                   blurRadius: 4,
@@ -848,20 +879,17 @@ void _onGameCompleted(int pointsEarned) async {
                             child: TextField(
                               controller: controllers[row][col],
                               textAlign: TextAlign.center,
-                              decoration: const InputDecoration(
-                                  border: InputBorder.none),
+                              decoration: const InputDecoration(border: InputBorder.none),
                               style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
                               maxLength: 1,
-                              buildCounter: (_,
-                                      {int? currentLength,
-                                      bool? isFocused,
-                                      int? maxLength}) =>
-                                  null,
+                              buildCounter: (_, {int? currentLength, bool? isFocused, int? maxLength}) => null,
                             ),
                           ),
+                          // Clue number
                           if (number != null)
                             Positioned(
                               top: 2,
@@ -869,9 +897,10 @@ void _onGameCompleted(int pointsEarned) async {
                               child: Text(
                                 number.toString(),
                                 style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blueAccent),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blueAccent,
+                                ),
                               ),
                             ),
                         ],
@@ -880,25 +909,18 @@ void _onGameCompleted(int pointsEarned) async {
                   ),
                 ),
               ),
+              // Clues list
               Expanded(
                 child: ListView.builder(
-                  itemCount: (widget.isFinnish
-                          ? finnishLevels
-                          : englishLevels)[currentLevel]!
-                      .length,
+                  itemCount: (widget.isFinnish ? finnishLevels : englishLevels)[currentLevel]!.length,
                   itemBuilder: (BuildContext context, int index) {
                     return Card(
                       color: Colors.white,
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 4, horizontal: 8),
+                      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                       child: ListTile(
                         title: Text(
-                          (widget.isFinnish
-                                  ? finnishLevels
-                                  : englishLevels)[currentLevel]![index]
-                              .clue,
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                          (widget.isFinnish ? finnishLevels : englishLevels)[currentLevel]![index].clue,
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         onTap: () => _selectClue(index),
                         selected: selectedClueIndex == index,
@@ -908,6 +930,7 @@ void _onGameCompleted(int pointsEarned) async {
                   },
                 ),
               ),
+              // Word input field
               if (selectedClueIndex != null)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -916,28 +939,28 @@ void _onGameCompleted(int pointsEarned) async {
                     decoration: InputDecoration(
                       labelText: 'Enter the word for the selected clue',
                       filled: true,
-                      fillColor: const Color.fromARGB(
-                          255, 152, 222, 255), // Custom background color
+                      fillColor: const Color.fromARGB(255, 152, 222, 255),
                     ),
                     onChanged: _updateSelectedWord,
                   ),
                 ),
+              // Action buttons
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
+                    // Check Answers button
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 12),
-                        textStyle: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       onPressed: _checkAnswers,
                       child: const Text('Check Answers'),
                     ),
+                    // Hint button
                     if (showLightbulb)
                       IconButton(
                         icon: const Icon(Icons.lightbulb),
