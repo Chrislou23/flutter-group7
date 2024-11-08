@@ -6,6 +6,7 @@
 
 ## 🌟 Vision and Mission
 
+
 - **Vision**: To be the go-to platform for fun, learning, and social connection, encouraging users worldwide to engage, learn, and play together.
 - **Mission**: To deliver an engaging, educational, and social experience through interactive games and activities that bring friends and families closer, spark joy, and create memorable moments for all ages.
 
@@ -66,6 +67,6 @@ Enjoy Funlandia! For questions or support, reach out at [support@funlandia.com](
 
 ## 📄 Additional Resources
 
-- Technical Guide
+- [07-Funlandia Project_technical_documentation_final.pdf](https://github.com/user-attachments/files/17674411/07-Funlandia.Project_technical_documentation_final.pdf)
 - [Funlandia_User_Manual.pdf](https://github.com/user-attachments/files/17664826/Funlandia_User_Manual.pdf)
 
