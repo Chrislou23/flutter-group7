@@ -94,7 +94,7 @@ class _FriendPageState extends State<FriendPage> {
 
   /// Shares an invitation message via social media.
   Future<void> _shareOnSocialMedia() async {
-    const String message = "I'm playing on FunLandia, come play with me!";
+    const String message = "I'm playing on FunLandia, come play with me! https://funlandia.web.app/";
     Share.share(message); // Uses share_plus to share the message.
   }
 
