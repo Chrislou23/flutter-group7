@@ -33,12 +33,16 @@ To get Funlandia running on your local machine:
    git clone https://github.com/YourUsername/Funlandia.git
 
 2. **Navigate to the Project Directory**
+
+  
 3. **Install Dependencies**: Ensure that Flutter and Dart are installed in your System, then run:
      ```bash
-     flutter pub get
-4.**Launch the App**:
-    ```bash
-    flutter run 
+    flutter pub get
+      ```
+4. **Launch the App**: run the following command:
+      ```bash
+    flutter run
+      ```
 
 
 ## 📖 User Manual 
@@ -50,13 +54,9 @@ The User Manual (PDF) provides detailed guidance on:
 - **Settings**: Information on privacy policies, app details, and managing screen time.
 - **Friends Feature**: Adding friends, inviting others to join, and viewing shared achievements.
 
-For full details, download the manual from the link above or access it directly within the app under "Settings."
-[Funlandia_User_Manual.pdf](https://github.com/user-attachments/files/17664826/Funlandia_User_Manual.pdf)
 
 
-## Privacy Policy
 
-Funlandia values user privacy. Our [Data Protection Policy (PDF)](docs/Data_Protection_Policy.pdf) is available within the app’s settings and can be downloaded directly to your device.
 
 ## 🎉 Have Fun!
 
@@ -66,6 +66,6 @@ Enjoy Funlandia! For questions or support, reach out at [support@funlandia.com](
 
 ## 📄 Additional Resources
 
-- [Flutter Documentation](https://docs.flutter.dev/)
-- [Dart Documentation](https://dart.dev/guides)
+- Technical Guide
+- [Funlandia_User_Manual.pdf](https://github.com/user-attachments/files/17664826/Funlandia_User_Manual.pdf)
 
