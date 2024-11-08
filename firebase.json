@@ -1,35 +1,36 @@
 {
-  "flutter": {
-    "platforms": {
-      "android": {
-        "default": {
-          "projectId": "mobile-games-2783a",
-          "appId": "1:556788420487:android:d629eff7a7f3ba5c090d22",
-          "fileOutput": "android/app/google-services.json"
-        }
-      },
-      "dart": {
-        "lib/firebase_options.dart": {
-          "projectId": "mobile-games-2783a",
-          "configurations": {
-            "android": "1:556788420487:android:d629eff7a7f3ba5c090d22"
+    "flutter": {
+      "platforms": {
+        "android": {
+          "default": {
+            "projectId": "mobile-games-2783a",
+            "appId": "1:556788420487:android:d629eff7a7f3ba5c090d22",
+            "fileOutput": "android/app/google-services.json"
+          }
+        },
+        "dart": {
+          "lib/firebase_options.dart": {
+            "projectId": "mobile-games-2783a",
+            "configurations": {
+              "web": "1:556788420487:web:99a9b9f573112e55090d22"
+            }
           }
         }
       }
+    },
+    "hosting": {
+      "public": "build/web",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
     }
-  },
-  "hosting": {
-    "public": "build/web",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ]
   }
-}
+    

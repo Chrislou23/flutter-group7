@@ -19,10 +19,7 @@ class DefaultFirebaseOptions {
   /// Returns the [FirebaseOptions] for the current platform.
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -63,4 +60,15 @@ class DefaultFirebaseOptions {
     databaseURL: '<YOUR_DATABASE_URL>',
     storageBucket: '<YOUR_STORAGE_BUCKET>',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyB7OPrF8jUCnVIjHkXTi11yzoaqQFNnTaY',
+    appId: '1:556788420487:web:99a9b9f573112e55090d22',
+    messagingSenderId: '556788420487',
+    projectId: 'mobile-games-2783a',
+    authDomain: 'mobile-games-2783a.firebaseapp.com',
+    databaseURL: 'https://mobile-games-2783a-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'mobile-games-2783a.appspot.com',
+  );
+
 }
